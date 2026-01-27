@@ -15,6 +15,12 @@
   src="https://cdn.jsdelivr.net/npm/@twemoji/api@latest/dist/twemoji.min.js"
   onload="window.twemojiLoaded = true"
 ></script>
+/* Quand le menu principal est ouvert, cache toutes les sections */
+.menu.active ~ #options,
+.menu.active ~ #quiz,
+.menu.active ~ #quiz-flash {
+  display: none !important;
+}
 <style>
 /* ========================================
    1. CSS DU PAYSAGE (de index.html)
@@ -977,7 +983,12 @@ body::before,
   display: flex; /* Visible quand activé */
 }
 
-
+/* Quand le menu principal est ouvert, cache toutes les sections */
+.menu.active ~ #options,
+.menu.active ~ #quiz,
+.menu.active ~ #quiz-flash {
+  display: none !important;
+}
 </style>
 
 
