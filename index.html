@@ -15,12 +15,7 @@
   src="https://cdn.jsdelivr.net/npm/@twemoji/api@latest/dist/twemoji.min.js"
   onload="window.twemojiLoaded = true"
 ></script>
-/* Quand le menu principal est ouvert, cache toutes les sections */
-.menu.active ~ #options,
-.menu.active ~ #quiz,
-.menu.active ~ #quiz-flash {
-  display: none !important;
-}
+
 <style>
 /* ========================================
    1. CSS DU PAYSAGE (de index.html)
@@ -4650,19 +4645,16 @@ let seuilValidation = parseInt(localStorage.getItem('difficulty')) || 6;
 let previousValidationStates = new Map();
 
 // --- Groupes de niveaux ---
+// Niveaux à exclure
 const GROUPES = {
-  1: { niveaux: [1, 2, 3], nom: "Groupe 1" },
-  2: { niveaux: [4, 5], nom: "Groupe 2" },
-  3: { niveaux: [6, 7, 8], nom: "Groupe 3" },
-  4: { niveaux: [9, 10, 11, 12], nom: "Groupe 4" },
-  5: { niveaux: [13, 14, 15, 16, 17], nom: "Groupe 5" },
-  6: { niveaux: [18, 19, 20, 21, 22], nom: "Groupe 6" },
-  7: { niveaux: [23, 24, 25, 26, 27], nom: "Groupe 7" },
-  8: { niveaux: [28, 29, 30, 31, 32, 33], nom: "Groupe 8" },
-  9: { niveaux: [34, 35, 36, 37, 38, 39], nom: "Groupe 9" },
-  10: { niveaux: [40, 41, 42, 43, 44, 45, 46], nom: "Groupe 10" }
+  1: { niveaux: [1, 2, 4], nom: "Groupe 1" },           // 3 niveaux
+  2: { niveaux: [6, 8, 9], nom: "Groupe 2" },           // 3 niveaux
+  3: { niveaux: [13, 15, 18], nom: "Groupe 3" },        // 3 niveaux
+  4: { niveaux: [19, 20, 23], nom: "Groupe 4" },        // 3 niveaux
+  5: { niveaux: [33, 39, 40], nom: "Groupe 5" },        // 3 niveaux
+  6: { niveaux: [41, 42, 43], nom: "Groupe 6" },        // 3 niveaux
+  7: { niveaux: [44, 45, 46], nom: "Groupe 7" }         // 3 niveaux
 };
-
 // --- Fonctions de gestion des données ---
 async function loadUserProgress() {
   if (!userToken) {
@@ -6494,6 +6486,17 @@ function deepWoodHit() {
 }
 
 // --- Sons de jeu ---
+
+function playQuestionSound() {
+  if (!soundEnabled) return;
+  
+  const audio = new Audio('https://emmanuel971-source.github.io/hirakataquizz/pop.mp3');
+  audio.volume = 0.5; // Ajustez le volume si besoin
+  audio.play().catch(err => console.log('Erreur son:', err));
+}
+
+
+
 function playMarioCoin() {
   playSound(() => playNotes([659.25, 1046.50], [0.1, 0.2]));
 }
@@ -8567,7 +8570,7 @@ setTimeout(() => {
   
   // Son de pop
   if (soundEnabled) {
-    playFireworkSound(); // Réutilise un son existant
+     playQuestionSound(); // ou un nom similaire
   }
   
   // Démarrer le timer
@@ -8659,14 +8662,47 @@ function flipCardAndReveal(item) {
 function showTrophyFlashcard(completedGroup) {
   const portal = document.getElementById('modal-portal');
   
+  // 🎨 Récupère les couleurs du paysage selon la saison
+  const season = document.getElementById('season')?.value || 'spring';
+  const timeOfDay = document.getElementById('timeOfDay')?.value || 'day';
+  
+  // Palettes de couleurs par saison
+  const seasonColors = {
+    spring: ['#FFB7C5', '#FFC8DD', '#98D8C8', '#C4E8C2'],
+    summer: ['#87CEEB', '#FFD700', '#FFA500', '#FF6B6B'],
+    autumn: ['#D2691E', '#FF8C42', '#CD853F', '#B8860B'],
+    winter: ['#4682B4', '#B0C4DE', '#778899', '#ADD8E6']
+  };
+  
+  // Ajuste selon moment de la journée (plus sombre la nuit)
+  let colors = seasonColors[season] || seasonColors.spring;
+  if (timeOfDay === 'night') {
+    colors = colors.map(c => {
+      // Assombrit les couleurs pour la nuit
+      const rgb = parseInt(c.slice(1), 16);
+      const r = Math.max(0, ((rgb >> 16) & 0xFF) * 0.6);
+      const g = Math.max(0, ((rgb >> 8) & 0xFF) * 0.6);
+      const b = Math.max(0, (rgb & 0xFF) * 0.6);
+      return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+    });
+  }
+  
+  // Choisit 2 couleurs aléatoires pour le gradient
+  const color1 = colors[Math.floor(Math.random() * colors.length)];
+  const color2 = colors[Math.floor(Math.random() * colors.length)];
+  
+  // 🏆 Emojis de trophées aléatoires
+  const trophyEmojis = ['🏆', '🥇', '🥈', '🥉', '🎖️', '👑', '⭐', '🌟'];
+  const randomTrophy = trophyEmojis[Math.floor(Math.random() * trophyEmojis.length)];
+  
   portal.innerHTML = `
-    <div class="revision-flashcard unlock-flashcard" style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);">
+    <div class="revision-flashcard unlock-flashcard" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%);">
       <div class="unlock-sparkles" style="position: absolute; top: 10%; left: 10%;">✨</div>
       <div class="unlock-sparkles" style="position: absolute; top: 10%; right: 10%; animation-delay: 0.3s;">✨</div>
       <div class="unlock-sparkles" style="position: absolute; bottom: 15%; left: 15%; animation-delay: 0.6s;">✨</div>
       <div class="unlock-sparkles" style="position: absolute; bottom: 15%; right: 15%; animation-delay: 0.9s;">✨</div>
       
-      <div style="font-size: 6em; margin-bottom: 0.3em;">🏆</div>
+      <div style="font-size: 6em; margin-bottom: 0.3em;">${randomTrophy}</div>
       <div style="font-size: 2.2em; font-weight: bold; color: #fff; text-shadow: 0 4px 8px rgba(0,0,0,0.3); margin-bottom: 0.5em;">
         ${t('quiz_flash_group_complete')}
       </div>
