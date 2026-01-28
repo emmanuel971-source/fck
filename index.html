@@ -4747,13 +4747,13 @@ if (totalTime < requiredTotalTime) {
         
         document.querySelector('.hamburger').classList.remove('hidden');
         
-        if (isApprentissageBloque()) {
-          console.log('🚫 Mode Apprendre bloqué → Redirection vers Mode Révision');
-          forceRevisionMode();
-        } else {
-          console.log('✅ Mode Apprendre débloqué → Redirection vers Mode Apprendre');
-          showSection('quiz');
-        }
+     //   if (isApprentissageBloque()) {
+     //     console.log('🚫 Mode Apprendre bloqué → Redirection vers Mode Révision');
+     //     forceRevisionMode();
+     //   } else {
+     //     console.log('✅ Mode Apprendre débloqué → Redirection vers Mode Apprendre');
+     //     showSection('quiz');
+     //   }
         
         updateAccountDisplay();
       }, 3500);
@@ -4852,7 +4852,7 @@ function showReturningUserWelcome(pseudo) {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: #F8F1E9;
+ //   background: #F8F1E9;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -4873,6 +4873,10 @@ function showReturningUserWelcome(pseudo) {
     text-align: center;
     padding: 0 20px;
     margin: 0 0 20px 0;
+  background: rgba(255, 255, 255, 0.7); /* Blanc 70% opacité */
+  padding: 10px 20px;
+  border-radius: 15px;
+  backdrop-filter: blur(5px); /* Flou du fond */
   `;
   title.textContent = `${t('welcome_back')} ${pseudo} ! 🎌`;
   
@@ -4886,6 +4890,10 @@ function showReturningUserWelcome(pseudo) {
     text-align: center;
     padding: 0 20px;
     margin: 0;
+  background: rgba(255, 255, 255, 0.7); /* Blanc 70% opacité */
+  padding: 10px 20px;
+  border-radius: 15px;
+  backdrop-filter: blur(5px); /* Flou du fond */
   `;
   subtitle.textContent = randomMessage;
   
@@ -4938,13 +4946,13 @@ setTimeout(() => {
   if (loadingText) loadingText.style.display = 'none';
   
   // ✅ NOUVEAU : Redirection intelligente
-  if (isApprentissageBloque()) {
-    console.log('🚫 Mode Apprendre bloqué → Redirection vers Mode Révision');
-    forceRevisionMode();
-  } else {
-    console.log('✅ Mode Apprendre débloqué → Redirection vers Mode Apprendre');
-    showSection('quiz');
-  }
+//  if (isApprentissageBloque()) {
+//    console.log('🚫 Mode Apprendre bloqué → Redirection vers Mode Révision');
+ //   forceRevisionMode();
+//  } else {
+ //   console.log('✅ Mode Apprendre débloqué → Redirection vers Mode Apprendre');
+//    showSection('quiz');
+//  }
   
   // Afficher le hamburger
   const hamburger = document.querySelector('.hamburger');
@@ -9316,6 +9324,14 @@ const menuEmojis = ['']
 function showSection(sectionId) {
   console.log('🔍 showSection appelée avec:', sectionId);
   
+  // ✅ DEBUG : Vérifier l'état de mode2
+  const mode2Section = document.getElementById('mode2');
+  console.log('📊 État mode2 AVANT:', {
+    display: mode2Section?.style.display,
+    hasActiveClass: mode2Section?.classList.contains('active'),
+    computedDisplay: window.getComputedStyle(mode2Section).display
+  });
+  
   // ✅ Arrêter le Quiz Flash si on quitte cette section
   if (sectionId !== 'quiz-flash' && typeof quizFlashState !== 'undefined' && quizFlashState.timerInterval) {
     console.log('🛑 Arrêt du Quiz Flash (changement de section)');
@@ -9397,6 +9413,20 @@ function showSection(sectionId) {
 document.querySelectorAll('.section').forEach(section => {
     section.classList.remove('active');
   });
+  
+  // ✅ NOUVEAU : Forcer le masquage complet de mode2 si on le quitte
+  if (sectionId !== 'mode2') {
+    const mode2Section = document.getElementById('mode2');
+    if (mode2Section) {
+      mode2Section.style.display = 'none';
+    }
+  } else {
+    const mode2Section = document.getElementById('mode2');
+    if (mode2Section) {
+      mode2Section.style.display = 'block';
+    }
+  }
+  
   document.getElementById(sectionId).classList.add('active');
   // ✅ Reset des Options à chaque entrée
 if (sectionId === 'options') {
@@ -9418,6 +9448,16 @@ if (sectionId === 'options') {
     }
     hasUnlockedInRevision = false;
     revisionMode.isActive = true;
+    
+    // ✅ NOUVEAU : Réafficher les éléments du mode révision
+    const revisionQuestion = document.getElementById('revision-question');
+    const revisionInputDisplay = document.getElementById('revision-input-display');
+    const revisionKeyboard = document.querySelector('.revision-keyboard');
+    
+    if (revisionQuestion) revisionQuestion.style.display = 'block';
+    if (revisionInputDisplay) revisionInputDisplay.style.display = 'block';
+    if (revisionKeyboard) revisionKeyboard.style.display = 'grid';
+    
     setTimeout(() => {
       initRevisionKeyboard();
       startRevisionQuestion();
@@ -9426,6 +9466,27 @@ if (sectionId === 'options') {
   } else {
     revisionMode.isActive = false;
     wasBlockedWhenEnteringRevision = false;
+    
+    // ✅ NOUVEAU : Nettoyer l'affichage du mode révision lors du retour au menu
+    const revisionQuestion = document.getElementById('revision-question');
+    const revisionInputDisplay = document.getElementById('revision-input-display');
+    const unlockProgressContainer = document.getElementById('unlock-progress-container');
+    const revisionKeyboard = document.querySelector('.revision-keyboard');
+    
+    if (revisionQuestion) {
+      revisionQuestion.innerHTML = '';
+      revisionQuestion.style.display = 'none';
+    }
+    if (revisionInputDisplay) {
+      revisionInputDisplay.innerHTML = '';
+      revisionInputDisplay.style.display = 'none';
+    }
+    if (unlockProgressContainer) {
+      unlockProgressContainer.style.display = 'none';
+    }
+    if (revisionKeyboard) {
+      revisionKeyboard.style.display = 'none';
+    }
   }
   
   // ✅ NOUVEAU : Générer une question quand on ouvre le mode Apprendre
@@ -9470,8 +9531,18 @@ if (sectionId === 'stats') {
     }, 100);
   }
 
-
-
+  // À la fin de la fonction, ajouter :
+  console.log('📊 État mode2 APRÈS:', {
+    display: mode2Section?.style.display,
+    hasActiveClass: mode2Section?.classList.contains('active'),
+    computedDisplay: window.getComputedStyle(mode2Section).display
+  });
+  
+  const revisionKeyboard = document.querySelector('.revision-keyboard');
+  console.log('⌨️ État clavier:', {
+    display: revisionKeyboard?.style.display,
+    computedDisplay: window.getComputedStyle(revisionKeyboard).display
+  });
 }
 function toggleMenu() {
   const menu = document.getElementById('menu');
@@ -9489,6 +9560,34 @@ function toggleMenu() {
     } catch (e) {
       console.warn('⚠️ Erreur arrêt quiz:', e);
     }
+    
+    // ✅ NOUVEAU : Masquer les sections actives quand on ouvre le menu
+    const mode2Section = document.getElementById('mode2');
+    const statsSection = document.getElementById('stats');
+    
+    if (mode2Section && mode2Section.classList.contains('active')) {
+      mode2Section.style.display = 'none';
+      console.log('🔧 Mode2 masqué temporairement pour afficher le menu');
+    }
+    
+    if (statsSection && statsSection.classList.contains('active')) {
+      statsSection.style.display = 'none';
+      console.log('🔧 Stats masqué temporairement pour afficher le menu');
+    }
+  } else {
+    // Si on FERME le menu, réafficher les sections qui étaient actives
+    const mode2Section = document.getElementById('mode2');
+    const statsSection = document.getElementById('stats');
+    
+    if (mode2Section && mode2Section.classList.contains('active')) {
+      mode2Section.style.display = 'block';
+      console.log('🔧 Mode2 réaffiché après fermeture du menu');
+    }
+    
+    if (statsSection && statsSection.classList.contains('active')) {
+      statsSection.style.display = 'block';
+      console.log('🔧 Stats réaffiché après fermeture du menu');
+    }
   }
   
   menu.classList.toggle('active');
@@ -9501,10 +9600,10 @@ function toggleMenu() {
       hamburger.classList.remove('hidden');
     }
   }
-if (menu.classList.contains('active')) {
-  setMenuEmojiOnOpen();
-}
-
+  
+  if (menu.classList.contains('active')) {
+    setMenuEmojiOnOpen();
+  }
 
   // ✅ NOUVEAU : Fermer les modales contact si elles sont ouvertes
   if (menu.classList.contains('active')) {
@@ -9527,7 +9626,6 @@ if (menu.classList.contains('active')) {
     updateMenuButtonStates();
   }
 }
-
 function setMenuEmoji(emoji) {
   const el = document.getElementById('menu-emoji');
   if (!el) return;
@@ -10647,8 +10745,8 @@ panda.addEventListener("click", async () => {
     pointsGagnesEnRevision = 0;
     
     setTimeout(() => {
-      showSection('mode2');
-    }, 100);
+   //   showSection('mode2');
+    }, 5000);
   }
   
   nextQuestion();
