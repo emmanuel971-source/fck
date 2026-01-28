@@ -6837,6 +6837,17 @@ function deepWoodHit() {
 }
 
 // --- Sons de jeu ---
+
+function playQuestionSound() {
+  if (!soundEnabled) return;
+  
+  const audio = new Audio('https://emmanuel971-source.github.io/hirakataquizz/pop.mp3');
+  audio.volume = 0.5; // Ajustez le volume si besoin
+  audio.play().catch(err => console.log('Erreur son:', err));
+}
+
+
+
 function playMarioCoin() {
   playSound(() => playNotes([659.25, 1046.50], [0.1, 0.2]));
 }
@@ -7047,6 +7058,8 @@ function sadSoundFlashcard() {
 // --- Initialisation au chargement ---
 loadSoundSettings();
 updateSoundUI();
+
+
 // ============================================================================
 // 📈 SECTION 6 : PROGRESSION & NIVEAUX
 // ============================================================================
@@ -11307,6 +11320,16 @@ let quizFlashState = {
   totalTime: 0
 };
 
+const GROUPES_flashquiz = {
+  1: { niveaux: [1, 2, 4], nom: "Groupe 1" },           // 3 niveaux
+  2: { niveaux: [6, 8, 9], nom: "Groupe 2" },           // 3 niveaux
+  3: { niveaux: [13, 15, 18], nom: "Groupe 3" },        // 3 niveaux
+  4: { niveaux: [19, 20, 23], nom: "Groupe 4" },        // 3 niveaux
+  5: { niveaux: [33, 39, 40], nom: "Groupe 5" },        // 3 niveaux
+  6: { niveaux: [41, 42, 43], nom: "Groupe 6" },        // 3 niveaux
+  7: { niveaux: [44, 45, 46], nom: "Groupe 7" }         // 3 niveaux
+};
+
 // === 4️⃣ FONCTIONS PRINCIPALES ===
 
 function startQuizFlash(groupNumber = 1) {
@@ -11333,7 +11356,7 @@ function startQuizFlash(groupNumber = 1) {
   showNextQuestion();
 }
 function loadQuizGroup(groupNumber) {
-  const group = GROUPES[groupNumber];
+  const group = GROUPES_flashquiz[groupNumber];
   
   if (!group) {
     console.error(`❌ Groupe ${groupNumber} introuvable`);
@@ -11369,25 +11392,37 @@ function showNextQuestion() {
   document.getElementById('flashCounter').textContent = 
     `${currentQuestionIndex + 1}/${questionsPool.length}`;
   document.getElementById('flashGroupName').textContent = 
-    GROUPES[currentGroup].nom;
+    GROUPES_flashquiz[currentGroup].nom;
   
-  // Réinitialiser la carte (face avant)
-  const card = document.getElementById('flashCard');
-  card.classList.remove('flipped');
-  quizFlashState.isFlipped = false;
-  
-  // Afficher l'hiragana
-  document.getElementById('flashHiragana').textContent = item.Hiragana;
+// Réinitialiser la carte (face avant)
+const card = document.getElementById('flashCard');
+
+// ✅ VIDER D'ABORD le contenu de la face arrière
+document.getElementById('flashHiraganaSmall').textContent = '';
+document.getElementById('flashRomaji').textContent = '';
+
+// Ensuite retirer la classe flipped
+card.classList.remove('flipped');
+quizFlashState.isFlipped = false;
+
+// Puis afficher le nouvel hiragana sur la face avant
+document.getElementById('flashHiragana').textContent = item.Hiragana;
+
+// ✅ ATTENDRE que l'animation soit terminée pour remplir la face arrière
+setTimeout(() => {
   document.getElementById('flashHiraganaSmall').textContent = item.Hiragana;
   document.getElementById('flashRomaji').textContent = item.Romaji;
-  
+  safeConvertEmojis(document.getElementById('flashHiraganaSmall'));
+}, 600); // 600ms = durée de l'animation de flip
+
+
   // Convertir les emojis
   safeConvertEmojis(document.getElementById('flashHiragana'));
   safeConvertEmojis(document.getElementById('flashHiraganaSmall'));
   
   // Son de pop
   if (soundEnabled) {
-    playFireworkSound(); // Réutilise un son existant
+     playQuestionSound(); // ou un nom similaire
   }
   
   // Démarrer le timer
@@ -11395,52 +11430,61 @@ function showNextQuestion() {
 }
 
 function startFlashTimer(item) {
-  // Stopper le timer précédent
   if (quizFlashState.timerInterval) {
     clearInterval(quizFlashState.timerInterval);
   }
-  
-  // Déterminer la durée selon la difficulté
+
   const difficulty = parseInt(localStorage.getItem('difficulty')) || 6;
-  let duration;
-  
-  if (difficulty <= 4) {
-    duration = 5; // Facile
-  } else if (difficulty <= 6) {
-    duration = 4; // Moyen
-  } else {
-    duration = 3; // Difficile
-  }
-  
+  const duration = difficulty <= 4 ? 5 : difficulty <= 6 ? 4 : 3;
+
   quizFlashState.totalTime = duration;
   quizFlashState.timeRemaining = duration;
-  
+
   const timerBar = document.getElementById('flashTimerBar');
-  const startTime = Date.now();
-  
-  quizFlashState.timerInterval = setInterval(() => {
-    const elapsed = (Date.now() - startTime) / 1000;
-    const remaining = Math.max(0, duration - elapsed);
-    const percentage = (remaining / duration) * 100;
-    
-    quizFlashState.timeRemaining = remaining;
-    timerBar.style.width = percentage + '%';
-    
-    // Changer la couleur selon le temps restant
-    timerBar.classList.remove('warning', 'danger');
-    if (percentage <= 30) {
-      timerBar.classList.add('danger');
-    } else if (percentage <= 60) {
-      timerBar.classList.add('warning');
-    }
-    
-    // Timer terminé
-    if (remaining <= 0) {
-      clearInterval(quizFlashState.timerInterval);
-      flipCardAndReveal(item);
-    }
-  }, 50);
+
+  // 🔒 Désactiver transitions et lueur
+  timerBar.classList.add('no-transition', 'no-shine');
+  timerBar.classList.remove('warning', 'danger', 'flash-start');
+
+  timerBar.style.width = '100%';
+  timerBar.offsetHeight; // force repaint
+
+  // 💥 Flash initial
+  timerBar.classList.add('flash-start');
+  setTimeout(() => timerBar.classList.remove('flash-start'), 200);
+
+  // 🔄 Relancer le timer après 250ms
+  setTimeout(() => {
+    timerBar.classList.remove('no-transition', 'no-shine'); // ✅ réactive transition et lueur
+
+    const startTime = Date.now();
+
+    quizFlashState.timerInterval = setInterval(() => {
+      const elapsed = (Date.now() - startTime) / 1000;
+      const remaining = Math.max(0, duration - elapsed);
+      const percentage = (remaining / duration) * 100;
+
+      quizFlashState.timeRemaining = remaining;
+      timerBar.style.width = percentage + '%';
+// ✅ AJOUTER CES 2 LIGNES
+const timerContainer = document.querySelector('.quiz-flash-timer');
+timerContainer.style.setProperty('--shine-opacity', percentage > 0 ? '1' : '0');
+
+      timerBar.classList.remove('warning', 'danger');
+      if (percentage <= 30) timerBar.classList.add('danger');
+      else if (percentage <= 60) timerBar.classList.add('warning');
+
+      // 🔥 STOP lueur si barre vide
+      if (remaining <= 0) {
+        timerBar.classList.add('no-shine'); // arrête l’animation
+        clearInterval(quizFlashState.timerInterval);
+        flipCardAndReveal(item);
+      }
+    }, 50);
+
+  }, 250);
 }
+
 
 function flipCardAndReveal(item) {
   const card = document.getElementById('flashCard');
@@ -11470,19 +11514,52 @@ function flipCardAndReveal(item) {
 function showTrophyFlashcard(completedGroup) {
   const portal = document.getElementById('modal-portal');
   
+  // 🎨 Récupère les couleurs du paysage selon la saison
+  const season = document.getElementById('season')?.value || 'spring';
+  const timeOfDay = document.getElementById('timeOfDay')?.value || 'day';
+  
+  // Palettes de couleurs par saison
+  const seasonColors = {
+    spring: ['#FFB7C5', '#FFC8DD', '#98D8C8', '#C4E8C2'],
+    summer: ['#87CEEB', '#FFD700', '#FFA500', '#FF6B6B'],
+    autumn: ['#D2691E', '#FF8C42', '#CD853F', '#B8860B'],
+    winter: ['#4682B4', '#B0C4DE', '#778899', '#ADD8E6']
+  };
+  
+  // Ajuste selon moment de la journée (plus sombre la nuit)
+  let colors = seasonColors[season] || seasonColors.spring;
+  if (timeOfDay === 'night') {
+    colors = colors.map(c => {
+      // Assombrit les couleurs pour la nuit
+      const rgb = parseInt(c.slice(1), 16);
+      const r = Math.max(0, ((rgb >> 16) & 0xFF) * 0.6);
+      const g = Math.max(0, ((rgb >> 8) & 0xFF) * 0.6);
+      const b = Math.max(0, (rgb & 0xFF) * 0.6);
+      return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+    });
+  }
+  
+  // Choisit 2 couleurs aléatoires pour le gradient
+  const color1 = colors[Math.floor(Math.random() * colors.length)];
+  const color2 = colors[Math.floor(Math.random() * colors.length)];
+  
+  // 🏆 Emojis de trophées aléatoires
+  const trophyEmojis = ['🏆', '🥇', '🥈', '🥉', '🎖️', '👑', '⭐', '🌟'];
+  const randomTrophy = trophyEmojis[Math.floor(Math.random() * trophyEmojis.length)];
+  
   portal.innerHTML = `
-    <div class="revision-flashcard unlock-flashcard" style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);">
+    <div class="revision-flashcard unlock-flashcard" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%);">
       <div class="unlock-sparkles" style="position: absolute; top: 10%; left: 10%;">✨</div>
       <div class="unlock-sparkles" style="position: absolute; top: 10%; right: 10%; animation-delay: 0.3s;">✨</div>
       <div class="unlock-sparkles" style="position: absolute; bottom: 15%; left: 15%; animation-delay: 0.6s;">✨</div>
       <div class="unlock-sparkles" style="position: absolute; bottom: 15%; right: 15%; animation-delay: 0.9s;">✨</div>
       
-      <div style="font-size: 6em; margin-bottom: 0.3em;">🏆</div>
+      <div style="font-size: 6em; margin-bottom: 0.3em;">${randomTrophy}</div>
       <div style="font-size: 2.2em; font-weight: bold; color: #fff; text-shadow: 0 4px 8px rgba(0,0,0,0.3); margin-bottom: 0.5em;">
         ${t('quiz_flash_group_complete')}
       </div>
       <div style="font-size: 1.5em; color: #fff; opacity: 0.9;">
-        ${GROUPES[completedGroup].nom} terminé !
+        ${GROUPES_flashquiz[completedGroup].nom} terminé !
       </div>
     </div>
   `;
@@ -11515,7 +11592,7 @@ function showTrophyFlashcard(completedGroup) {
       
       // Passer au groupe suivant s'il existe
       const nextGroup = completedGroup + 1;
-      if (GROUPES[nextGroup]) {
+      if (GROUPES_flashquiz[nextGroup]) {
         startQuizFlash(nextGroup);
       } else {
         // Tous les groupes terminés - retour au menu
@@ -11551,6 +11628,7 @@ function shuffleArray(array) {
   }
   return shuffled;
 }
+
 </script>
 
 </script>
