@@ -1069,9 +1069,10 @@ body::before,
 <div id="menu-emoji-header" class="menu-emoji-header">
   <span id="menu-emoji"></span>
 </div>
-  
+    <button class="arcade-button" onclick="showSection('quiz')" data-i18n="menu_learn">Apprendre</button>
+  <button class="arcade-button" id="revision-button" onclick="showSection('mode2')" data-i18n="menu_revision">Mode révisions</button>
   <button class="arcade-button" onclick="startQuizFlash(1)" data-i18n="menu_quiz_flash">Quiz Flash</button>
-
+  <button class="arcade-button" onclick="showSection('stats')" data-i18n="menu_stats">Mes stats</button>
   <button class="arcade-button" onclick="showSection('options')" data-i18n="menu_options">Options</button>
 </nav>
 
@@ -1091,6 +1092,7 @@ body::before,
 </div>
 </div>
   <!-- Section Menu -->
+
 
 
 <!-- Section Quiz -->
@@ -1114,6 +1116,49 @@ body::before,
 </div>
     </div>
   </div>
+
+  <!-- Section Mode Katakana -->
+<!-- Section Mode révisions -->
+<div id="mode2" class="section">
+<!--  <h2 data-i18n="revision_title">🎌⛩️ Réviser les Kanas ⛩️🎌</h2>  -->
+<div id="unlock-progress-container" class="unlock-progress-container" style="display: none;">
+  <div class="unlock-progress-bar">
+    <div class="unlock-progress-fill" id="unlock-progress-fill"></div>
+  </div>
+</div>
+
+  <div id="revision-question"></div>
+  
+  <div id="revision-input-display"></div>
+    <div class="revision-keyboard">
+    <div class="revision-key">a</div>
+    <div class="revision-key">i</div>
+    <div class="revision-key">u</div>
+    <div class="revision-key">e</div>
+    <div class="revision-key">o</div>
+    <div class="revision-key">k</div>
+    <div class="revision-key">g</div>
+    <div class="revision-key">y</div>
+    <div class="revision-key">h</div>
+    <div class="revision-key">f</div>
+    <div class="revision-key">t</div>
+    <div class="revision-key">ts</div>
+    <div class="revision-key">d</div>
+    <div class="revision-key">b</div>
+    <div class="revision-key">p</div>
+    <div class="revision-key">s</div>
+    <div class="revision-key">sh</div>
+    <div class="revision-key">z</div>
+    <div class="revision-key">j</div>
+    <div class="revision-key">ch</div>
+    <div class="revision-key">m</div>
+    <div class="revision-key">n</div>
+    <div class="revision-key">r</div>
+    <div class="revision-key">w</div>
+    <div class="revision-key" id="revision-back">←</div>
+  </div>
+
+</div>
 
 
 
@@ -1289,7 +1334,293 @@ body::before,
   </div>
 </div>
 </div>
+<!-- ========================================
+     HTML À AJOUTER APRÈS LA SECTION OPTIONS
+     ======================================== -->
 
+<!-- Section Mon compte -->
+<div id="account" class="section">
+  <h1 data-i18n="account_title">Mon compte</h1>
+  
+  <div class="account-section">
+    <div class="account-info">
+      <div class="account-info-line">
+  🐼 <strong data-i18n="account_pseudo_label">Pseudo :</strong> <span id="account-pseudo" data-i18n="account_default_value">-</span>
+</div>
+<div class="account-info-line">
+  📊 <strong data-i18n="account_level_label">Niveau :</strong> <span id="account-level" data-i18n="account_default_value">-</span>
+</div>
+    </div>
+
+    <div class="button-group">
+      <button class="arcade-button" onclick="showChangeDevice()" data-i18n="account_change_device">
+        📱 Changer d'appareil
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<!-- Section Création de compte - ÉTAPE 1 : Choix du  -->
+<div id="create-account" class="section">
+  <div id="onboarding-step-1" class="onboarding-step active">
+    <h1 class="onboarding-title" data-i18n="onboarding_welcome">Bienvenue ! 🌸</h1>
+    
+    <div class="onboarding-content">
+      <p class="onboarding-subtitle" data-i18n="onboarding_subtitle">Commençons ton voyage zen</p>
+      
+      <div class="onboarding-buttons">
+        <button class="arcade-button large-button" onclick="goToStep(2)" data-i18n="onboarding_create">
+          🎋 Créer un compte
+        </button>
+        <button class="arcade-button secondary-button large-button" onclick="showLoginFromOnboarding()" data-i18n="onboarding_login">
+          🔐 J'ai déjà un compte
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 2 : Choix du pseudo -->
+  <div id="onboarding-step-2" class="onboarding-step">
+    <h1 class="onboarding-title" data-i18n="onboarding_pseudo_title">Choisissons ton pseudo zen 🐼</h1>
+    
+    <div class="onboarding-content">
+      <div class="pseudo-input-wrapper">
+<input 
+  type="text" 
+  id="pseudo-input" 
+  class="pseudo-input" 
+  data-i18n-placeholder="pseudo_input_placeholder"
+  placeholder="Ton pseudo..."
+  maxlength="20"
+/>
+      </div>
+<!-- ✅ AJOUTÉ : Honeypot (piège à bot) -->
+<input 
+  type="text" 
+  id="website" 
+  name="website" 
+  style="position: absolute; left: -9999px; opacity: 0; pointer-events: none;"
+  tabindex="-1"
+  autocomplete="off"
+  aria-hidden="true"
+/>
+      <div id="create-error" class="error-message" style="display: none;"></div>
+
+      <div class="onboarding-buttons">
+        <button class="arcade-button" onclick="generateNewPseudo()" data-i18n="onboarding_regenerate">
+          🔄 Changer de pseudo
+        </button>
+        <button class="arcade-button primary-button" onclick="validatePseudoAndContinue()" data-i18n="onboarding_next">
+          Suivant ➡️
+        </button>
+      </div>
+    </div>
+  </div>
+
+<!-- ÉTAPE 3 : Saisie du PIN -->
+<div id="onboarding-step-3" class="onboarding-step">
+  <h1 class="onboarding-title" data-i18n="onboarding_pin_title">Sécurise ton compte 🔐</h1>
+  
+  <div class="onboarding-content">
+    <p class="onboarding-subtitle" data-i18n="onboarding_pin_subtitle">Entre ta date de naissance</p>
+    
+    <div class="birthdate-selectors">
+      <div class="selector-group">
+        <label class="selector-label" data-i18n="onboarding_day">Jour</label>
+        <select id="birth-day" class="birthdate-select">
+          <option value="">--</option>
+        </select>
+      </div>
+      
+      <div class="selector-group">
+        <label class="selector-label" data-i18n="onboarding_month">Mois</label>
+        <select id="birth-month" class="birthdate-select">
+          <option value="">--</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="pin-error" class="error-message" style="display: none;"></div>
+
+    <div class="onboarding-buttons">
+      <button class="arcade-button secondary-button small-button" onclick="goToStep(2)">
+        ← <span data-i18n="onboarding_back">Retour</span>
+      </button>
+      <button class="arcade-button primary-button" onclick="validateBirthdateAndContinue()" data-i18n="onboarding_next">
+        Suivant ➡️
+      </button>
+    </div>
+  </div>
+</div>
+
+  <!-- ÉTAPE 4 : Confirmation -->
+  <div id="onboarding-step-4" class="onboarding-step">
+    <h1 class="onboarding-title" data-i18n="onboarding_confirm_title">Confirme ta date 📅</h1>
+    
+    <div class="onboarding-content">
+      <div class="confirmation-box">
+        <p class="confirmation-question" data-i18n="onboarding_confirm_question">Tu es né(e) le</p>
+<p class="confirmation-date">
+  <span id="confirm-date-display" class="date-value"></span>
+  <span> ?</span>
+</p>
+
+
+        </div>
+
+      <div class="warning-box">
+        <p data-i18n="onboarding_warning">⚠️ Cette date te servira à récupérer ton compte</p>
+      </div>
+
+      <div class="onboarding-buttons">
+        <button class="arcade-button secondary-button" onclick="goToStep(3)" data-i18n="onboarding_correct">
+          ✏️ Corriger
+        </button>
+        <button class="arcade-button primary-button" onclick="finalizeAccount()" data-i18n="onboarding_confirm">
+          ✅ C'est correct
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Écran de chargement création compte -->
+<div id="account-creation-loader" class="section" style="display: none;">
+  <div class="zen-loader-container">
+    <div class="zen-circle-loader">
+      <div class="bamboo-leaf">🍃</div>
+    </div>
+    <p class="zen-loader-text" data-i18n="loader_preparing">Préparation de ton jardin zen...</p>
+  </div>
+</div>
+
+<!-- Écran de bienvenue -->
+<div id="welcome-screen" class="section" style="display: none;">
+  <div class="welcome-animation-container">
+    <div class="sakura-rain"></div>
+    <h1 class="welcome-user-title"></h1>
+    <p class="welcome-user-subtitle" data-i18n="welcome_journey_starts">Ton voyage commence maintenant 🌸</p>
+  </div>
+</div> 
+  
+</div>
+
+<!-- Section Connexion (changement d'appareil) -->
+<div id="login" class="section">
+  <h1 data-i18n="login_title">Connexion 🔐</h1>
+  
+  <div class="account-section">
+    <p data-i18n="login_subtitle">Retrouve ton compte</p>
+
+      <!-- Pseudo -->
+      <div class="pseudo-input-wrapper">
+  <!--        <label class="selector-label" data-i18n="login_pseudo_label">Ton pseudo</label> -->
+        <input 
+  type="text" 
+  id="login-pseudo" 
+  class="pseudo-input" 
+  data-i18n-placeholder="login_pseudo_placeholder"
+  placeholder="ton pseudo"
+/>
+      </div>
+
+      <!-- Date de naissance (même style que l'onboarding) -->
+     <p data-i18n="login_pin_label">Ta date d'anniversaire :</p>
+
+      <div class="birthdate-selectors" style="margin-top: 20px;">
+        <div class="selector-group">
+          <label class="selector-label" data-i18n="onboarding_day">Jour</label>
+          <select id="login-birth-day" class="birthdate-select">
+            <option value="">--</option>
+          </select>
+        </div>
+        
+        <div class="selector-group">
+          <label class="selector-label" data-i18n="onboarding_month">Mois</label>
+          <select id="login-birth-month" class="birthdate-select">
+            <option value="">--</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="login-error" class="error-message" style="display: none;"></div>
+      <div id="login-success" class="success-message" style="display: none;"></div>
+
+      <div class="onboarding-buttons">
+        <button class="arcade-button primary-button" onclick="loginUser()" data-i18n="login_connect">
+          🎋 Me connecter
+        </button>
+      
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="login-loader" class="section" style="display: none;">
+  <div class="zen-loader-container">
+    <div class="zen-circle-loader">
+      <div class="bamboo-leaf">🍃</div>
+    </div>
+    <p class="zen-loader-text" data-i18n="loader_preparing">Préparation de ton jardin zen...</p>
+  </div>
+</div>
+    <!-- Section Mes Stats -->
+<!-- Section Mon Jardin -->
+<div id="stats" class="section">
+<!--  <h1 data-i18n="stats_title">Mon Jardin</h1>  -->
+
+<!-- Légende sticky -->
+<div id="garden-legend" class="garden-legend">
+  <span><span>🌱</span> <span data-i18n="garden_legend_learning">En cours</span></span>
+  <span><span>🌿</span> <span data-i18n="garden_legend_practice">À entretenir</span></span>
+  <span><span>🌸</span> <span data-i18n="garden_legend_mastered">Maîtrisé</span></span>
+</div>
+
+  <!-- Jardin scrollable -->
+  <div class="garden-container">
+    <div class="garden-ground" id="garden-ground">
+      <!-- Généré par JS -->
+    </div>
+
+    <!-- Quelques décors fixes (tu peux en ajouter/supprimer) -->
+<!-- Décors zen en vrais émojis (tu peux en ajouter/supprimer à l'infini) -->
+<!-- 
+<div class="garden-decor" style="top:8%;left:4%;font-size:3.8em;transform:rotate(-12deg);">🎋</div>
+<div class="garden-decor" style="bottom:12%;right:6%;font-size:4.2em;transform:rotate(20deg);">🌾</div>
+<div class="garden-decor" style="top:25%;left:2%;font-size:3em;">🌵</div>
+<div class="garden-decor" style="bottom:30%;right:2%;font-size:3.5em;transform:rotate(8deg);">🌳</div>
+<div class="garden-decor" style="top:45%;right:8%;font-size:2.8em;transform:rotate(-15deg);">🍂</div>
+<div class="garden-decor" style="bottom:5%;left:10%;font-size:4.5em;opacity:0.5;">🎋</div>
+<div class="garden-decor" style="top:15%;left:12%;font-size:3.2em;transform:rotate(25deg);">🎍</div>
+  </div>
+-->
+<!-- Flashcard modale zen -->
+<div id="garden-modal" class="garden-modal" onclick="closeGardenModal()">
+  <div class="garden-card" onclick="event.stopPropagation()"> <!-- empêche la fermeture si on clique dedans -->
+    <div id="modal-plant" style="font-size:4.2em; margin-bottom:0.6em;"></div>
+<h2 id="modal-hiragana" style="margin:0 0 0.35em 0; font-size:4em; font-weight:bold; line-height:1.1;"></h2>
+<div class="katakana" id="modal-katakana" style="font-size:3.4em; color:#6B5D4F; font-weight:bold; margin:0 0 0.35em 0; line-height:1.1;"></div>
+    <div class="romaji" id="modal-romaji" style="font-size:3.6em; color:#8B6F47; font-weight:bold; margin:0 0 0.6em 0; line-height:1.1;"></div>
+    <div class="info">
+  <span data-i18n="garden_level"></span>
+  <span id="modal-level"></span> •
+  <span data-i18n="garden_score"></span>
+  <span id="modal-validation"></span>
+</div>
+  </div>
+</div>
+
+<!-- Flashcard modale insecte test -->  
+<div id="insect-modal" class="garden-modal">
+  <div class="garden-card insect-card">
+    <div id="insect-emoji" class="garden-plant"></div>
+    <div id="insect-text" class="garden-hiragana"></div>
+  </div>
+</div>
+
+    
+</div>
+</div>  
  <!-- ========================================
      PORTAL POUR TOUTES LES MODALES
      ======================================== -->
@@ -2768,7 +3099,6 @@ updateDepthBlur();
    2. CODE DU QUIZ (du fichier quiz)
    ======================================== */
 
-
 "use strict";
 // ============================================================================
 // 🌍 SECTION 1 : TRADUCTIONS & INTERNATIONALISATION
@@ -3645,7 +3975,11 @@ function setLanguage(lang) {
     }
     
     updateAllTexts();
-  
+    if (revisionMode.isActive) {
+  startRevisionQuestion();
+} else {
+  nextQuestion();
+}
   }
 }
 function updateAllTexts() {
@@ -3667,8 +4001,10 @@ function updateAllTexts() {
   // Mettre à jour les titres des sections
   updateSectionTitles();
   
+  // Mettre à jour les messages du menu si visible
+  updateMenuMessage();
 
-
+updateAccountDisplay();
   
   // Mettre à jour le message de chargement si présent
   const loadingText = document.getElementById("loadingText");
@@ -4413,7 +4749,7 @@ if (totalTime < requiredTotalTime) {
         
         if (isApprentissageBloque()) {
           console.log('🚫 Mode Apprendre bloqué → Redirection vers Mode Révision');
-        
+          forceRevisionMode();
         } else {
           console.log('✅ Mode Apprendre débloqué → Redirection vers Mode Apprendre');
           showSection('quiz');
@@ -4604,7 +4940,7 @@ setTimeout(() => {
   // ✅ NOUVEAU : Redirection intelligente
   if (isApprentissageBloque()) {
     console.log('🚫 Mode Apprendre bloqué → Redirection vers Mode Révision');
-   
+    forceRevisionMode();
   } else {
     console.log('✅ Mode Apprendre débloqué → Redirection vers Mode Apprendre');
     showSection('quiz');
@@ -4645,16 +4981,19 @@ let seuilValidation = parseInt(localStorage.getItem('difficulty')) || 6;
 let previousValidationStates = new Map();
 
 // --- Groupes de niveaux ---
-// Niveaux à exclure
 const GROUPES = {
-  1: { niveaux: [1, 2, 4], nom: "Groupe 1" },           // 3 niveaux
-  2: { niveaux: [6, 8, 9], nom: "Groupe 2" },           // 3 niveaux
-  3: { niveaux: [13, 15, 18], nom: "Groupe 3" },        // 3 niveaux
-  4: { niveaux: [19, 20, 23], nom: "Groupe 4" },        // 3 niveaux
-  5: { niveaux: [33, 39, 40], nom: "Groupe 5" },        // 3 niveaux
-  6: { niveaux: [41, 42, 43], nom: "Groupe 6" },        // 3 niveaux
-  7: { niveaux: [44, 45, 46], nom: "Groupe 7" }         // 3 niveaux
+  1: { niveaux: [1, 2, 3], nom: "Groupe 1" },
+  2: { niveaux: [4, 5], nom: "Groupe 2" },
+  3: { niveaux: [6, 7, 8], nom: "Groupe 3" },
+  4: { niveaux: [9, 10, 11, 12], nom: "Groupe 4" },
+  5: { niveaux: [13, 14, 15, 16, 17], nom: "Groupe 5" },
+  6: { niveaux: [18, 19, 20, 21, 22], nom: "Groupe 6" },
+  7: { niveaux: [23, 24, 25, 26, 27], nom: "Groupe 7" },
+  8: { niveaux: [28, 29, 30, 31, 32, 33], nom: "Groupe 8" },
+  9: { niveaux: [34, 35, 36, 37, 38, 39], nom: "Groupe 9" },
+  10: { niveaux: [40, 41, 42, 43, 44, 45, 46], nom: "Groupe 10" }
 };
+
 // --- Fonctions de gestion des données ---
 async function loadUserProgress() {
   if (!userToken) {
@@ -5677,7 +6016,7 @@ console.log('🔍 DEBUG 4 - clientTruth AVANT update:', {
 
   const id = params.id.toString();
   const scorePoints = parseFloat(params.scorePoints || 0);
-
+  const isRevisionMode = params.isRevisionMode === true;
 
   // Initialiser l’item si nécessaire
   if (!clientTruth.stats_json[id]) {
@@ -5697,7 +6036,19 @@ console.log('🔍 DEBUG 4 - clientTruth AVANT update:', {
   // Calcul validation (copie STRICTE de la logique serveur)
   let newValidation;
 
- 
+  if (isRevisionMode) {
+    if (scorePoints === 1) {
+      newValidation = item.validation + 1;
+    } else {
+      newValidation = Math.max(5, item.validation - 2);
+    }
+  } else {
+    let validationChange =
+      scorePoints === 1 ? 1 :
+      scorePoints === 0.5 ? -1 : -2;
+
+    newValidation = Math.max(0, item.validation + validationChange);
+  }
 
   item.validation = newValidation;
 
@@ -6175,7 +6526,7 @@ async function processUpdates() {
         token: update.token,
         id: update.id,
         scorePoints: update.scorePoints,
-      
+        isRevisionMode: update.isRevisionMode
       };
 
       const result = await callAPI('updateStats', apiParams);
@@ -6486,17 +6837,6 @@ function deepWoodHit() {
 }
 
 // --- Sons de jeu ---
-
-function playQuestionSound() {
-  if (!soundEnabled) return;
-  
-  const audio = new Audio('https://emmanuel971-source.github.io/hirakataquizz/pop.mp3');
-  audio.volume = 0.5; // Ajustez le volume si besoin
-  audio.play().catch(err => console.log('Erreur son:', err));
-}
-
-
-
 function playMarioCoin() {
   playSound(() => playNotes([659.25, 1046.50], [0.1, 0.2]));
 }
@@ -6707,7 +7047,6 @@ function sadSoundFlashcard() {
 // --- Initialisation au chargement ---
 loadSoundSettings();
 updateSoundUI();
-
 // ============================================================================
 // 📈 SECTION 6 : PROGRESSION & NIVEAUX
 // ============================================================================
@@ -6871,12 +7210,15 @@ function renderProgressBar(currentLevel, maxLevel) {
 }
 
 function renderHiraganaCards(list, niveau) {
+console.trace('📍 Stack:')
+  console.log('🎴 renderHiraganaCards appelée');
   const container = document.getElementById("hiraganaCards");
   if (!container) return;
-
+  console.log('🎴 Avant innerHTML:', container.children.length, 'cartes');
   const items = getItemsByLevel(list, niveau);
+  console.log('🎴 Items retournés:', items.length);
   container.innerHTML = "";
-
+  console.log('🎴 Après innerHTML:', container.children.length, 'cartes');
   items.forEach(item => {
     const validation = parseInt(item.Validation || 0, 10);
     const card = document.createElement("div");
@@ -6892,6 +7234,7 @@ function renderHiraganaCards(list, niveau) {
     container.appendChild(card);
     previousValidationStates.set(parseInt(item.ID, 10), validation);
   });
+  console.log('🎴 Après appendChild:', container.children.length, 'cartes');
 }
 
 function updateStarsForHiragana(hiraganaId, newValidation) {
@@ -6926,6 +7269,1180 @@ function updateStarsForHiragana(hiraganaId, newValidation) {
 }
 
 
+// ============================================================================
+// 🎮 SECTION 7 : MODE QUIZ (APPRENTISSAGE)
+// ============================================================================
+
+// --- Variables quiz ---
+let current = {};
+let selections = { first: null, second: null };
+let targetFields = [];
+let isAnswered = false;
+let previousCharacter = null;
+let wasApprentissageBloque = false;
+
+// --- Fonctions quiz ---
+function nextQuestion() {
+  document.getElementById("result").innerText = "";
+  document.getElementById("continueBtn").style.visibility = "hidden";
+  selections = { first: null, second: null };
+  isAnswered = false;
+
+  // Items non maîtrisés du niveau actif
+  let kanas = HiraganaList.filter(k => 
+    parseInt(k.Niveau, 10) === niveauActif && 
+    parseInt(k.Validation || 0, 10) < SEUIL_VALIDATION
+  );
+
+  // Si tout est maîtrisé → passage éventuel au niveau suivant
+  if (kanas.length === 0) {
+    const nouveauNiveau = determineNiveauActif(HiraganaList);
+    if (nouveauNiveau !== niveauActif) {
+      niveauActif = nouveauNiveau;
+      localStorage.setItem('unlockedLevel', niveauActif);
+      document.getElementById("levelDisplay").innerText = `Niveau actuel : ${niveauActif}`;
+      renderProgressBar(niveauActif, getMaxLevel(HiraganaList));
+      updateLevelProgress(HiraganaList, niveauActif);
+      updateRevisionButtonState();
+      updateApprendreButtonState();
+      triggerLevelUpAnimation(document.body); // Level up détecté
+    }
+    // On retombe sur les items du niveau (même s’ils sont maîtrisés) pour ne pas bloquer
+    kanas = HiraganaList.filter(k => parseInt(k.Niveau, 10) === niveauActif);
+  }
+
+  // Pondération : plus la validation est basse, plus l'item a de chances d'être tiré
+  const weights = kanas.map(k => Math.max(0.1, 5 - parseInt(k.Validation || 0, 10) + 0.5));
+  const sum = weights.reduce((a, b) => a + b, 0);
+  
+  let selected;
+  do {
+    let rand = Math.random() * sum;
+    let acc = 0;
+    for (let i = 0; i < kanas.length; i++) {
+      acc += weights[i];
+      if (rand < acc) {
+        selected = kanas[i];
+        break;
+      }
+    }
+  } while (selected === previousCharacter && kanas.length > 1);
+
+  current = selected;
+  previousCharacter = current;
+
+  // Choix aléatoire du mode de question
+  const modes = [
+    { question: "Hiragana", options1: "Katakana", options2: "Romaji" },
+    { question: "Katakana", options1: "Hiragana", options2: "Romaji" },
+    { question: "Romaji",   options1: "Hiragana", options2: "Katakana" }
+  ];
+  const mode = modes[Math.floor(Math.random() * modes.length)];
+  targetFields = [mode.options1, mode.options2];
+
+  document.getElementById("question").innerText = 
+    mode.question === 'Katakana' ? getLocalizedKatakana(current) : current[mode.question];
+
+  renderChoices("choices1", generateChoices(mode.options1), "first");
+  renderChoices("choices2", generateChoices(mode.options2), "second");
+}
+
+function generateChoices(field) {
+  const getValue = (item) => field === 'Katakana' ? getLocalizedKatakana(item) : item[field];
+  
+  const others = HiraganaList.filter(k => k !== current && parseInt(k.Niveau, 10) === niveauActif);
+  const values = [
+    getValue(current),
+    ...others.sort(() => 0.5 - Math.random()).slice(0, 3).map(getValue)
+  ];
+  return values.sort(() => 0.5 - Math.random());
+}
+
+function renderChoices(id, options, slot) {
+  const container = document.getElementById(id);
+  if (!container) return;
+  
+  container.innerHTML = "";
+  options.forEach(text => {
+    const btn = document.createElement("button");
+    btn.innerText = text;
+    btn.className = "arcade-button";
+    btn.onclick = () => {
+      if (selections[slot] || isAnswered) return;
+      
+      selections[slot] = text;
+      btn.classList.add("clicked-glow", "clicked");
+      container.querySelectorAll("button").forEach(b => b.disabled = true);
+      checkAnswer();
+    };
+    container.appendChild(btn);
+  });
+}
+
+async function checkAnswer() {
+  if (!selections.first || !selections.second || isAnswered) return;
+  isAnswered = true;
+
+  const getValue = (field) => field === 'Katakana' ? getLocalizedKatakana(current) : current[field];
+  const correct = [getValue(targetFields[0]), getValue(targetFields[1])];
+  const user = [selections.first, selections.second];
+
+  let score = 0;
+  ["choices1", "choices2"].forEach((id, idx) => {
+    const container = document.getElementById(id);
+    if (!container) return;
+    
+    container.querySelectorAll("button").forEach(btn => {
+      btn.classList.remove("clicked-glow", "correct", "incorrect");
+      const text = btn.innerText;
+      
+      if (text === correct[idx]) {
+        btn.classList.add("correct");
+        if (text === user[idx]) score += 0.5;
+      } else if (text === user[idx]) {
+        btn.classList.add("incorrect");
+      }
+      btn.disabled = true;
+    });
+  });
+
+  // Calcul nouvelle validation
+  const oldValidation = parseInt(current.Validation || 0, 10);
+  let newValidation = oldValidation;
+  if (score === 1) newValidation = Math.min(SEUIL_VALIDATION, oldValidation + 1);
+  else if (score === 0.5) newValidation = Math.max(0, oldValidation - 1);
+  else newValidation = Math.max(0, oldValidation - 2);
+
+  const itemId = parseInt(current.ID, 10);
+  const isFinalValidation = score === 1 && oldValidation < SEUIL_VALIDATION && newValidation >= SEUIL_VALIDATION;
+
+  // Mise à jour locale
+  updateStarsForHiragana(itemId, newValidation);
+  const index = HiraganaList.findIndex(h => parseInt(h.ID, 10) === itemId);
+  if (index !== -1) {
+    HiraganaList[index].Validation = newValidation.toString();
+    HiraganaList[index].Tentatives = (parseInt(HiraganaList[index].Tentatives || 0, 10) + 1);
+    HiraganaList[index].Réussites = (parseInt(HiraganaList[index].Réussites || 0, 10) + score);
+    validationCache[itemId] = newValidation;
+  }
+
+  // Feedback succès / échec
+  if (score === 1) {
+    const emojisOK = ["🦋","🐸","🌵","🌴","🍏","🍀","🌳","🌱","👻","😸","😽","🌈","🐻","🐌","🌞","✅","🧠","🐶","🐵"];
+    const emoji = emojisOK[Math.floor(Math.random() * emojisOK.length)];
+    const text = isFinalValidation ? t('msg_validated') : t('msg_perfect');
+    
+    if (!isFinalValidation) playTwinkle();
+    
+    const questionDiv = document.getElementById("question");
+    const resultDiv = document.getElementById("result");
+    const container = document.querySelector('.quiz-container');
+    
+    const questionRect = questionDiv.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    
+    resultDiv.style.position = "absolute";
+    resultDiv.style.top = (questionRect.top - containerRect.top) + "px";
+    resultDiv.style.left = "0"; resultDiv.style.right = "0";
+    resultDiv.style.height = questionRect.height + "px";
+    resultDiv.style.zIndex = "10";
+    questionDiv.style.visibility = "hidden";
+
+    setTimeout(() => {
+      resultDiv.className = 'anim-combo';
+      resultDiv.innerHTML = `<div class="result-line">
+        <div class="result-text">${text}</div>
+        <div class="result-emoji">${emoji}</div>
+      </div>`;
+      safeConvertEmojis(resultDiv);
+      setTimeout(createSparkles, 100);
+    }, 10);
+
+    setTimeout(() => {
+      questionDiv.style.visibility = "visible";
+      resultDiv.style.opacity = "0";
+      setTimeout(() => { resultDiv.innerHTML = ""; resultDiv.style = ""; }, 500);
+    }, 1800);
+  } else {
+    playSoftError();
+  }
+
+  // Son hiragana
+  if (current.Hiragana && voiceEnabled) {
+    const audio = new Audio(`https://emmanuel971-source.github.io/hirakataquizz/${encodeURIComponent(current.Hiragana)}.mp3`);
+    audio.play().catch(() => {});
+  }
+
+  // Mise à jour niveau et UI
+  const previousNiveau = niveauActif;
+  niveauActif = determineNiveauActif(HiraganaList);
+  document.getElementById("levelDisplay").innerText = `${t('quiz_level')} ${niveauActif}`;
+  updateLevelProgress(HiraganaList, niveauActif);
+  renderProgressBar(niveauActif, getMaxLevel(HiraganaList));
+  renderHiraganaCards(HiraganaList, niveauActif);
+  updateMenuButtonStates();
+
+  if (niveauActif > previousNiveau) {
+    SyncMonitor.syncCheckRequested = true;
+    console.log('[SYNC CHECK] requested (level-up)');
+    triggerLevelUpAnimation(document.body);
+    syncNiveauAtteint(); 
+  }
+
+  // Envoi stats
+  queueUpdateStats({
+    token: userToken,
+    id: itemId,
+    scorePoints: score,
+    isRevisionMode: revisionMode.isActive,
+    previousLevel: previousNiveau,
+    hasLeveledUp: niveauActif > previousNiveau,
+    targetLevel: niveauActif
+  });
+
+  // Rafraîchissement stats page si ouverte
+  if (document.getElementById('stats')?.classList.contains('active')) {
+    setTimeout(generateStatsPage, 100);
+  }
+
+  // Suite
+  if (!revisionMode.isActive) {
+    if (score === 1) {
+      setTimeout(nextQuestion, niveauActif > previousNiveau ? 4000 : 1500);
+    } else {
+      document.getElementById("continueBtn").style.visibility = "visible";
+    }
+  } else {
+    document.getElementById("continueBtn").style.visibility = "visible";
+  }
+}
+
+function resetGameContext() {
+  current = {};
+  selections = { first: null, second: null };
+  isAnswered = false;
+  previousCharacter = null;
+
+  ["choices1", "choices2"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = "";
+  });
+
+  const result = document.getElementById("result");
+  if (result) result.innerText = "";
+
+  const continueBtn = document.getElementById("continueBtn");
+  if (continueBtn) continueBtn.style.visibility = "hidden";
+}
+// ============================================================================
+// 🔄 SECTION 8 : MODE RÉVISION
+// ============================================================================
+
+// --- Variables révision ---
+let revisionMode = {
+  currentQuestion: "",
+  input: "",
+  romajiSegments: [],
+  charCounts: [],
+  fullCorrect: "",
+  cumulativeRomaji: [],
+  cumulativeChars: [],
+  isActive: false,
+  currentItem: null
+};
+
+let wasBlockedWhenEnteringRevision = false;
+let deficitInitialRevision = 0;
+let pointsGagnesEnRevision = 0;
+let hasUnlockedInRevision = false;
+
+// --- Fonctions révision ---
+function startRevisionQuestion() {
+
+
+  const niveauActif = determineNiveauActif(HiraganaList);
+  const excludedKatakanaLevels = [3, 5, 7, 10, 11, 12, 14, 16, 17, 21, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 34, 35, 36, 37, 38];
+  const hiraganaItems = HiraganaList.filter(h => 
+    parseInt(h.Niveau || 1) < niveauActif && 
+    revisionRomajiTable[h.Hiragana] &&
+    h.Hiragana && h.Romaji
+  );
+  const katakanaItems = HiraganaList.filter(h => 
+    parseInt(h.Niveau || 1) < niveauActif && 
+    !excludedKatakanaLevels.includes(parseInt(h.Niveau || 1)) && 
+    revisionKatakanaTable[h.Katakana] &&
+    h.Katakana && h.Romaji
+  );
+  const availableItems = [
+    ...hiraganaItems.map(item => ({ ...item, type: 'hiragana', key: item.Hiragana })), 
+    ...katakanaItems.map(item => ({ ...item, type: 'katakana', key: getLocalizedKatakana(item) }))
+  ];
+
+  console.log(`🎯 Items disponibles pour révision: Hiragana=${hiraganaItems.length}, Katakana=${katakanaItems.length}`);
+
+
+
+  // Tampon des 3 derniers tirages - convertir en numbers
+  const recentItems = JSON.parse(localStorage.getItem('recentRevisionItems') || '[]').map(id => parseInt(id));
+
+  let selectedItem;
+  const apprendreBloque = isApprentissageBloque();
+  if (!apprendreBloque) {
+    // 🎲 TIRAGE ALÉATOIRE PUR (20%) - Filtré seulement par le tampon
+    const randomItems = availableItems.filter(item => !recentItems.includes(parseInt(item.ID)));
+    const finalRandomItems = randomItems.length >= 4 ? randomItems : availableItems;
+    
+    selectedItem = finalRandomItems[Math.floor(Math.random() * finalRandomItems.length)];
+    
+    console.log(`🎲 TIRAGE ALÉATOIRE (20%)`);
+    console.log(`📋 Items disponibles pour tirage aléatoire: ${finalRandomItems.length}/${availableItems.length}`);
+    console.log(`🔍 Items filtrés par tampon:`, finalRandomItems.map(item => `${item.key}(ID:${item.ID})`).join(', '));
+    
+  } else {
+    // ⚖️ TIRAGE PONDÉRÉ (80%) - Filtré par Validation ≤ 10 + tampon
+    const validationFilteredItems = availableItems.filter(item => (validationCache[parseInt(item.ID)] || 0) < seuilValidation);
+    const weightedItems = validationFilteredItems.filter(item => !recentItems.includes(parseInt(item.ID)));
+    
+    let finalWeightedItems;
+    
+    if (weightedItems.length >= 4) {
+      // Cas idéal : assez d'items respectant validation ≤ 10 ET hors tampon
+      finalWeightedItems = weightedItems;
+    } else if (weightedItems.length > 0) {
+      // Peu d'items mais au moins quelques-uns : on les garde
+      finalWeightedItems = weightedItems;
+    } else {
+      // Aucun item respectant les deux contraintes
+      // PRIORITÉ : éviter le tampon (libérer contrainte validation ≤ 10)
+      const itemsHorsTampon = availableItems.filter(item => !recentItems.includes(parseInt(item.ID)));
+      if (itemsHorsTampon.length > 0) {
+        finalWeightedItems = itemsHorsTampon;
+        console.log(`⚠️ FALLBACK 1 - Libération contrainte Validation ≤ 10 pour éviter tampon`);
+      } else {
+        // Dernier recours : prendre tous les items (même dans le tampon)
+        finalWeightedItems = availableItems;
+        console.log(`⚠️ FALLBACK 2 - Tous les items utilisés (tampon ignoré)`);
+      }
+    }
+
+    // Tirage pondéré sur les items finaux
+    const weights = finalWeightedItems.map(item => {
+      const stats = statsCache.items[parseInt(item.ID)] || { pourcentage: 0 };
+      const pourcentage = stats.pourcentage;
+      return pourcentage === 0 ? 50 : Math.min(50, Math.pow(100 / (pourcentage + 10), 2));
+    });
+    const totalWeight = weights.reduce((a, b) => a + b, 0);
+    let random = Math.random() * totalWeight;
+    for (let i = 0; i < finalWeightedItems.length; i++) {
+      random -= weights[i];
+      if (random <= 0) {
+        selectedItem = finalWeightedItems[i];
+        break;
+      }
+    }
+    
+    console.log(`⚖️ TIRAGE PONDÉRÉ (80%)`);
+    console.log(`📋 Items disponibles (Validation ≤ 10 + tampon): ${finalWeightedItems.length}/${availableItems.length}`);
+    console.log(`🔍 Items respectant Validation ≤ 10:`, 
+      validationFilteredItems.map(item => `${item.key}(ID:${item.ID},Val:${validationCache[parseInt(item.ID)] || 0})`)
+        .join(', '));
+    console.log(`🚫 Items exclus par tampon:`, recentItems.join(', '));
+    console.log(`✅ Items finaux pour pondération:`, 
+      finalWeightedItems.map(item => `${item.key}(ID:${item.ID},Val:${validationCache[parseInt(item.ID)] || 0},${(statsCache.items[parseInt(item.ID)]?.pourcentage || 0).toFixed(1)}%)`)
+        .join(', '));
+  }
+
+  // Mettre à jour le tampon - s'assurer que c'est un number
+  recentItems.push(parseInt(selectedItem.ID));
+  if (recentItems.length > 3) recentItems.shift(); // Garder seulement les 3 derniers
+  localStorage.setItem('recentRevisionItems', JSON.stringify(recentItems));
+
+  // Log pour vérification
+  console.log(`🎯 Question sélectionnée: "${selectedItem.key}" (ID: ${selectedItem.ID}, Type: ${selectedItem.type})`);
+  console.log(`🔍 Tampon récent:`, recentItems);
+
+  // Configurer la question
+  revisionMode.currentQuestion = selectedItem.key;
+  const table = selectedItem.type === 'hiragana' ? revisionRomajiTable : revisionKatakanaTable;
+  const tableEntry = table[selectedItem.key];
+  revisionMode.romajiSegments = tableEntry.romaji;
+  revisionMode.charCounts = tableEntry.charCounts;
+  revisionMode.fullCorrect = revisionMode.romajiSegments.join("");
+  revisionMode.currentItem = selectedItem;
+
+  let cumRom = 0;
+  revisionMode.cumulativeRomaji = revisionMode.romajiSegments.map(segment => {
+    cumRom += segment.length;
+    return cumRom;
+  });
+  let cumChar = 0;
+  revisionMode.cumulativeChars = revisionMode.charCounts.map(count => {
+    cumChar += count;
+    return cumChar;
+  });
+
+  revisionMode.input = "";
+  document.getElementById("revision-question").innerHTML = 
+    revisionMode.currentQuestion.split("").map((char, index) => 
+      `<div class="char-card" id="revision-card-${index}">
+        <span id="revision-char-${index}">${char}</span>
+      </div>`
+    ).join("");
+  document.getElementById("revision-input-display").textContent = "";
+ 
+
+  // 💬 Affiche l’infobulle du déficit/avance de Validation sur la première carte
+const firstCard = document.getElementById(`revision-card-0`);
+if (firstCard && revisionMode.currentItem) {
+  const currentValidation = parseInt(revisionMode.currentItem.Validation || validationCache[revisionMode.currentItem.ID] || 0);
+  showValidationBubble(firstCard, currentValidation, seuilValidation);
+}
+
+
+  
+
+  if (firstCard) firstCard.classList.add("pulsing");
+
+  console.log(`📝 Question: "${revisionMode.currentQuestion}" (${selectedItem.Romaji}) -> Attendu: "${revisionMode.fullCorrect}"`);
+  console.log(`📊 Pourcentage item (ID ${selectedItem.ID}): ${(statsCache.items[parseInt(selectedItem.ID)]?.pourcentage || 0).toFixed(2)}% | Pourcentage global: ${statsCache.globalPourcentage.toFixed(2)}%`);
+// ✅ FORCER l'affichage de la barre à chaque nouvelle question
+setTimeout(() => {
+  updateUnlockProgress();
+}, 200);
+} 
+function updateRevisionFeedback() {
+  // Reset toutes les classes
+  for (let i = 0; i < revisionMode.currentQuestion.length; i++) {
+    const cardElement = document.getElementById(`revision-card-${i}`);
+    const charElement = document.getElementById(`revision-char-${i}`);
+    if (cardElement) {
+      cardElement.classList.remove(
+        "char-correct-1", "char-correct-2", "char-correct-3", "char-correct-4",
+        "char-incorrect-1", "char-incorrect-2", "char-incorrect-3", "char-incorrect-4",
+        "pulsing", "pop-animation"
+      );
+    }
+    if (charElement) {
+      charElement.classList.remove("pulsing");
+    }
+  }
+
+  let currentSegment = -1;
+  const inputLength = revisionMode.input.length;
+
+  // Parcourir chaque segment
+  for (let seg = 0; seg < revisionMode.romajiSegments.length; seg++) {
+    const romStart = seg > 0 ? revisionMode.cumulativeRomaji[seg - 1] : 0;
+    const romEnd = revisionMode.cumulativeRomaji[seg];
+    const charStart = seg > 0 ? revisionMode.cumulativeChars[seg - 1] : 0;
+    const charEnd = revisionMode.cumulativeChars[seg];
+    const segmentLength = romEnd - romStart;
+    const typedLen = Math.max(0, Math.min(inputLength - romStart, segmentLength));
+    const typedSegment = revisionMode.input.substring(romStart, romStart + typedLen);
+    const expected = revisionMode.romajiSegments[seg];
+    let className = "";
+
+    console.log(`Segment ${seg}: romStart=${romStart}, romEnd=${romEnd}, typedLen=${typedLen}, typedSegment="${typedSegment}", expected="${expected}"`);
+
+    // Gradation basée sur la progression dans le segment
+    if (typedLen > 0) {
+      if (expected.startsWith(typedSegment)) {
+        const level = Math.min(4, typedLen);
+        className = `char-correct-${level}`;
+      } else {
+        const level = Math.min(4, typedLen);
+        className = `char-incorrect-${level}`;
+      }
+    }
+
+    // Appliquer la gradation aux cartes du segment
+    for (let c = charStart; c < charEnd; c++) {
+      const card = document.getElementById(`revision-card-${c}`);
+      const span = document.getElementById(`revision-char-${c}`);
+      if (card) {
+        card.className = `char-card ${className || ""}`; // Appliquer la gradation
+        // Ajouter animation "pop" et son si on valide un nouveau caractère
+        if (inputLength > romStart && c === charStart && !card.classList.contains("pop-animation")) {
+          card.classList.add("pop-animation");
+          playPopSound();
+          setTimeout(() => card.classList.remove("pop-animation"), 300);
+        }
+      }
+    }
+
+    // Validation finale uniquement pour le segment courant si entièrement saisi
+    if (inputLength >= romEnd) {
+      const fullSegment = revisionMode.input.substring(romStart, romEnd);
+      if (fullSegment === expected) {
+        for (let c = charStart; c < charEnd; c++) {
+          const card = document.getElementById(`revision-card-${c}`);
+          if (card) {
+            card.classList.remove("pulsing");
+            card.className = `char-card char-correct-4`;
+          }
+        }
+      } else if (romStart < inputLength) { // Saisie incorrecte partielle
+        for (let c = charStart; c < charEnd; c++) {
+          const card = document.getElementById(`revision-card-${c}`);
+          if (card) {
+            card.classList.remove("pulsing");
+            card.className = `char-card char-incorrect-4`;
+          }
+        }
+      }
+    }
+
+    // Déterminer le segment en cours pour la pulsation
+    if (romStart <= inputLength && inputLength < romEnd) {
+      currentSegment = seg;
+    }
+  }
+
+  // Ajouter la pulsation à la carte en cours
+  if (currentSegment >= 0) {
+    const charStart = currentSegment > 0 ? revisionMode.cumulativeChars[currentSegment - 1] : 0;
+    const charEnd = revisionMode.cumulativeChars[currentSegment];
+    for (let c = charStart; c < charEnd; c++) {
+      const cardElement = document.getElementById(`revision-card-${c}`);
+      if (cardElement) {
+        cardElement.classList.add("pulsing");
+      }
+    }
+  }
+
+}
+  
+function initRevisionKeyboard() {
+  const revisionKeys = document.querySelectorAll('.revision-key');
+  revisionKeys.forEach(key => key.replaceWith(key.cloneNode(true)));
+  const newRevisionKeys = document.querySelectorAll('.revision-key');
+
+  newRevisionKeys.forEach(key => {
+    key.addEventListener("click", async () => {
+      if (!revisionMode.isActive) return;
+
+      // Saisie ou effacement
+      if (key.id === "revision-back") {
+        revisionMode.input = revisionMode.input.slice(0, -1);
+      } else {
+        revisionMode.input += key.textContent;
+      }
+
+      document.getElementById("revision-input-display").textContent = revisionMode.input;
+      updateRevisionFeedback();
+
+      const totalLength = revisionMode.cumulativeRomaji[revisionMode.cumulativeRomaji.length - 1] || 1;
+
+      // Réponse complète → on valide
+      if (revisionMode.input.length >= totalLength) {
+        const isCorrect = revisionMode.input === revisionMode.fullCorrect;
+        const itemId = parseInt(revisionMode.currentItem.ID);
+
+        // === Stats (inchangé) ===
+        statsCache.items[itemId] = statsCache.items[itemId] || { tentatives: 0, reussites: 0, pourcentage: 0 };
+        statsCache.items[itemId].tentatives += 1;
+        statsCache.items[itemId].reussites += isCorrect ? 1 : 0;
+        statsCache.items[itemId].pourcentage = statsCache.items[itemId].tentatives > 0
+          ? (statsCache.items[itemId].reussites / statsCache.items[itemId].tentatives * 100)
+          : 0;
+
+        const totalTentatives = Object.values(statsCache.items).reduce((s, i) => s + i.tentatives, 0);
+        const totalReussites = Object.values(statsCache.items).reduce((s, i) => s + i.reussites, 0);
+        statsCache.globalPourcentage = totalTentatives > 0 ? (totalReussites / totalTentatives * 100) : 0;
+
+        // === Validation + points (inchangé) ===
+        const hiraganaIndex = HiraganaList.findIndex(h => h.ID == itemId);
+        const currentValidation = parseInt(HiraganaList[hiraganaIndex].Validation || 0);
+        let newValidation;
+        let pointsGagnes = 0;
+
+        if (isCorrect) {
+          newValidation = currentValidation + 1;
+          if (currentValidation < seuilValidation) pointsGagnes = 1;
+        } else {
+          newValidation = Math.max(5, currentValidation - 2);
+          const oldDeficit = Math.max(0, seuilValidation - currentValidation);
+          const newDeficit = Math.max(0, seuilValidation - newValidation);
+          pointsGagnes = oldDeficit - newDeficit;
+        }
+
+        HiraganaList[hiraganaIndex].Validation = newValidation.toString();
+        validationCache[itemId] = newValidation;
+
+        if (wasBlockedWhenEnteringRevision) {
+          pointsGagnesEnRevision += pointsGagnes;
+          updateUnlockProgress();
+        }
+
+        // === Calcul pour les animations ===
+        const oldEmoji = getPlantEmoji(currentValidation);
+        const newEmoji = getPlantEmoji(newValidation);
+        const statusChanged = oldEmoji !== newEmoji; // surtout vrai lors du passage 🌿 ↔ 🌸
+
+        // === AFFICHAGE DE LA FLASHCARD   ===
+ // === AFFICHAGE DE LA FLASHCARD PENDANT 3 SECONDES ===
+openRevisionFlashcard(
+  revisionMode.currentItem,   // l'item
+  newEmoji,                   // emoji à jour
+  isCorrect,                  // ✅ bonne ou mauvaise réponse
+  currentValidation,          // ✅ ancien score (AVANT la validation)
+  newValidation,              // ✅ nouveau score (APRÈS la validation)
+  statusChanged,              // animation plante si changement de statut
+  true                        // toujours scintillement du score
+);
+
+
+        // === Feedback texte + couleur ===
+        const niveau = parseInt(revisionMode.currentItem.Niveau || 1);
+        const isHighLevel = niveau > 38;
+        const isMultiChar = revisionMode.romajiSegments.length >= 2;
+        const katakanaDisplay = (!isHighLevel && isMultiChar) ? ` (${getLocalizedKatakana(revisionMode.currentItem)})` : '';
+
+        if (isCorrect) {
+         
+          playZenBell();
+        } else {
+        
+          playSoftError();
+        }
+
+        // === Mise à jour bulle de validation sur la carte (optionnel mais joli) ===
+        const currentCard = document.querySelector('.char-card.pulsing') || document.getElementById('revision-card-0');
+        if (currentCard) {
+          showValidationBubble(currentCard, newValidation, seuilValidation);
+        }
+
+        // === Envoi stats en arrière-plan ===
+        queueUpdateStats({ token: userToken, id: itemId, scorePoints: isCorrect ? 1 : 0, isRevisionMode: true });
+
+        // === Rafraîchissement stats si page ouverte ===
+        if (document.getElementById('stats').classList.contains('active')) {
+          setTimeout(generateGarden, 100);
+        }
+
+       
+      }
+    });
+  });
+}
+
+function isRevisionModeAvailable() {
+  return niveauActif >= 4;
+}  
+function updateUnlockProgress() {
+  const container = document.getElementById('unlock-progress-container');
+  const fill = document.getElementById('unlock-progress-fill');
+
+  if (!container || !fill) return;
+
+  const isBlockedNow = isApprentissageBloque();
+
+  // Détecter la transition bloqué → débloqué
+  if (wasApprentissageBloque && !isBlockedNow) {
+    container.style.display = 'none';
+    updateApprendreButtonState();
+
+    setTimeout(() => {
+      showUnlockFlashcard(
+        t('unlock_learning_title'),
+        '🌱',
+        t('unlock_learning_message')
+      );
+    }, 500);
+  }
+
+  wasApprentissageBloque = isBlockedNow;
+
+  // Affichage de la barre uniquement si bloqué ET en révision
+  if (!revisionMode.isActive || !isBlockedNow) {
+    container.style.display = 'none';
+    return;
+  }
+
+  const deficitActuel = calculerDeficitValidation();
+  const deficitMaximum = calculerDeficitMaximum();
+
+  if (deficitMaximum <= 0) {
+    container.style.display = 'none';
+    return;
+  }
+
+  container.style.display = 'block';
+
+  const pourcentage = Math.min(
+    100,
+    Math.max(0, (deficitActuel / deficitMaximum) * 100)
+  );
+
+  fill.style.width = `${pourcentage}%`;
+
+  if (pourcentage < 10 && pourcentage > 0) {
+    fill.classList.add('proche-deblocage');
+  } else {
+    fill.classList.remove('proche-deblocage');
+  }
+}
+
+// ============================================================================
+// 🌸 SECTION 9 : MON JARDIN (STATISTIQUES) - VERSION OPTIMISÉE
+// ============================================================================
+
+// --- Variables garden ---
+let currentStatsData = [];
+
+// --- Configuration ---
+const GARDEN_CONFIG = {
+  itemsPerRow: 5,
+  bugs: ['🐛', '🦋', '🐝', '🐞', '🐜'],
+  plants: {
+    beginner: ['🌱', '🌱'],
+    intermediate: ['🌿', '🌿', '🌿', '🌿'],
+    master: ['🌸', '🌸', '🌸', '🌸']
+  },
+  modalAutoCloseDelay: 2200,
+  validationThresholds: {
+    intermediate: 5,
+    master: 10 // Utilisera seuilValidation si défini
+  }
+};
+
+// ============================================================================
+// GÉNÉRATION DU JARDIN
+// ============================================================================
+
+/**
+ * Génère et affiche le jardin visuel avec les caractères sous forme de plantes
+ */
+function generateGarden() {
+  const ground = document.getElementById('garden-ground');
+  if (!ground) {
+    console.error('❌ Élément #garden-ground introuvable');
+    return;
+  }
+  
+  ground.innerHTML = '';
+  
+  const currentLevel = niveauActif;
+  const visibleItems = HiraganaList.filter(item => parseInt(item.Niveau) <= currentLevel);
+  
+  // Regrouper par niveau
+  const levels = groupByLevel(visibleItems);
+  
+  // Générer les lignes du jardin
+  const rows = generateGardenRows(levels, currentLevel);
+  rows.forEach(row => ground.appendChild(row));
+  
+  // Conversion des emojis en Fluent 3D
+  convertGardenEmojis(ground);
+  
+  // Initialiser la légende avec scroll
+  initializeGardenLegend();
+  
+  console.log(`🌸 Jardin généré: ${visibleItems.length} caractères, niveau ${currentLevel}`);
+}
+
+/**
+ * Regroupe les items par niveau
+ */
+function groupByLevel(items) {
+  const levels = {};
+  items.forEach(item => {
+    const lvl = parseInt(item.Niveau);
+    if (!levels[lvl]) levels[lvl] = [];
+    levels[lvl].push(item);
+  });
+  return levels;
+}
+
+/**
+ * Génère toutes les lignes du jardin
+ */
+function generateGardenRows(levels, maxLevel) {
+  const rows = [];
+  let currentRow = null;
+  let itemsInRow = 0;
+  
+  for (let lvl = 1; lvl <= maxLevel; lvl++) {
+    // Ajouter un insecte séparateur entre les niveaux (sauf au début)
+    if (lvl > 1) {
+      if (!currentRow || itemsInRow === GARDEN_CONFIG.itemsPerRow) {
+        currentRow = createNewRow();
+        rows.push(currentRow);
+        itemsInRow = 0;
+      }
+      addBugToRow(currentRow);
+      itemsInRow++;
+    }
+    
+    // Ajouter tous les items de ce niveau
+    if (levels[lvl]) {
+      levels[lvl].forEach(item => {
+        if (!currentRow || itemsInRow === GARDEN_CONFIG.itemsPerRow) {
+          currentRow = createNewRow();
+          rows.push(currentRow);
+          itemsInRow = 0;
+        }
+        
+        const itemDiv = createPlantItem(item);
+        currentRow.appendChild(itemDiv);
+        itemsInRow++;
+      });
+    }
+  }
+  
+  // Compléter la dernière ligne avec des slots invisibles
+  if (currentRow && itemsInRow < GARDEN_CONFIG.itemsPerRow) {
+    addEmptySlots(currentRow, GARDEN_CONFIG.itemsPerRow - itemsInRow);
+  }
+  
+  return rows;
+}
+
+/**
+ * Crée un élément plante pour un caractère
+ */
+function createPlantItem(item) {
+  const validation = validationCache[parseInt(item.ID)] || 0;
+  const plant = getPlantEmoji(validation);
+  
+  const itemDiv = document.createElement('div');
+  itemDiv.className = 'garden-item';
+  itemDiv.onclick = () => openGardenModal(item, plant);
+  itemDiv.innerHTML = `
+    <div class="garden-plant">${plant}</div>
+    <div class="garden-hiragana">${item.Hiragana}</div>
+  `;
+  
+  return itemDiv;
+}
+
+/**
+ * Crée une nouvelle ligne de jardin
+ */
+function createNewRow() {
+  const row = document.createElement('div');
+  row.className = 'garden-level';
+  return row;
+}
+
+/**
+ * Ajoute un insecte aléatoire à une ligne
+ */
+function addBugToRow(row) {
+  const emoji = GARDEN_CONFIG.bugs[Math.floor(Math.random() * GARDEN_CONFIG.bugs.length)];
+  const bugDiv = document.createElement('div');
+  bugDiv.className = 'garden-item garden-bug';
+  bugDiv.innerHTML = `<div style="font-size:2.8em;">${emoji}</div>`;
+  bugDiv.onclick = () => openInsectFlashcard(emoji);
+  row.appendChild(bugDiv);
+}
+
+/**
+ * Ajoute des slots vides invisibles pour compléter une ligne
+ */
+function addEmptySlots(row, count) {
+  for (let i = 0; i < count; i++) {
+    const empty = document.createElement('div');
+    empty.className = 'garden-item';
+    empty.style.visibility = 'hidden';
+    row.appendChild(empty);
+  }
+}
+
+/**
+ * Convertit les emojis du jardin en Fluent 3D
+ */
+function convertGardenEmojis(ground) {
+  requestAnimationFrame(() => {
+    if (typeof safeConvertEmojis === 'function') {
+      safeConvertEmojis(ground);
+      console.log('✅ Emojis du jardin convertis en Fluent 3D');
+    } else {
+      console.warn('⚠️ safeConvertEmojis non disponible');
+    }
+  });
+}
+
+/**
+ * Initialise la légende flottante avec gestion du scroll
+ */
+function initializeGardenLegend() {
+  const container = document.querySelector('.garden-container');
+  const legend = document.getElementById('garden-legend');
+  
+  if (!legend || !container) return;
+  
+  legend.style.display = 'flex';
+  legend.classList.add('visible');
+  
+  container.addEventListener('scroll', () => {
+    legend.classList.toggle('visible', container.scrollTop > 80);
+  });
+}
+
+// ============================================================================
+// MODAL DE DÉTAILS
+// ============================================================================
+
+let modalCloseTimeout = null;
+
+/**
+ * Ouvre la modal avec les détails d'un caractère
+ */
+function openGardenModal(item, emoji) {
+  const modal = document.getElementById('garden-modal');
+  if (!modal) {
+    console.error('❌ Modal #garden-modal introuvable');
+    return;
+  }
+
+  // Annuler le précédent timeout si existant
+  if (modalCloseTimeout) {
+    clearTimeout(modalCloseTimeout);
+  }
+
+  // Remplir les données
+  safeSetContent('modal-plant', emoji);
+  safeSetContent('modal-hiragana', item.Hiragana);
+  safeSetContent('modal-katakana', getLocalizedKatakana(item) || '-');
+  safeSetContent('modal-romaji', item.Romaji);
+  safeSetContent('modal-level', item.Niveau);
+  safeSetContent('modal-validation', validationCache[parseInt(item.ID)] || 0);
+
+  // Convertir les emojis de la modal
+  requestAnimationFrame(() => {
+    const card = modal.querySelector('.garden-card');
+    if (card && typeof safeConvertEmojis === 'function') {
+      safeConvertEmojis(card);
+    }
+  });
+  
+  // Afficher la modal
+  modal.classList.add('visible');
+  
+  // Fermeture automatique
+  modalCloseTimeout = setTimeout(closeGardenModal, GARDEN_CONFIG.modalAutoCloseDelay);
+  
+  // Jouer le son si activé
+  playCharacterSound(item);
+}
+
+/**
+ * Ferme la modal de jardin
+ */
+function closeGardenModal() {
+  const modal = document.getElementById('garden-modal');
+  if (modal) {
+    modal.classList.remove('visible');
+  }
+  if (modalCloseTimeout) {
+    clearTimeout(modalCloseTimeout);
+    modalCloseTimeout = null;
+  }
+}
+
+/**
+ * Joue le son d'un caractère si la voix est activée
+ */
+function playCharacterSound(item) {
+  if (typeof voiceEnabled !== 'undefined' && voiceEnabled) {
+    const audioUrl = `https://emmanuel971-source.github.io/hirakataquizz/${encodeURIComponent(item.Hiragana)}.mp3`;
+    const audio = new Audio(audioUrl);
+    audio.play().catch(err => {
+      console.warn('⚠️ Erreur lecture audio:', err.message);
+    });
+  }
+}
+
+/**
+ * Ouvre une flashcard pour un insecte (fonction de fallback)
+ */
+function openInsectFlashcard(emoji) {
+  if (typeof window.openInsectFlashcard === 'function') {
+    window.openInsectFlashcard(emoji);
+  } else {
+    console.log(`🐛 Insecte cliqué: ${emoji}`);
+    // Fallback : afficher une alerte simple
+    alert(`${emoji} Insecte du niveau !`);
+  }
+}
+
+// ============================================================================
+// SYSTÈME DE PLANTES
+// ============================================================================
+
+/**
+ * Retourne l'emoji de plante selon le nombre de validations
+ */
+function getPlantEmoji(validation) {
+  const masterThreshold = typeof seuilValidation !== 'undefined' 
+    ? seuilValidation 
+    : GARDEN_CONFIG.validationThresholds.master;
+  
+  const intermediateThreshold = GARDEN_CONFIG.validationThresholds.intermediate;
+  
+  let plantArray;
+  if (validation >= masterThreshold) {
+    plantArray = GARDEN_CONFIG.plants.master;
+  } else if (validation >= intermediateThreshold) {
+    plantArray = GARDEN_CONFIG.plants.intermediate;
+  } else {
+    plantArray = GARDEN_CONFIG.plants.beginner;
+  }
+  
+  return plantArray[Math.floor(Math.random() * plantArray.length)];
+}
+
+// ============================================================================
+// STATISTIQUES ET FILTRES
+// ============================================================================
+
+/**
+ * Filtre les statistiques selon le critère sélectionné
+ */
+function filterStats(filter) {
+  console.log('🔍 Filtrage:', filter);
+  
+  // Mettre à jour les boutons actifs
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  const activeBtn = document.querySelector(`[data-filter="${filter}"]`);
+  if (activeBtn) {
+    activeBtn.classList.add('active');
+  }
+  
+  // Afficher le tableau filtré
+  renderStatsTable(currentStatsData, filter);
+}
+
+/**
+ * Affiche le tableau de statistiques filtré
+ */
+function renderStatsTable(data, filter = 'all') {
+  const tbody = document.getElementById('stats-table-body');
+  if (!tbody) {
+    console.error('❌ Élément #stats-table-body introuvable');
+    return;
+  }
+  
+  // Filtrer les données
+  let filtered = filterDataByStatus(data, filter);
+  
+  // Trier par niveau décroissant puis par ID décroissant
+  filtered.sort((a, b) => {
+    const nivA = parseInt(a.niveau);
+    const nivB = parseInt(b.niveau);
+    if (nivA !== nivB) return nivB - nivA;
+    return b.id - a.id;
+  });
+  
+  // Générer le HTML
+  if (filtered.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="4" style="text-align: center; opacity: 0.5; padding: 2em;">
+          🌸 ${getTranslation('stats_no_items', 'Aucun élément à afficher')}
+        </td>
+      </tr>
+    `;
+    return;
+  }
+  
+  tbody.innerHTML = filtered.map(item => `
+    <tr class="${item.statutClass}">
+      <td><strong>${item.hiragana}</strong></td>
+      <td>${item.katakana}</td>
+      <td><em>${item.romaji}</em></td>
+      <td><span class="status-emoji">${item.statutEmoji}</span></td>
+    </tr>
+  `).join('');
+  
+  console.log(`📋 Tableau affiché: ${filtered.length} items (filtre: ${filter})`);
+}
+
+/**
+ * Filtre les données selon le statut
+ */
+function filterDataByStatus(data, filter) {
+  if (filter === 'all') return data;
+  
+  return data.filter(item => {
+    if (filter === 'acquired') return item.statutClass === 'acquired';
+    if (filter === 'review') return item.statutClass === 'review';
+    if (filter === 'progress') return item.statutClass === 'progress';
+    return true;
+  });
+}
+
+/**
+ * Met à jour les compteurs de filtres
+ */
+function updateFilterCounts(data) {
+  const counts = {
+    all: data.length,
+    acquired: data.filter(item => item.statutClass === 'acquired').length,
+    review: data.filter(item => item.statutClass === 'review').length,
+    progress: data.filter(item => item.statutClass === 'progress').length
+  };
+  
+  safeSetContent('count-all', `(${counts.all})`);
+  safeSetContent('count-acquired', `(${counts.acquired})`);
+  safeSetContent('count-review', `(${counts.review})`);
+  safeSetContent('count-progress', `(${counts.progress})`);
+  
+  console.log('📊 Compteurs mis à jour:', counts);
+}
+
+// ============================================================================
+// UTILITAIRES
+// ============================================================================
+
+/**
+ * Définit le contenu d'un élément de manière sécurisée
+ */
+function safeSetContent(elementId, content) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.textContent = content;
+  } else {
+    console.warn(`⚠️ Élément #${elementId} introuvable`);
+  }
+}
+
+/**
+ * Récupère une traduction avec fallback
+ */
+function getTranslation(key, fallback) {
+  if (typeof t === 'function') {
+    return t(key);
+  }
+  return fallback;
+}
+
+/**
+ * Fonction de placeholder pour la bulle de validation (legacy)
+ */
+function showValidationBubble(charCard, validation, seuil) {
+  charCard.style.position = "relative";
+  // Implémentation à compléter si nécessaire
+}
+
+// ============================================================================
+// EXPORT (si module ES6)
+// ============================================================================
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    generateGarden,
+    filterStats,
+    renderStatsTable,
+    updateFilterCounts,
+    openGardenModal,
+    closeGardenModal
+  };
+}
 // ============================================================================
 // 🎨 SECTION 10 : ANIMATIONS & EFFETS VISUELS
 // ============================================================================
@@ -7151,7 +8668,7 @@ canvas.style.left = '50%';
 canvas.style.top = '50%';
 canvas.style.transform = 'translate(-50%, -50%)';
 canvas.style.pointerEvents = 'none';
-canvas.style.zIndex = '100000';
+canvas.style.zIndex = '20';
 canvas.width = 400;
 canvas.height = 400;
 document.body.appendChild(canvas);  // ✅ Ajouter au body au lieu du container
@@ -7190,7 +8707,7 @@ halo.style.borderRadius = '50%';
 halo.style.background = 'radial-gradient(circle, rgba(255,255,255,0.9), rgba(255,255,255,0.05))';
 halo.style.transform = 'translate(-50%, -50%) scale(1)';
 halo.style.opacity = '1';
-halo.style.zIndex = '100000';
+halo.style.zIndex = '0';
 halo.style.pointerEvents = 'none';
 document.body.appendChild(halo);
 halo.style.position = 'fixed';
@@ -7409,6 +8926,367 @@ console.log(`🧹 Nettoyage: ${activeSparks.length} particules actives, ${global
 
 
 
+// ============================================================================
+// 💬 SECTION 11 : FLASHCARDS & MODALES
+// ============================================================================
+
+let modalCloseTimer = null;
+// ============================================================================TEST
+let recentInsectMessageKeys = [];
+const MAX_RECENT_INSECT_MESSAGES = 2;
+function getRandomInsectMessage() {
+  let available = insectMessages.filter(
+    msg => !recentInsectMessageKeys.includes(msg.key)
+  );
+
+  // Sécurité : si tout a été utilisé récemment
+  if (available.length === 0) {
+    available = [...insectMessages];
+    recentInsectMessageKeys = [];
+  }
+
+  const selected = available[Math.floor(Math.random() * available.length)];
+
+  // Mise à jour mémoire courte
+  recentInsectMessageKeys.push(selected.key);
+  if (recentInsectMessageKeys.length > MAX_RECENT_INSECT_MESSAGES) {
+    recentInsectMessageKeys.shift();
+  }
+
+  return selected;
+}
+
+  
+  // 🐞 Insectes – clés de messages (i18n)
+const insectMessages = [
+  { emoji: '🐞', key: 'insect_msg_01' },
+  { emoji: '🦋', key: 'insect_msg_02' },
+  { emoji: '🐝', key: 'insect_msg_03' },
+  { emoji: '🐛', key: 'insect_msg_04' },
+  { emoji: '🐜', key: 'insect_msg_05' }
+];
+
+function openInsectFlashcard(forcedEmoji = null) {
+  const modal = document.getElementById('insect-modal');
+  const emojiDiv = document.getElementById('insect-emoji');
+  const textDiv = document.getElementById('insect-text');
+
+  if (!modal || !emojiDiv || !textDiv) return;
+
+  const message = getRandomInsectMessage();
+
+  emojiDiv.textContent = forcedEmoji || message.emoji;
+  textDiv.textContent = t(message.key);
+
+  modal.classList.add('visible');
+
+  setTimeout(() => {
+    safeConvertEmojis(modal);
+  }, 50);
+
+  setTimeout(closeInsectFlashcard, 2500);
+}
+
+
+function closeInsectFlashcard() {
+  const modal = document.getElementById('insect-modal');
+  if (modal) modal.classList.remove('visible');
+}
+// ============================================================================TEST
+
+  
+// --- Fonctions flashcards ---
+function openRevisionFlashcard(item, emoji, isCorrect, oldValidation, newValidation, animateStatusChange = false, animateScore = false) {
+  const portal = document.getElementById('modal-portal');
+  
+  // Emoji de l'ancienne plante (pour l'animation de changement de statut)
+  const oldPlant = animateStatusChange ? getPlantEmoji(oldValidation) : emoji;
+
+  // ✅ Déterminer quel caractère afficher (inverse de la question)
+  const displayChar = revisionMode.currentItem.type === 'hiragana' 
+    ? getLocalizedKatakana(item)  // Si question était Hiragana → afficher Katakana
+    : item.Hiragana;                // Si question était Katakana → afficher Hiragana
+
+  // ✅ Déterminer le type de transformation (flower ou leaf)
+  const isUpgrade = newValidation > oldValidation; // 🌿 → 🌸
+  const isDowngrade = newValidation < oldValidation; // 🌸 → 🌿
+
+  // Construire le contenu de la flashcard
+  portal.innerHTML = `
+    <div class="revision-flashcard" style="background-color: ${isCorrect ? '#d4edda' : '#f8d7da'};">
+      
+      <!-- 1️⃣ LIGNE 1 : ROMAJI (principal) -->
+      <div class="romaji-display" style="font-size: 4em; font-weight: bold; color: #333; margin-bottom: 0.5em;">
+        ${item.Romaji}
+      </div>
+      
+<!-- 2️⃣ LIGNE 2 : KATAKANA ou HIRAGANA (opposé de la question) -->
+<div class="char-display" style="font-size: 4em !important; font-weight: bold; color: #8B6F47; margin-bottom: 0.5em;">
+      
+        ${displayChar}
+      </div>
+      
+      <!-- 3️⃣ LIGNE 3 : SCORE + ANIMATION (ou EMOJI si changement de statut) -->
+      <div id="line3-container" style="position: relative; min-height: 100px; display: flex; align-items: center; justify-content: center;">
+        
+        ${animateStatusChange ? `
+          <!-- CAS A : Animation de changement de statut (score → emoji) -->
+          <div id="score-container" style="font-size: 2.4em; font-weight: bold; color: #8B6F47;">
+            Score : 
+            <div style="display: inline-block; position: relative; width: 90px; height: 70px; overflow: hidden; margin-left: 12px; vertical-align: middle;">
+              <div id="score-old" style="position: absolute; top: 0; left: 0; width: 100%; text-align: center; font-size: 1em; color: #333; line-height: 70px;">
+                ${oldValidation}
+              </div>
+              <div id="score-new" style="position: absolute; left: 0; width: 100%; text-align: center; font-size: 1em; color: #333; font-weight: bold; line-height: 70px; top: ${isCorrect ? '70px' : '-70px'};">
+                ${newValidation}
+              </div>
+            </div>
+          </div>
+          
+          <!-- ✅ Container plante CENTRÉ avec position relative pour les sparkles -->
+          <div id="plant-game" style="position: absolute; opacity: 0; display: flex; align-items: center; justify-content: center;">
+            <span id="plant-emoji" class="plant-emoji" style="font-size: 4.5em; position: relative; z-index: 2; filter: drop-shadow(0 12px 24px rgba(0,0,0,.2));">${oldPlant}</span>
+          </div>
+        ` : `
+          <!-- CAS B : Animation de score simple (pas de changement de statut) -->
+          <div style="font-size: 2.4em; font-weight: bold; color: #8B6F47;">
+            Score : 
+            <div style="display: inline-block; position: relative; width: 90px; height: 70px; overflow: hidden; margin-left: 12px; vertical-align: middle;">
+              <div id="score-old" style="position: absolute; top: 0; left: 0; width: 100%; text-align: center; font-size: 1em; color: #333; line-height: 70px;">
+                ${oldValidation}
+              </div>
+              <div id="score-new" style="position: absolute; left: 0; width: 100%; text-align: center; font-size: 1em; color: #333; font-weight: bold; line-height: 70px; top: ${isCorrect ? '70px' : '-70px'};">
+                ${newValidation}
+              </div>
+            </div>
+          </div>
+        `}
+        
+      </div>
+    </div>
+  `;
+
+  // Activer le portal
+  portal.classList.add('active');
+  safeConvertEmojis(portal);
+
+  // Fade vers blanc après 0.3s
+  setTimeout(() => {
+    const flashcard = portal.querySelector('.revision-flashcard');
+    if (flashcard) {
+      flashcard.style.transition = 'background-color 0.5s ease-out';
+      flashcard.style.backgroundColor = '#ffffff';
+    }
+  }, 300);
+
+  // Son
+  if (voiceEnabled) {
+    new Audio(`https://emmanuel971-source.github.io/hirakataquizz/${encodeURIComponent(item.Hiragana)}.mp3`)
+      .play()
+      .catch(() => {});
+  }
+
+  // === ANIMATIONS APRÈS LE FADE VERS BLANC (0.8s) ===
+  setTimeout(() => {
+    // 1. Animation du score (compteur à rouleaux)
+if (animateScore && oldValidation !== newValidation) {  // ✅ Ajout de la condition
+  const oldS = document.getElementById('score-old');
+  const newS = document.getElementById('score-new');
+  
+if (animateScore) {
+  const oldS = document.getElementById('score-old');
+  const newS = document.getElementById('score-new');
+  
+  if (oldS && newS) {
+    const diff = Math.abs(newValidation - oldValidation);
+    const isGoingUp = newValidation > oldValidation;
+    
+    if (diff > 1) {
+      // ✅ SOLUTION SIMPLE : Enchaîner plusieurs animations
+      let currentValue = oldValidation;
+      const direction = isGoingUp ? 1 : -1;
+      
+      function rollNext() {
+        if (currentValue !== endValue) {
+          const nextValue = currentValue + direction;
+          
+          // Créer les deux divs pour cette étape
+          oldS.textContent = currentValue;
+          newS.textContent = nextValue;
+          
+          // Reset positions
+          oldS.style.animation = 'none';
+          newS.style.animation = 'none';
+          oldS.style.top = '0';
+          newS.style.top = isGoingUp ? '70px' : '-70px';
+          
+          // Forcer le reflow
+          void oldS.offsetHeight;
+          
+          // Lancer l'animation
+          if (isGoingUp) {
+            oldS.style.animation = 'rollDown 0.35s ease-in-out forwards';
+            newS.style.animation = 'rollInDown 0.35s ease-in-out forwards';
+          } else {
+            oldS.style.animation = 'rollUp 0.35s ease-in-out forwards';
+            newS.style.animation = 'rollInUp 0.35s ease-in-out forwards';
+          }
+          
+          currentValue = nextValue;
+          
+          // Attendre la fin de l'animation avant la prochaine
+          setTimeout(rollNext, 350);
+        }
+      }
+      
+      const endValue = newValidation;
+      rollNext();
+      
+    } else {
+      // Animation simple si diff = 1
+      if (isGoingUp) {
+        oldS.style.animation = 'rollDown 0.7s ease-in-out forwards';
+        newS.style.animation = 'rollInDown 0.7s ease-in-out forwards';
+      } else {
+        oldS.style.animation = 'rollUp 0.7s ease-in-out forwards';
+        newS.style.animation = 'rollInUp 0.7s ease-in-out forwards';
+      }
+    }
+  }
+}
+}
+    // 2. Animation de changement de statut AVEC TES VRAIES ANIMATIONS 🎊
+    if (animateStatusChange) {
+      const scoreContainer = document.getElementById('score-container');
+      const plantGame = document.getElementById('plant-game');
+      const plantEmoji = document.getElementById('plant-emoji');
+      
+      // Attendre la fin de l'animation du score (0.7s) puis transition
+      setTimeout(() => {
+        // Faire disparaître le score
+        if (scoreContainer) {
+          scoreContainer.style.transition = 'opacity 0.3s ease-out';
+          scoreContainer.style.opacity = '0';
+        }
+        
+        // ✅ FAIRE APPARAÎTRE LE CONTAINER PLANTE
+        if (plantGame && plantEmoji) {
+          plantGame.style.opacity = '1';
+          plantGame.style.transition = 'opacity 0.3s ease-in';
+          
+          setTimeout(() => {
+            // 🌿 → 🌸 (UPGRADE)
+            if (isUpgrade) {
+              plantEmoji.classList.add('wobble');
+              
+              setTimeout(() => {
+                plantEmoji.classList.add('explode');
+                spawnSparklesInFlashcard(plantGame, "flower");
+                
+                if (soundEnabled) {
+                  happySoundFlashcard();
+                }
+                
+                setTimeout(() => {
+                  plantEmoji.textContent = emoji;
+                  plantEmoji.className = 'plant-emoji pop';
+                  safeConvertEmojis(plantEmoji);
+                }, 60);
+                
+              }, 500); // Durée du wobble
+            }
+            
+            // 🌸 → 🌿 (DOWNGRADE)
+            else if (isDowngrade) {
+              plantEmoji.classList.add('jelly');
+              spawnSparklesInFlashcard(plantGame, "leaf");
+              
+              if (soundEnabled) {
+                sadSoundFlashcard();
+              }
+              
+              const shine = document.createElement("div");
+              shine.className = "shine-flashcard";
+              plantGame.appendChild(shine);
+              setTimeout(() => shine.remove(), 800);
+              
+              setTimeout(() => {
+                plantEmoji.textContent = emoji;
+                safeConvertEmojis(plantEmoji);
+              }, 300);
+            }
+          }, 100);
+        }
+      }, 700); // Attendre fin animation score
+    }
+  }, 800);
+
+  // ✅ Fermeture adaptative selon le type d'animation
+const closingDelay = animateStatusChange 
+  ? (isUpgrade ? 2900 : 2800)  // Upgrade = 2.5s trop court test à 2900 pour voir, Downgrade = 2.8s (jelly plus long)
+  : 1500;  // Pas de changement = fermeture rapide après le score
+
+setTimeout(() => {
+  closeRevisionFlashcard();
+}, closingDelay);
+}
+
+function closeRevisionFlashcard() {
+  const portal = document.getElementById('modal-portal');
+  const flashcard = portal.querySelector('.revision-flashcard');
+  
+  if (flashcard) {
+    flashcard.style.transition = 'all 0.4s ease-in';
+    flashcard.style.opacity = '0';
+    flashcard.style.transform = 'scale(0.8)';
+  }
+  
+  setTimeout(() => {
+    portal.classList.remove('active');
+    portal.innerHTML = '';
+    startRevisionQuestion();
+  }, 400);
+}
+function showUnlockFlashcard(featureName, emoji, message) {
+  console.log('🎭 showUnlockFlashcard appelée avec:', featureName);
+  const portal = document.getElementById('modal-portal');
+  console.log('🎭 Portal trouvé:', portal ? 'OUI' : 'NON');
+  
+  portal.innerHTML = `
+    <div class="revision-flashcard unlock-flashcard" style="background: linear-gradient(135deg, #d4edda 0%, #f8f1e9 100%); animation: popIn 0.6s ease-out forwards;">
+      <div class="unlock-sparkles" style="position: absolute; top: 10%; left: 10%; font-size: 2em; animation: sparkle 2s ease-in-out infinite;">✨</div>
+      <div class="unlock-sparkles" style="position: absolute; top: 10%; right: 10%; font-size: 2em; animation: sparkle 2s ease-in-out infinite; animation-delay: 0.3s;">✨</div>
+      <div class="unlock-sparkles" style="position: absolute; bottom: 15%; left: 15%; font-size: 2em; animation: sparkle 2s ease-in-out infinite; animation-delay: 0.6s;">✨</div>
+      <div class="unlock-sparkles" style="position: absolute; bottom: 15%; right: 15%; font-size: 2em; animation: sparkle 2s ease-in-out infinite; animation-delay: 0.9s;">✨</div>
+      
+      <div style="font-size: 5em; animation: kawaii-bounce 1s ease-in-out infinite; display: inline-block; margin-bottom: 0.3em;">${emoji}</div>
+      <div style="font-size: 2em; font-weight: bold; color: #8B6F47; margin: 0.5em 0; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">${featureName}</div>
+      <div style="font-size: 1.3em; color: #636E72; margin-top: 1em;">${message}</div>
+    </div>
+  `;
+  
+  portal.classList.add('active');
+  safeConvertEmojis(portal);
+  // Son de célébration
+  if (soundEnabled) {
+    playLevelUp();
+  }
+  
+  // Fermer après 3 secondes
+  setTimeout(() => {
+    const flashcard = portal.querySelector('.revision-flashcard');
+    if (flashcard) {
+      flashcard.style.transition = 'all 0.4s ease-in';
+      flashcard.style.opacity = '0';
+      flashcard.style.transform = 'scale(0.8)';
+    }
+    
+    setTimeout(() => {
+      portal.classList.remove('active');
+      portal.innerHTML = '';
+    }, 400);
+  }, 3000);
+}
 
 // ============================================================================
 // 🎯 SECTION 12 : NAVIGATION & UI GÉNÉRALE
@@ -7421,6 +9299,7 @@ let lastSectionOpened = null;
 const menuEmojis = ['']
 
 // --- Fonctions navigation ---
+
 function showSection(sectionId) {
   console.log('🔍 showSection appelée avec:', sectionId);
   
@@ -7443,6 +9322,64 @@ function showSection(sectionId) {
     }
   }
 
+  // NOUVEAU : Vérifier le blocage seulement lors du retour au menu depuis le mode révision
+  if (sectionId === 'menu-section' && revisionMode.isActive) {
+    const wasBlocked = hasShownBlockedMenu; // État précédent
+    const isNowBlocked = isApprentissageBloque();
+    
+    // Mettre à jour l'état des boutons
+    updateApprendreButtonState();
+    
+    // Afficher message approprié
+    if (isNowBlocked && !wasBlocked) {
+      // Passage de débloqué à bloqué
+      setTimeout(() => {
+        const menu = document.getElementById('menu');
+        const menuMessage = document.getElementById('menu-message');
+        menu.classList.add('active');
+        menuMessage.innerText = t('menu_msg_blocked'); // ✅ MODIFIÉ
+        hasShownBlockedMenu = true;
+      }, 500);
+    } else if (!isNowBlocked && wasBlocked) {
+      // Passage de bloqué à débloqué
+      setTimeout(() => {
+        const menu = document.getElementById('menu');
+        const menuMessage = document.getElementById('menu-message');
+        menu.classList.add('active');
+        menuMessage.innerText = t('menu_msg_unblocked'); // ✅ MODIFIÉ
+        hasShownBlockedMenu = false;
+        hasShownUnblockedMenu = true;
+      }, 500);
+    } else if (isNowBlocked) {
+      // Toujours bloqué
+      setTimeout(() => {
+        const menuMessage = document.getElementById('menu-message');
+        if (menuMessage) {
+          menuMessage.innerText = t('menu_msg_still_blocked'); // ✅ MODIFIÉ
+        }
+      }, 500);
+    }
+    // Si on quitte le mode révision
+  if (sectionId !== 'mode2') { // 'mode2' est l'ID de la section révision
+    revisionMode.isActive = false;
+    hasUnlockedInRevision = false; // Réinitialiser pour la prochaine session
+  }
+  }
+
+  // NOUVEAU : Vérifier systématiquement l'état du bouton Apprendre à chaque passage par le menu
+  if (sectionId === 'menu-section') {
+    updateApprendreButtonState();
+    updateMenuSectionMessage();
+  }
+
+  // Vérifier si on essaie d'accéder au mode révision
+  if (sectionId === 'mode2' && !isRevisionModeAvailable()) {
+    console.log('Mode révision non disponible');
+    return;
+  }
+
+  // SUPPRIMER la redirection automatique vers le mode révision
+  // Le bouton bloqué ne doit plus rediriger, il doit juste être inopérant
   
 document.querySelectorAll('.section').forEach(section => {
     section.classList.remove('active');
@@ -7466,14 +9403,16 @@ if (sectionId === 'options') {
       pointsGagnesEnRevision = 0;
       console.log(`🎯 Déficit initial capturé: ${deficitInitialRevision} points`);
     }
-   
+    hasUnlockedInRevision = false;
+    revisionMode.isActive = true;
     setTimeout(() => {
       initRevisionKeyboard();
       startRevisionQuestion();
       updateUnlockProgress(); // ✅ AJOUTE cette ligne
     }, 100);
   } else {
-  
+    revisionMode.isActive = false;
+    wasBlockedWhenEnteringRevision = false;
   }
   
   // ✅ NOUVEAU : Générer une question quand on ouvre le mode Apprendre
@@ -7517,10 +9456,10 @@ if (sectionId === 'stats') {
       }
     }, 100);
   }
+
+
+
 }
-
-
-
 function toggleMenu() {
   const menu = document.getElementById('menu');
   const hamburger = document.querySelector('.hamburger');
@@ -7539,17 +9478,8 @@ function toggleMenu() {
     }
   }
   
-menu.classList.toggle('active');
-
-
-// ✅ AJOUTEZ CES LIGNES
-  if (menu.classList.contains('active')) {
-    // Masque tous les sous-menus quand on ouvre le menu principal
-    document.querySelectorAll('.options-sub').forEach(sub => {
-      sub.classList.add('hidden');
-    });
-  }
-
+  menu.classList.toggle('active');
+  
   // ✅ CORRECTION : Utiliser une classe au lieu de style.display
   if (hamburger) {
     if (menu.classList.contains('active')) {
@@ -7628,7 +9558,114 @@ function backToOptions() {
 
 // --- Fonctions menu ---
 function updateMenuButtonStates() {
+  updateApprendreButtonState();
+  updateRevisionButtonState();
+  updateStatsButtonState(); // ✅ NOUVEAU
+}
+function updateApprendreButtonState() {
+  const apprendreButton = document.querySelector('button[onclick="showSection(\'quiz\')"]');
+  if (!apprendreButton) return;
+  
+  if (isApprentissageBloque()) {
+    apprendreButton.classList.add('disabled');
+    // Complètement bloquer le clic
+    apprendreButton.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      // Optionnel : feedback visuel ou sonore pour indiquer que c'est bloqué
+      console.log('Mode apprentissage bloqué - utilisez le mode révision');
+      return false;
+    };
+    apprendreButton.title = 'Mode bloqué - Pratiquez le mode révision pour débloquer';
+    apprendreButton.style.opacity = '0.5';
+    apprendreButton.style.cursor = 'not-allowed';
+  } else {
+    apprendreButton.classList.remove('disabled');
+    apprendreButton.onclick = () => showSection('quiz');
+    apprendreButton.title = '';
+    apprendreButton.style.opacity = '1';
+    apprendreButton.style.cursor = 'pointer';
+  }
+}
+function updateRevisionButtonState() {
+  const revisionButton = document.getElementById('revision-button');
+  if (!revisionButton) return;
+  
+  if (isRevisionModeAvailable()) {
+    revisionButton.classList.remove('disabled');
+    revisionButton.onclick = () => showSection('mode2');
+    revisionButton.title = '';
+  } else {
+    revisionButton.classList.add('disabled');
+    revisionButton.onclick = (e) => {
+      e.preventDefault();
+      // Optionnel : afficher un message
+      console.log('Mode révision disponible à partir du niveau 4');
+    };
+    revisionButton.title = 'Disponible à partir du niveau 4';
+  }
+}
 
+function updateStatsButtonState() {
+  const statsButton = document.querySelector('button[onclick="showSection(\'stats\')"]');
+  if (!statsButton) return;
+  
+  if (niveauActif >= 5) {
+    statsButton.classList.remove('disabled');
+    statsButton.onclick = () => showSection('stats');
+    statsButton.title = '';
+    statsButton.style.opacity = '1';        // ✅ AJOUTE cette ligne
+    statsButton.style.cursor = 'pointer';   // ✅ AJOUTE cette ligne
+  } else {
+    statsButton.classList.add('disabled');
+    statsButton.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('Mon jardin disponible à partir du niveau 5');
+      return false;
+    };
+    statsButton.title = 'Disponible à partir du niveau 5';
+    statsButton.style.opacity = '0.5';
+    statsButton.style.cursor = 'not-allowed';
+  }
+}
+function updateMenuMessage() {
+  const menuMessage = document.getElementById('menu-message');
+  if (menuMessage && menuMessage.innerText === '') {
+    // Messages neutres multilingues (les emojis sont universels)
+    const messages = [
+      '⛩️ Kanas-Zen-Garden ⛩️',
+      '🎌 Kanas-Zen-Garden 🎌',
+      '🍃 Kanas-Zen-Garden 🍵',
+    ];
+    menuMessage.innerText = messages[Math.floor(Math.random() * messages.length)];
+  }
+}
+function updateMenuSectionMessage() {
+  const messages = [
+    'Continues à apprendre ! 🌸',
+    'Explores les options ! ⚙️',
+    'Progresses chaque jour ! 🐼',
+    'Un pas après l\'autre 🌸',
+    'Bravo, tu progresses 🎌'
+  ];
+  const menuMessage = document.getElementById('menu-message');
+  if (menuMessage) {
+    menuMessage.innerText = messages[Math.floor(Math.random() * messages.length)];
+  }
+} 
+function forceRevisionMode() {
+  document.querySelectorAll('.section').forEach(section => {
+    section.classList.remove('active');
+  });
+  document.getElementById('mode2').classList.add('active');
+  
+  revisionMode.isActive = true;
+  setTimeout(() => {
+    initRevisionKeyboard();
+    startRevisionQuestion();
+    updateUnlockProgress(); // Ajouter cette ligne
+  }, 100);
 }
 
 
@@ -8077,7 +10114,6 @@ const EMOJIS_USED = [
 window.safeConvertEmojis = function(element, attempt = 0) { /* ... */ };
 function preloadEmojis() { /* ... */ }
 
-
 // ============================================================================
 // 🚀 SECTION 16 : INITIALISATION & CHARGEMENT
 // ============================================================================
@@ -8090,18 +10126,38 @@ async function initGame() {
 // Récupération du token (déjà existant dans ton code, on le garde ici)
     const userTokenFromStorage = localStorage.getItem('userToken'); // ← renommé pour éviter conflit
 
-// Détection simple de la langue du navigateur
-const browserLang = (navigator.language || navigator.userLanguage || "en")
-  .toLowerCase().split('-')[0];
+    // ==================================================================
+    // DÉTECTION DE LA LANGUE SELON NEW / RETURNING USER
+    // ==================================================================
+    let finalLanguage;
 
-if (browserLang.startsWith("fr")) currentLanguage = "fr";
-else if (browserLang.startsWith("es")) currentLanguage = "es";
-else currentLanguage = "en";
+    if (!userTokenFromStorage) {
+      // NEW USER → on force la langue du navigateur
+      const browserLang = (navigator.language || navigator.userLanguage || "en")
+        .toLowerCase().split('-')[0];
 
-console.log("Langue détectée :", currentLanguage);
-localStorage.setItem('appLanguage', currentLanguage);
+      if (browserLang.startsWith("fr")) finalLanguage = "fr";
+      else if (browserLang.startsWith("es")) finalLanguage = "es";
+      else finalLanguage = "en";
 
-updateAllTexts();
+      console.log("NEW USER → Langue forcée par navigateur :", finalLanguage);
+
+      // On sauvegarde pour cohérence (même si c'est un new user)
+      localStorage.setItem('appLanguage', finalLanguage);
+
+    } else {
+      // RETURNING USER → on prend la langue qu'il a choisie dans les Options
+      const savedLang = localStorage.getItem('appLanguage');
+      finalLanguage = savedLang || "en"; // fallback au cas où
+
+      console.log("RETURNING USER → Langue restaurée depuis localStorage :", finalLanguage);
+    }
+
+    // Application finale de la langue
+    currentLanguage = finalLanguage;
+
+    // Mise à jour IMMÉDIATE de tous les textes (avant tout affichage !)
+    updateAllTexts();
     console.log("Langue appliquée au démarrage :", currentLanguage);
 
     // ==================================================================
@@ -8143,27 +10199,78 @@ if (wordListsResult.success) {
 } else {
   console.warn('⚠️ Échec chargement WordLists, fallback sera utilisé');
 }
-// Chargement simple de tous les niveaux
-updateLoadingProgress(35, "Chargement des données...");
-const chunk1Result = await callAPI('getHiraganaChunk', { startLevel: 1, endLevel: 46 });
 
-if (chunk1Result.success) {
-  HiraganaList = chunk1Result.data.map(item => ({
-    ...item,
-    Validation: 0,
-    Tentatives: 0,
-    Réussites: 0
-  }));
-  console.log(`📊 ${chunk1Result.count} items chargés`);
-}
+if (profile.isNew) {
+  // 🆕 NEW USER : Niveaux 1-3
+  updateLoadingProgress(35, "Chargement niveaux 1-3...");
+      const chunk1Result = await callAPI('getHiraganaChunk', { startLevel: 1, endLevel: 3 });
+      
+      if (chunk1Result.success) {
+        HiraganaList = chunk1Result.data.map(item => ({
+          ...item,
+          Validation: 0,
+          Tentatives: 0,
+          Réussites: 0
+        }));
+        console.log(`📊 Chunk 1: ${chunk1Result.count} items chargés (niveaux ${chunk1Result.startLevel}-${chunk1Result.endLevel})`);
+      }
+      
+      updateLoadingProgress(60, "Prêt à jouer !");
+      
 
-updateLoadingProgress(60, "Données chargées !");
+       } else {
+      // 🔁 RETURNING USER – NO CHUNK YET
+
+      // Récupération profil et user (on en a besoin pour totalLevels et pseudo)
+      updateLoadingProgress(40, "Récupération de votre profil...");
+      userToken = token;
+      const userResult = await callAPI('getUserByToken', { token: token });
+      if (userResult.success) {
+        currentUser = userResult.user;
+        console.log('👤 Utilisateur récupéré:', currentUser.pseudo);
+      }
+
+      // Résolution définitive : qui est en avance ? Sync si besoin
+      updateLoadingProgress(50, "Vérification de vos progrès...");
+      await ensureLatestProgress(); // ← clientTruth est maintenant la vérité absolue
+
+      // Maintenant on sait EXACTEMENT quel niveau utiliser
+      const trustedNiveau = clientTruth.niveau_atteint || 1;
+      const maxLevel = Math.min(trustedNiveau + 2, profile.totalLevels || 46);
+
+      console.log(`🛠️ Chunk initial décidé APRÈS clientTruth : niveaux 1-${maxLevel} (basé sur niveau ${trustedNiveau})`);
+
+      updateLoadingProgress(55, `Chargement niveaux 1-${maxLevel}...`);
+      const chunkResult = await callAPI('getHiraganaChunk', { startLevel: 1, endLevel: maxLevel });
+
+      if (chunkResult.success) {
+        HiraganaList = chunkResult.data.map(item => ({
+          ...item,
+          Validation: 0,
+          Tentatives: 0,
+          Réussites: 0
+        }));
+        console.log(`📊 Chunk initial chargé : ${chunkResult.count} items (niveaux 1-${maxLevel})`);
+      } else {
+        console.error('Erreur chunk initial');
+      }
+
+      // Merge des stats (serveur à jour après éventuelle sync)
+      updateLoadingProgress(58, "Application de vos statistiques...");
+      await applyUserProgress();
+
+      updateLoadingProgress(60, "Profil chargé !");
+    }
     // ==========================================
     // PHASE 3 : INTERFACE JOUABLE (60-80%)
     // ==========================================
     updateLoadingProgress(70, "Initialisation de l'interface...");
     
-
+    // Initialiser le système utilisateur
+// ✅ Mettre à jour l'affichage du compte (pour new + returning)
+if (currentUser) {
+  updateAccountDisplay();
+}
     
     // Déterminer niveau actif
     niveauActif = determineNiveauActif(HiraganaList);
@@ -8224,10 +10331,105 @@ async function loadRemainingDataInBackground(profile) {
   
   console.log('🔄 Démarrage chargement background...');
   
+  try {
+    if (profile.isNew) {
+      // Charger niveaux 4-46 par paquets de 10
+      for (let start = 4; start <= profile.totalLevels; start += 10) {
+        const end = Math.min(start + 9, profile.totalLevels);
+        console.log(`📥 Background: chargement niveaux ${start}-${end}...`);
+        
+        const chunkResult = await callAPI('getHiraganaChunk', { startLevel: start, endLevel: end });
+        
+        if (chunkResult.success) {
+          const newItems = chunkResult.data.map(item => ({
+            ...item,
+            Validation: 0,
+            Tentatives: 0,
+            Réussites: 0
+          }));
+          
+          HiraganaList.push(...newItems);
+          
+          // 🆕 MISE À JOUR DES CACHES POUR LES NOUVEAUX ITEMS
+          newItems.forEach(item => {
+            const id = parseInt(item.ID);
+            validationCache[id] = 0; // Validation initiale à 0
+            
+            statsCache.items[id] = statsCache.items[id] || { tentatives: 0, reussites: 0, pourcentage: 0 };
+            statsCache.items[id].tentatives = 0;
+            statsCache.items[id].reussites = 0;
+            statsCache.items[id].pourcentage = 0;
+          });
+          
+          // Recalcul global des stats (propre mais pas obligatoire)
+          const totalTentatives = Object.values(statsCache.items).reduce((sum, item) => sum + item.tentatives, 0);
+          const totalReussites = Object.values(statsCache.items).reduce((sum, item) => sum + item.reussites, 0);
+          statsCache.globalPourcentage = totalTentatives > 0 ? (totalReussites / totalTentatives * 100) : 0;
+          
+          console.log(`✅ Background: ${newItems.length} items ajoutés + caches initialisés (total: ${HiraganaList.length})`);
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+      
+    } else {
+      // RETURNING USER
+      const trustedNiveau = clientTruth?.niveau_atteint || profile.niveau || 1;
+      const currentMax = Math.min(trustedNiveau + 2, profile.totalLevels || 46);
+      
+      if (currentMax < profile.totalLevels) {
+        console.log(`📥 Background: chargement niveaux ${currentMax + 1}-${profile.totalLevels}...`);
+        
+        const chunkResult = await callAPI('getHiraganaChunk', { 
+          startLevel: currentMax + 1, 
+          endLevel: profile.totalLevels 
+        });
+        
+        if (chunkResult.success) {
+          const newItems = chunkResult.data.map(item => ({
+            ...item,
+            Validation: 0,
+            Tentatives: 0,
+            Réussites: 0
+          }));
+          
+          HiraganaList.push(...newItems);
+          
+          // 🆕 MISE À JOUR DES CACHES POUR LES NOUVEAUX ITEMS
+          newItems.forEach(item => {
+            const id = parseInt(item.ID);
+            validationCache[id] = 0;
+            
+            statsCache.items[id] = statsCache.items[id] || { tentatives: 0, reussites: 0, pourcentage: 0 };
+            statsCache.items[id].tentatives = 0;
+            statsCache.items[id].reussites = 0;
+            statsCache.items[id].pourcentage = 0;
+          });
+          
+          // Recalcul global
+          const totalTentatives = Object.values(statsCache.items).reduce((sum, item) => sum + item.tentatives, 0);
+          const totalReussites = Object.values(statsCache.items).reduce((sum, item) => sum + item.reussites, 0);
+          statsCache.globalPourcentage = totalTentatives > 0 ? (totalReussites / totalTentatives * 100) : 0;
+          
+          console.log(`✅ Background: ${newItems.length} items ajoutés + caches initialisés (total: ${HiraganaList.length})`);
+        }
+      }
+      
 
-// Pas de chargement en arrière-plan nécessaire en mode simplifié
-console.log('✅ Chargement background désactivé (mode simplifié)');
-   
+    }
+    
+    // Régénération tables
+    revisionRomajiTable = generateRevisionRomajiTable(HiraganaList);
+    revisionKatakanaTable = generateRevisionKatakanaTable(HiraganaList);
+    console.log(`📚 Tables régénérées: Romaji=${Object.keys(revisionRomajiTable).length}, Katakana=${Object.keys(revisionKatakanaTable).length}`);
+    
+    console.log('✅ Chargement background terminé !');
+    
+  } catch (error) {
+    console.error('❌ Erreur chargement background:', error.message);
+  } finally {
+    backgroundLoadingInProgress = false;
+  }
 }
 function updateLoadingProgress(percent, message) {
   const fill = document.getElementById('loading-progress-fill');
@@ -8245,6 +10447,7 @@ function startApp() {
     return;
   }
   
+  updateMenuMessage();
 }
 // === FONCTION UNIVERSELLE SÉCURISÉE AVEC LIMITE ===
 // === FONCTION UNIVERSELLE SÉCURISÉE AVEC TES EMOJIS ===
@@ -8323,6 +10526,7 @@ console.warn(msg);
 }
 
 
+
 // ============================================================================
 // 🎬 SECTION 17 : DÉMARRAGE APPLICATION
 // ============================================================================
@@ -8377,7 +10581,6 @@ speechSynthesis.onvoiceschanged = () => {
 // --- Nettoyage particules ---
 setInterval(cleanupOldParticles, 3000);
 
-
 // ============================================================================
 // 🐼 SECTION 18 : ÉVÉNEMENTS PANDA & ÉCRAN D'ACCUEIL
 // ============================================================================
@@ -8417,8 +10620,25 @@ panda.addEventListener("click", async () => {
   const menuBtn = document.querySelector(".hamburger");
   if (menuBtn) menuBtn.classList.remove("hidden");
   
-  // Aller directement au menu
-  showSection('menu');
+ if (!userToken || !currentUser) {
+    showSection('create-account');
+    await initPseudoCache(); // ✅ Maintenant valide
+  } else {
+    showReturningUserWelcome(currentUser.pseudo);
+  }
+  
+  if (isApprentissageBloque()) {
+    console.log('🚫 Mode Apprendre bloqué détecté au démarrage');
+    wasBlockedWhenEnteringRevision = true;
+    deficitInitialRevision = calculerDeficitValidation();
+    pointsGagnesEnRevision = 0;
+    
+    setTimeout(() => {
+      showSection('mode2');
+    }, 100);
+  }
+  
+  nextQuestion();
 });
   
   updateAllTexts();
@@ -8461,6 +10681,615 @@ document.querySelectorAll('.revision-key').forEach(key => {
 });
 
 
+
+// =============================================================================
+// =============================================================================
+//                            SECTION 19 : TUTORIEL MODE QUIZ
+// =============================================================================
+// =============================================================================
+
+const quizTutorialSteps = [
+  {
+    title: "tuto_step1_title",  // 👈 Clé de traduction
+    text: "tuto_step1_text",    // 👈 Clé de traduction
+    animate: () => {}
+  },
+  {
+    title: "tuto_step2_title",
+    text: "tuto_step2_text",
+    animate: () => {
+      const marker = document.querySelector(".progress-marker");
+      if (!marker) return;
+      const orig = getComputedStyle(marker).left;
+      let interval = setInterval(() => {
+        marker.style.transition = "left 1s ease";
+        marker.style.left = "100%";
+        setTimeout(() => {
+          marker.style.transition = "none";
+          marker.style.left = orig;
+          setTimeout(() => {
+            marker.style.transition = "left 1s ease";
+          }, 50);
+        }, 1200);
+      }, 2500);
+      return () => clearInterval(interval);
+    }
+  },
+  {
+    title: "tuto_step3_title",
+    text: "tuto_step3_text",
+    animate: () => {
+      const cards = document.querySelectorAll(".hiragana-card");
+      if (cards.length === 0) return;
+      const target = cards[Math.floor(cards.length / 2)];
+      
+      const stars = target.querySelectorAll(".star");
+      
+      let interval = null;
+      let timeouts = [];
+      
+      const animateStars = () => {
+        stars.forEach(s => {
+          s.classList.remove("filled", "new-star");
+          s.style.background = "var(--gray-very-light)";
+        });
+        
+        stars.forEach((star, i) => {
+          const timeout1 = setTimeout(() => {
+            star.classList.add("filled", "new-star");
+            star.style.background = "var(--pink-primary)";
+            
+            const timeout2 = setTimeout(() => {
+              star.classList.remove("new-star");
+            }, 1200);
+            
+            timeouts.push(timeout2);
+          }, i * 1200);
+          
+          timeouts.push(timeout1);
+        });
+        
+        const completedTimeout = setTimeout(() => {
+          target.classList.add("completed");
+        }, stars.length * 1200 + 1200);
+        
+        timeouts.push(completedTimeout);
+      };
+      
+      animateStars();
+      interval = setInterval(() => {
+        timeouts.forEach(t => clearTimeout(t));
+        timeouts = [];
+        animateStars();
+      }, stars.length * 1200 + 2000);
+      
+      target.classList.add("pulsing");
+      
+      return () => {
+        if (interval) clearInterval(interval);
+        timeouts.forEach(t => clearTimeout(t));
+        timeouts = [];
+        target.classList.remove("completed", "pulsing");
+        stars.forEach(star => {
+          star.classList.remove("filled", "new-star");
+          star.style.background = "var(--gray-very-light)";
+        });
+      };
+    }
+  },
+  {
+    title: "tuto_step4_title",
+    text: "tuto_step4_text",
+    animate: () => {
+      const question = document.getElementById("question");
+      if (question) {
+        question.classList.add("tutorial-highlight", "pulsing");
+      }
+    }
+  },
+  {
+    title: "tuto_step5_title",
+    text: "tuto_step5_text",
+    animate: () => {
+      const buttons = document.querySelectorAll(".answers button");
+      if (buttons.length === 0) return;
+    }
+  },
+  {
+    title: "tuto_step6_title",
+    text: "tuto_step6_text",
+    animate: playIncorrectAnswerDemo
+  },
+  {
+    title: "tuto_step7_title",
+    text: "tuto_step7_text",
+    animate: playCorrectAnswerDemo
+  },
+  {
+    title: "tuto_step8_title",
+    text: "tuto_step8_text",
+    animate: () => {}
+  },
+  {
+    title: "tuto_step9_title",
+    text: "tuto_step9_text",
+  }
+];
+let tutorialStep = 0;
+let tutorialActive = false;
+let currentCleanup = null;
+function startQuizTutorial() {
+  if (tutorialActive) return;
+  tutorialActive = true;
+  tutorialStep = 0;
+
+  // Désactive les boutons pour que l'utilisateur puisse jouer
+  document.querySelectorAll(".answers button").forEach(b => {
+    b.style.pointerEvents = "none";
+  });
+  
+  // 👇 AJOUT : Désactiver le bouton hamburger
+  const hamburger = document.querySelector(".hamburger");
+  if (hamburger) {
+    hamburger.style.pointerEvents = "none";
+  //  hamburger.style.opacity = "0.5";
+  }
+  
+  document.getElementById("quiz-tutorial-overlay").style.display = "flex";
+  const dots = document.getElementById("tutorial-progress-dots");
+  dots.innerHTML = "";
+  quizTutorialSteps.forEach((_, i) => {
+    const d = document.createElement("div");
+    d.className = "tutorial-dot" + (i === 0 ? " active" : "");
+    dots.appendChild(d);
+  });
+  showTutorialStep();
+}
+
+
+function showTutorialStep() {
+  // Nettoyage...
+  if (currentCleanup) {
+    currentCleanup();
+    currentCleanup = null;
+  }
+
+  const step = quizTutorialSteps[tutorialStep];
+
+  // 👇 Utilise la fonction de traduction t()
+  document.getElementById("tutorial-title").textContent = t(step.title);
+  document.getElementById("tutorial-text").textContent = t(step.text);
+
+
+  // Reset question
+  const q = document.getElementById("question");
+  if (q) {
+    q.textContent = "あ";
+  }
+
+  // 👇 Maintenant le reste du code (reset cartes, etc.)
+  const resultDiv = document.getElementById("result");
+  if (resultDiv && tutorialStep !== 6) {
+    resultDiv.style.zIndex = "";
+  }
+
+  // Reset complet de la carte avec étoiles
+  if (tutorialStep !== 2) {
+    document.querySelectorAll(".hiragana-card").forEach(card => {
+      card.classList.remove("completed", "pulsing");
+      card.querySelectorAll(".star").forEach(star => {
+        star.classList.remove("filled", "new-star");
+        star.style.background = "var(--gray-very-light)";
+      });
+    });
+  } else {
+    // À l'arrivée sur l'étape 2, reset aussi
+    document.querySelectorAll(".hiragana-card").forEach(card => {
+      card.classList.remove("completed", "pulsing");
+      card.querySelectorAll(".star").forEach(star => {
+        star.classList.remove("filled", "new-star");
+        star.style.background = "var(--gray-very-light)";
+      });
+    });
+  }
+
+  // Mise à jour des points de progression
+  document.querySelectorAll(".tutorial-dot").forEach((d, i) => {
+    d.classList.toggle("active", i === tutorialStep);
+  });
+
+
+
+
+  // Retrait des highlights et animations générales
+// Retrait des highlights et animations générales
+document.querySelectorAll(".tutorial-highlight, .tutorial-highlight-hamburger, .pulsing, .completed").forEach(el => {
+  el.classList.remove("tutorial-highlight", "tutorial-highlight-hamburger", "pulsing", "completed");
+});
+
+  // Nettoyage spécifique des boutons de réponses
+  document.querySelectorAll(".answers button").forEach(b => {
+    b.classList.remove("clicked-glow", "clicked", "correct", "incorrect");
+  });
+
+  // Positionnement de la carte du tutoriel
+  const card = document.getElementById("quiz-tutorial-card");
+  card.style.transform = "translateY(0)"; // reset
+
+  if (tutorialStep === 1) {
+    card.style.transform = "translateY(0)";
+  } else if (tutorialStep === 2) {
+    card.style.transform = "translateY(5vh)";
+  } else if (tutorialStep === 3) {
+    card.style.transform = "translateY(20vh)";
+  } else if (tutorialStep === 4) {
+    card.style.transform = "translateY(-28vh)";
+  } else if (tutorialStep === 5) {
+    card.style.transform = "translateY(-28vh)";
+  } else if (tutorialStep === 6) {
+    card.style.transform = "translateY(-28vh)";
+    card.style.zIndex = "5"; // 👈 AJOUT : Passe sous les sparkles (z-index 10)
+  } else if (tutorialStep === 7) {
+    card.style.transform = "translateY(0)";
+  } else {
+    card.style.transform = "translateY(0)";
+  }
+
+// Highlight de la zone concernée
+//const highlightSelector = tutorialStep === 1 ? "#progressBarContainer" :
+//                          tutorialStep === 2 ? ".hiraganas-grid" :
+//                          tutorialStep === 3 ? "#question" :
+//                        //  tutorialStep === 4 ? ".quiz-container > div:has(.answers)" :  // 👈 Parent des 2 rangées
+//                        //  tutorialStep === 5 ? ".quiz-container > div:has(.answers)" :  // 👈 Parent des 2 rangées
+//                        //  tutorialStep === 6 ? ".quiz-container > div:has(.answers)" :  // 👈 Parent des 2 rangées
+//                          tutorialStep === 4 ? ".answers" :
+//                          tutorialStep === 5 ? ".answers" :
+//                          tutorialStep === 6 ? ".answers" :
+//         tutorialStep === 7 ? null :
+//                            null;
+
+
+ // if (highlightSelector) {
+ //   document.querySelectorAll(highlightSelector).forEach(el => {
+ //     el.classList.add("tutorial-highlight");
+ //   });
+ // }
+// Highlight de la zone concernée
+// Highlight de la zone concernée
+if (tutorialStep === 1) {
+  document.querySelector("#progressBarContainer")?.classList.add("tutorial-highlight");
+} else if (tutorialStep === 2) {
+  document.querySelector(".hiraganas-grid")?.classList.add("tutorial-highlight");
+} else if (tutorialStep === 3) {
+  document.querySelector("#question")?.classList.add("tutorial-highlight");
+} else if (tutorialStep === 4 || tutorialStep === 5 || tutorialStep === 6) {
+  const choices1 = document.querySelector("#choices1");
+  const choices2 = document.querySelector("#choices2");
+  
+  if (choices1 && choices2) {
+    const parent = choices1.parentElement;
+    if (parent) {
+      parent.classList.add("tutorial-highlight");
+    }
+  }
+} else if (tutorialStep === 7) {
+  // 👇 Utilise la classe spéciale pour le hamburger
+  document.querySelector(".hamburger")?.classList.add("tutorial-highlight-hamburger");
+}
+  // === LANCEMENT DE L'ANIMATION DE L'ÉTAPE ===
+ if (tutorialStep >= 1 && tutorialStep <= 6) {
+    // Pour les étapes ❌ et ✅ : on utilise une question fixe ultra-fiable
+    setupTutorialDemoQuestion();
+
+    // Petit délai pour que les boutons soient bien dans le DOM
+    setTimeout(() => {
+      if (step.animate) {
+        currentCleanup = step.animate() || null;
+      }
+    }, 50);
+
+  } else {
+    // Toutes les autres étapes : animation immédiate (comme avant)
+    if (step.animate) {
+      currentCleanup = step.animate() || null;
+    }
+  }
+
+  // Texte du bouton Suivant / Commencer
+  document.getElementById("tutorial-next").textContent =
+    tutorialStep === quizTutorialSteps.length - 1 ? t('tuto_start') : t('tuto_next');
+}
+function nextTutorialStep() {
+  tutorialStep++;
+  if (tutorialStep >= quizTutorialSteps.length) {
+    endQuizTutorial();
+  } else {
+    showTutorialStep();
+  }
+}
+function endQuizTutorial() {
+  tutorialActive = false;
+  document.getElementById("quiz-tutorial-overlay").style.display = "none";
+  if (currentCleanup) currentCleanup();
+// Retrait des highlights et animations générales
+document.querySelectorAll(".tutorial-highlight, .tutorial-highlight-hamburger, .pulsing, .completed").forEach(el => {
+  el.classList.remove("tutorial-highlight", "tutorial-highlight-hamburger", "pulsing", "completed");
+});
+ 
+  // ✅ Réactive les boutons pour que l'utilisateur puisse jouer
+  document.querySelectorAll(".answers button").forEach(b => {
+    b.disabled = false;
+    b.style.pointerEvents = "auto";
+  });
+   // 👇 AJOUT : Réactiver le bouton hamburger
+  const hamburger = document.querySelector(".hamburger");
+  if (hamburger) {
+    hamburger.style.pointerEvents = "auto";
+    hamburger.style.opacity = "1";
+  }
+// localStorage.removeItem('quizTutorialSeen');
+  nextQuestion();
+}
+// Fonctions utilitaires
+function simulateTutorialAnswer(correct) {
+  const rows = [document.getElementById("choices1"), document.getElementById("choices2")];
+  rows.forEach(row => {
+    row.querySelectorAll("button").forEach(b => b.disabled = true);
+  });
+  rows.forEach((row, idx) => {
+    const btns = row.querySelectorAll("button");
+    const good = btns[idx % btns.length];
+    const chosen = correct ? good : btns[(idx + 1) % btns.length];
+    setTimeout(() => {
+      chosen.classList.add("clicked-glow", correct ? "correct" : "incorrect");
+      good.classList.add("correct");
+    }, idx * 400);
+  });
+  if (correct) {
+  }
+}
+function resetTutorialButtons() {
+  document.querySelectorAll(".answers button").forEach(b => {
+    b.className = "arcade-button";
+    b.disabled = false;
+  });
+}
+// Fonction pour simuler une réponse correcte (étape du tuto)
+function playCorrectAnswerDemo() {
+  const correctKatakana = "ア";
+  const correctRomaji = "a";
+
+  const correctBtn1 = [...document.querySelectorAll("#choices1 button")].find(b => b.innerText === correctKatakana);
+  const correctBtn2 = [...document.querySelectorAll("#choices2 button")].find(b => b.innerText === correctRomaji);
+
+  if (!correctBtn1 || !correctBtn2) {
+    console.warn("Boutons corrects non trouvés (démo bonne réponse)");
+    return () => {};
+  }
+
+  // 1️⃣ Premier bouton cliqué + son + grisage des autres
+  setTimeout(() => {
+    correctBtn1.classList.add("clicked-glow", "clicked");
+    playTwinkle();
+    
+    // Griser tous les autres boutons de la ligne 1
+    document.querySelectorAll("#choices1 button").forEach(btn => {
+      if (btn !== correctBtn1) {
+        btn.disabled = true;
+        btn.style.opacity = "0.5";
+      }
+    });
+  }, 300);
+
+  // 2️⃣ Deuxième bouton cliqué + son + grisage des autres
+  setTimeout(() => {
+    correctBtn2.classList.add("clicked-glow", "clicked");
+    playTwinkle();
+    
+    // Griser tous les autres boutons de la ligne 2
+    document.querySelectorAll("#choices2 button").forEach(btn => {
+      if (btn !== correctBtn2) {
+        btn.disabled = true;
+        btn.style.opacity = "0.5";
+      }
+    });
+  }, 800);
+
+  // 3️⃣ Validation quasi-immédiate (comme dans le vrai jeu)
+  setTimeout(() => {
+    correctBtn1.classList.remove("clicked-glow");
+    correctBtn1.classList.add("correct");
+    correctBtn2.classList.remove("clicked-glow");
+    correctBtn2.classList.add("correct");
+
+    // 🎉 ANIMATION DE SUCCÈS (immédiatement après validation)
+    const questionDiv = document.getElementById("question");
+    const resultDiv = document.getElementById("result");
+    const container = document.querySelector('.quiz-container');
+    
+    if (!questionDiv || !resultDiv || !container) return;
+    
+    const questionRect = questionDiv.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    
+    // Positionnement du résultat à la place de la question
+    resultDiv.style.position = "absolute";
+    resultDiv.style.top = (questionRect.top - containerRect.top) + "px";
+    resultDiv.style.left = "0";
+    resultDiv.style.right = "0";
+    resultDiv.style.height = questionRect.height + "px";
+    resultDiv.style.zIndex = "10";
+    questionDiv.style.visibility = "hidden";
+
+    // Emojis de succès
+    const emojisOK = ["🦋","🐸","🍀","💩","👻","😸","😽","🌈","🐻","🌞","✅","🧠","🐶","🐵"];
+    const emoji = emojisOK[Math.floor(Math.random() * emojisOK.length)];
+    const text = t('tuto_perfect'); 
+
+    setTimeout(() => {
+      resultDiv.className = 'anim-combo';
+      resultDiv.innerHTML = `<div class="result-line">
+        <div class="result-text">${text}</div>
+        <div class="result-emoji">${emoji}</div>
+      </div>`;
+      
+      // Conversion des emojis si twemoji est chargé
+      if (window.safeConvertEmojis) {
+        safeConvertEmojis(resultDiv);
+      }
+      
+      // Création des sparkles
+      setTimeout(() => {
+        if (window.createSparkles) {
+          createSparkles();
+        }
+      }, 100);
+    }, 10);
+
+    // Nettoyage après animation
+    setTimeout(() => {
+      questionDiv.style.visibility = "visible";
+      resultDiv.style.opacity = "0";
+      setTimeout(() => { 
+        resultDiv.innerHTML = ""; 
+        resultDiv.style = ""; 
+      }, 500);
+    }, 1800);
+  }, 900);
+
+  // Fonction de cleanup
+  return () => {
+    const resultDiv = document.getElementById("result");
+    if (resultDiv) {
+      resultDiv.innerHTML = "";
+      resultDiv.style = "";
+    }
+    const questionDiv = document.getElementById("question");
+    if (questionDiv) {
+      questionDiv.style.visibility = "visible";
+    }
+    document.querySelectorAll(".answers button").forEach(btn => {
+      btn.classList.remove("clicked-glow", "clicked", "correct", "incorrect");
+      btn.disabled = false;
+      btn.style.opacity = "";
+    });
+  };
+}
+
+function playIncorrectAnswerDemo() {
+  const correctKatakana = "ア";
+  const correctRomaji = "a";
+
+  const buttons1 = [...document.querySelectorAll("#choices1 button")];
+  const buttons2 = [...document.querySelectorAll("#choices2 button")];
+
+  const correctBtn1 = buttons1.find(b => b.innerText === correctKatakana);
+  const correctBtn2 = buttons2.find(b => b.innerText === correctRomaji);
+
+  // On prend un mauvais bouton (pas le bon)
+  const wrongBtn1 = buttons1.find(b => b.innerText !== correctKatakana);
+  const wrongBtn2 = buttons2.find(b => b.innerText !== correctRomaji);
+
+  if (!correctBtn1 || !correctBtn2 || !wrongBtn1 || !wrongBtn2) {
+    console.warn("Boutons manquants (démo mauvaise réponse)");
+    return () => {};
+  }
+
+  // 1️⃣ Premier mauvais bouton → cliqué + son + grisage
+  setTimeout(() => {
+    wrongBtn1.classList.add("clicked-glow", "clicked");
+    playTwinkle();
+    
+    // Griser tous les autres boutons de la ligne 1
+    document.querySelectorAll("#choices1 button").forEach(btn => {
+      if (btn !== wrongBtn1) {
+        btn.disabled = true;
+        btn.style.opacity = "0.5";
+      }
+    });
+  }, 300);
+
+  // 2️⃣ Deuxième mauvais bouton → cliqué + son + grisage
+  setTimeout(() => {
+    wrongBtn2.classList.add("clicked-glow", "clicked");
+    playTwinkle();
+    
+    // Griser tous les autres boutons de la ligne 2
+    document.querySelectorAll("#choices2 button").forEach(btn => {
+      if (btn !== wrongBtn2) {
+        btn.disabled = true;
+        btn.style.opacity = "0.5";
+      }
+    });
+  }, 800);
+
+  // 3️⃣ Résolution : rouges + verts + son (juste après le 2ème clic)
+  setTimeout(() => {
+    // Retrait glow
+    wrongBtn1.classList.remove("clicked-glow");
+    wrongBtn2.classList.remove("clicked-glow");
+
+    // Mauvaises réponses → rouge
+    wrongBtn1.classList.add("incorrect");
+    wrongBtn2.classList.add("incorrect");
+
+    // Bonnes réponses → vert (simultané)
+    correctBtn1.classList.add("correct");
+    correctBtn2.classList.add("correct");
+
+    // Rendre les bonnes réponses bien visibles
+    correctBtn1.style.opacity = "1";
+    correctBtn2.style.opacity = "1";
+
+    // Son d'erreur
+    playSoftError();
+  }, 900);
+
+  return () => {
+    document.querySelectorAll(".answers button").forEach(btn => {
+      btn.classList.remove("clicked-glow", "clicked", "correct", "incorrect");
+      btn.disabled = false;
+      btn.style.opacity = "";
+    });
+  };
+}
+// Événements boutons
+document.getElementById("tutorial-next").onclick = nextTutorialStep;
+function setupTutorialDemoQuestion() {
+  // Question fixe pour le tutoriel : on prend "ア" (a en romaji) → simple et visuel
+
+  // 1. Mise à jour du kana affiché dans la question
+  const questionEl = document.getElementById("question");
+  if (questionEl) {
+    questionEl.textContent = "あ";  // Le kana affiché
+  }
+
+  // 2. Vidage des conteneurs de réponses
+  const choices1 = document.getElementById("choices1");
+  const choices2 = document.getElementById("choices2");
+  if (choices1) choices1.innerHTML = "";
+  if (choices2) choices2.innerHTML = "";
+
+  // 3. Création des boutons pour la ligne Katakana (choices1)
+  // Bonne réponse : "ア" → on la met en position 0 pour simplifier
+  const katakanaOptions = ["ウ", "イ", "ア", "エ"];
+  katakanaOptions.forEach(text => {
+    const btn = document.createElement("button");
+    btn.className = "arcade-button";
+    btn.innerText = text;
+    choices1.appendChild(btn);
+  });
+
+  // 4. Création des boutons pour la ligne Romaji (choices2)
+  // Bonne réponse : "a"
+  const romajiOptions = ["i", "a", "e", "o"];
+  romajiOptions.forEach(text => {
+    const btn = document.createElement("button");
+    btn.className = "arcade-button";
+    btn.innerText = text;
+    choices2.appendChild(btn);
+  });
+}
 
 // =============================================================================
 // =============================================================================
@@ -8542,35 +11371,23 @@ function showNextQuestion() {
   document.getElementById('flashGroupName').textContent = 
     GROUPES[currentGroup].nom;
   
-// Réinitialiser la carte (face avant)
-const card = document.getElementById('flashCard');
-
-// ✅ VIDER D'ABORD le contenu de la face arrière
-document.getElementById('flashHiraganaSmall').textContent = '';
-document.getElementById('flashRomaji').textContent = '';
-
-// Ensuite retirer la classe flipped
-card.classList.remove('flipped');
-quizFlashState.isFlipped = false;
-
-// Puis afficher le nouvel hiragana sur la face avant
-document.getElementById('flashHiragana').textContent = item.Hiragana;
-
-// ✅ ATTENDRE que l'animation soit terminée pour remplir la face arrière
-setTimeout(() => {
+  // Réinitialiser la carte (face avant)
+  const card = document.getElementById('flashCard');
+  card.classList.remove('flipped');
+  quizFlashState.isFlipped = false;
+  
+  // Afficher l'hiragana
+  document.getElementById('flashHiragana').textContent = item.Hiragana;
   document.getElementById('flashHiraganaSmall').textContent = item.Hiragana;
   document.getElementById('flashRomaji').textContent = item.Romaji;
-  safeConvertEmojis(document.getElementById('flashHiraganaSmall'));
-}, 600); // 600ms = durée de l'animation de flip
-
-
+  
   // Convertir les emojis
   safeConvertEmojis(document.getElementById('flashHiragana'));
   safeConvertEmojis(document.getElementById('flashHiraganaSmall'));
   
   // Son de pop
   if (soundEnabled) {
-     playQuestionSound(); // ou un nom similaire
+    playFireworkSound(); // Réutilise un son existant
   }
   
   // Démarrer le timer
@@ -8578,61 +11395,52 @@ setTimeout(() => {
 }
 
 function startFlashTimer(item) {
+  // Stopper le timer précédent
   if (quizFlashState.timerInterval) {
     clearInterval(quizFlashState.timerInterval);
   }
-
+  
+  // Déterminer la durée selon la difficulté
   const difficulty = parseInt(localStorage.getItem('difficulty')) || 6;
-  const duration = difficulty <= 4 ? 5 : difficulty <= 6 ? 4 : 3;
-
+  let duration;
+  
+  if (difficulty <= 4) {
+    duration = 5; // Facile
+  } else if (difficulty <= 6) {
+    duration = 4; // Moyen
+  } else {
+    duration = 3; // Difficile
+  }
+  
   quizFlashState.totalTime = duration;
   quizFlashState.timeRemaining = duration;
-
+  
   const timerBar = document.getElementById('flashTimerBar');
-
-  // 🔒 Désactiver transitions et lueur
-  timerBar.classList.add('no-transition', 'no-shine');
-  timerBar.classList.remove('warning', 'danger', 'flash-start');
-
-  timerBar.style.width = '100%';
-  timerBar.offsetHeight; // force repaint
-
-  // 💥 Flash initial
-  timerBar.classList.add('flash-start');
-  setTimeout(() => timerBar.classList.remove('flash-start'), 200);
-
-  // 🔄 Relancer le timer après 250ms
-  setTimeout(() => {
-    timerBar.classList.remove('no-transition', 'no-shine'); // ✅ réactive transition et lueur
-
-    const startTime = Date.now();
-
-    quizFlashState.timerInterval = setInterval(() => {
-      const elapsed = (Date.now() - startTime) / 1000;
-      const remaining = Math.max(0, duration - elapsed);
-      const percentage = (remaining / duration) * 100;
-
-      quizFlashState.timeRemaining = remaining;
-      timerBar.style.width = percentage + '%';
-// ✅ AJOUTER CES 2 LIGNES
-const timerContainer = document.querySelector('.quiz-flash-timer');
-timerContainer.style.setProperty('--shine-opacity', percentage > 0 ? '1' : '0');
-
-      timerBar.classList.remove('warning', 'danger');
-      if (percentage <= 30) timerBar.classList.add('danger');
-      else if (percentage <= 60) timerBar.classList.add('warning');
-
-      // 🔥 STOP lueur si barre vide
-      if (remaining <= 0) {
-        timerBar.classList.add('no-shine'); // arrête l’animation
-        clearInterval(quizFlashState.timerInterval);
-        flipCardAndReveal(item);
-      }
-    }, 50);
-
-  }, 250);
+  const startTime = Date.now();
+  
+  quizFlashState.timerInterval = setInterval(() => {
+    const elapsed = (Date.now() - startTime) / 1000;
+    const remaining = Math.max(0, duration - elapsed);
+    const percentage = (remaining / duration) * 100;
+    
+    quizFlashState.timeRemaining = remaining;
+    timerBar.style.width = percentage + '%';
+    
+    // Changer la couleur selon le temps restant
+    timerBar.classList.remove('warning', 'danger');
+    if (percentage <= 30) {
+      timerBar.classList.add('danger');
+    } else if (percentage <= 60) {
+      timerBar.classList.add('warning');
+    }
+    
+    // Timer terminé
+    if (remaining <= 0) {
+      clearInterval(quizFlashState.timerInterval);
+      flipCardAndReveal(item);
+    }
+  }, 50);
 }
-
 
 function flipCardAndReveal(item) {
   const card = document.getElementById('flashCard');
@@ -8662,47 +11470,14 @@ function flipCardAndReveal(item) {
 function showTrophyFlashcard(completedGroup) {
   const portal = document.getElementById('modal-portal');
   
-  // 🎨 Récupère les couleurs du paysage selon la saison
-  const season = document.getElementById('season')?.value || 'spring';
-  const timeOfDay = document.getElementById('timeOfDay')?.value || 'day';
-  
-  // Palettes de couleurs par saison
-  const seasonColors = {
-    spring: ['#FFB7C5', '#FFC8DD', '#98D8C8', '#C4E8C2'],
-    summer: ['#87CEEB', '#FFD700', '#FFA500', '#FF6B6B'],
-    autumn: ['#D2691E', '#FF8C42', '#CD853F', '#B8860B'],
-    winter: ['#4682B4', '#B0C4DE', '#778899', '#ADD8E6']
-  };
-  
-  // Ajuste selon moment de la journée (plus sombre la nuit)
-  let colors = seasonColors[season] || seasonColors.spring;
-  if (timeOfDay === 'night') {
-    colors = colors.map(c => {
-      // Assombrit les couleurs pour la nuit
-      const rgb = parseInt(c.slice(1), 16);
-      const r = Math.max(0, ((rgb >> 16) & 0xFF) * 0.6);
-      const g = Math.max(0, ((rgb >> 8) & 0xFF) * 0.6);
-      const b = Math.max(0, (rgb & 0xFF) * 0.6);
-      return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
-    });
-  }
-  
-  // Choisit 2 couleurs aléatoires pour le gradient
-  const color1 = colors[Math.floor(Math.random() * colors.length)];
-  const color2 = colors[Math.floor(Math.random() * colors.length)];
-  
-  // 🏆 Emojis de trophées aléatoires
-  const trophyEmojis = ['🏆', '🥇', '🥈', '🥉', '🎖️', '👑', '⭐', '🌟'];
-  const randomTrophy = trophyEmojis[Math.floor(Math.random() * trophyEmojis.length)];
-  
   portal.innerHTML = `
-    <div class="revision-flashcard unlock-flashcard" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%);">
+    <div class="revision-flashcard unlock-flashcard" style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);">
       <div class="unlock-sparkles" style="position: absolute; top: 10%; left: 10%;">✨</div>
       <div class="unlock-sparkles" style="position: absolute; top: 10%; right: 10%; animation-delay: 0.3s;">✨</div>
       <div class="unlock-sparkles" style="position: absolute; bottom: 15%; left: 15%; animation-delay: 0.6s;">✨</div>
       <div class="unlock-sparkles" style="position: absolute; bottom: 15%; right: 15%; animation-delay: 0.9s;">✨</div>
       
-      <div style="font-size: 6em; margin-bottom: 0.3em;">${randomTrophy}</div>
+      <div style="font-size: 6em; margin-bottom: 0.3em;">🏆</div>
       <div style="font-size: 2.2em; font-weight: bold; color: #fff; text-shadow: 0 4px 8px rgba(0,0,0,0.3); margin-bottom: 0.5em;">
         ${t('quiz_flash_group_complete')}
       </div>
