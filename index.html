@@ -283,9 +283,7 @@ html {touch-action: pan-x pan-y; -ms-touch-action: pan-x pan-y;}
 * {user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;}
 body {background: var(--beige-background); font-family: 'Noto Sans JP', sans-serif; color: var(--brown-primary); font-family: sans-serif; text-align: center; padding: 0.5em 1em 1em 1em; margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column;}
 body::before {content: ''; position: absolute; top: 0; left: 0; background: url('https://www.transparenttextures.com/patterns/paper-fibers.png'); opacity: 0.1; z-index: -1;}
-h1 {margin: 0.5em 0; font-size: 1.8em; text-align: center; color: var(--brown-primary); text-shadow: 0 1px 2px var(--shadow-brown-light);
-  
-}
+h1 {margin: 0.5em 0; font-size: 1.8em; text-align: center; color: var(--brown-primary); text-shadow: 0 1px 2px var(--shadow-brown-light)}
 h2 {margin: 0.1em 0; font-size: 2.5em; text-align: center; color: var(--brown-primary); text-shadow: 0 1px 2px var(--shadow-brown-light); margin-bottom: 5px;
 
 }
@@ -309,7 +307,11 @@ h2 {margin: 0.1em 0; font-size: 2.5em; text-align: center; color: var(--brown-pr
   border-radius: 15px;
   backdrop-filter: blur(5px); /* Flou du fond */
 }
-.loading-dots {font-size: 1.5em; color: var(--brown-primary); margin-top: 30px; animation: loadingDots 1.5s infinite; margin-bottom: 1px;}
+.loading-dots {font-size: 1.5em; color: var(--brown-primary); margin-top: 30px; animation: loadingDots 1.5s infinite; margin-bottom: 1px;
+  background: rgba(255, 255, 255, 0.7); /* Blanc 70% opacité */
+  padding: 10px 20px;
+  border-radius: 15px;
+  backdrop-filter: blur(5px); /* Flou du fond */}
 @keyframes loadingDots {0% { opacity: 0.2; } 20% { opacity: 1; } 100% { opacity: 0.2; }}
 .hidden {display: none !important;}
 #unlock-progress-container{position:fixed!important;top:12px;left:50%;transform:translateX(-50%);width:90vw;max-width:600px;margin:0 auto;padding:6px 10px;background:var(--overlay-white-10);border-radius:12px;box-sizing:border-box}
@@ -317,14 +319,16 @@ h2 {margin: 0.1em 0; font-size: 2.5em; text-align: center; color: var(--brown-pr
 .unlock-progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--red-progress),var(--red-progress-light));border-radius:8px;transition:width .4s ease;position:relative}
 .unlock-progress-fill.proche-deblocage{animation:pulse-unlock 1s infinite}
 @keyframes pulse-unlock{0%,100%{box-shadow:0 0 8px rgba(255,107,107,.6)}50%{box-shadow:0 0 20px rgba(255,107,107,1)}}@keyframes pulse-unlock {0%, 100% { background: linear-gradient(90deg, var(--green-bright), var(--green-gradient-start)); } 50% { background: linear-gradient(90deg, var(--green-gradient-start), var(--green-gradient-end)); }}
-#progressBarContainer {display: flex; align-items: center; justify-content: space-between; gap: 0.5em; margin: 1em auto 0.3em auto; max-width: 50ch; width: 100%; margin-bottom: 10px;}
+#progressBarContainer {display: flex; align-items: center; justify-content: space-between; gap: 0.5em; margin: 1em auto 0.3em auto; max-width: 50ch; width: 100%; margin-bottom: 10px;
+}
 .progress-bar-track {position: relative; height: 16px; background: linear-gradient(to right, var(--blue-gradient-start), var(--green-dark)); border-radius: 6px; flex: 1; box-shadow: 0 2px 4px var(--shadow-black-light);}
 .progress-marker {position: absolute; top: 45%; left: 0; transform: translate(-50%, -50%); font-size: 2em; transition: left 1.5s ease; color: var(--gray-dark);animation: pulse 2s ease-in-out infinite;}
 .side-emoji {font-size: 1.6em; line-height: 1; color: var(--gray-dark);}
 @keyframes pulse {
   0%, 100% { transform: translate(-50%, -50%) scale(1); } 
   50% { transform: translate(-50%, -50%) scale(1.15); }}
-.level {font-size: 1.6em; margin: 0.4em 0; margin-bottom: 50px;}
+.level {font-size: 1.6em; margin: 0.4em 0; margin-bottom: 50px;
+}
 .level-hiraganas {margin: 1em auto; max-width: 800px; flex-shrink: 0; margin-bottom: 25px;}
 .hiraganas-grid {display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 0.5em;}
 .hiragana-card {text-align: center; transition: all 0.3s ease; position: relative; padding: 10px; background: var(--white); border-radius: 8px; box-shadow: 0 6px 12px var(--shadow-black-dark), 0 3px 6px var(--shadow-black-medium);}
@@ -339,11 +343,12 @@ h2 {margin: 0.1em 0; font-size: 2.5em; text-align: center; color: var(--brown-pr
 .hiragana-card.completed .star.filled {background: var(--green-primary); animation: starGlow 2s ease-in-out infinite;}
 @keyframes starFill {0% { transform: scale(0) rotate(180deg); } 100% { transform: scale(1) rotate(0deg); }}
 @keyframes starGlow {0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.3); }}
-.firework {position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 0.5em; height: 0.5em; background: transparent; pointer-events: none; animation: fireworkExplosion 700ms ease-out forwards; z-index: 100000;}
+.firework {position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 0.5em; height: 0.5em; background: transparent; pointer-events: none; animation: fireworkExplosion 700ms ease-out forwards; z-index: 200000;}
 @keyframes fireworkExplosion {0% { box-shadow: 0 0 #ff0, 0 0 #f00, 0 0 #0ff; opacity: 1; transform: translateX(-50%) scale(1); } 100% { box-shadow: 0 -40px #ff0, 30px -30px #f00, 40px 0 #0ff, 30px 30px #0f0, 0 40px #00f, -30px 30px #f0f, -40px 0 #fff, -30px -30px #ff0; opacity: 0; transform: translateX(-50%) scale(0.5); }}
 .sakura {position: absolute; width: 100px; height: 10px; background: var(--pink-primary); border-radius: 50%; pointer-events: none; animation: sakuraFall 3s linear forwards; z-index: 10;}
 @keyframes sakuraFall {0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }}
-.quiz-container { position: relative; flex: 1; display: flex; flex-direction: column; justify-content: space-between; min-height: 0; padding-bottom: 2em;}
+.quiz-container { position: relative; flex: 1; display: flex; flex-direction: column; justify-content: space-between; min-height: 0; padding-bottom: 2em;
+}
 .question {font-size: 4em; font-weight: bold; margin: 0.5em 0; height: 1.2em; display: flex; align-items: center; justify-content: center; color: var(--brown-primary); text-shadow: 1px 1px 2px var(--shadow-brown-medium); margin-bottom: 53px;}
 .answers {display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8em; margin-bottom: 1em;}
 .sakura {width: 12px; height: 12px;}
@@ -427,7 +432,11 @@ body.shake {animation: screenShake 0.4s ease-in-out;}
 .pulsing {animation: pulse-revision 1.8s infinite ease-in-out;}
 @keyframes pulse-revision {0% { transform: scale(1); box-shadow: 0 6px 12px var(--shadow-black-dark), 0 3px 6px var(--shadow-black-medium); } 50% { transform: scale(1.08); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3), 0 4px 8px var(--shadow-black-strong), 0 0 8px var(--shadow-brown-light); } 100% { transform: scale(1); box-shadow: 0 6px 12px var(--shadow-black-dark), 0 3px 6px var(--shadow-black-medium); }}
 #mode2 .title {margin: 0.5em 0; font-size: 1.8em; text-align: center; color: var(--brown-primary); text-shadow: 0 1px 2px var(--shadow-brown-light);}
-.account-section {padding: 2em; max-width: 500px; margin: 0 auto; text-align: center;}
+.account-section {padding: 2em; max-width: 500px; margin: 0 auto; text-align: center;
+  background: rgba(255, 255, 255, 0.7); /* Blanc 70% opacité */
+  padding: 10px 20px;
+  border-radius: 15px;
+  backdrop-filter: blur(5px); /* Flou du fond */}
 .pseudo-display {font-size: 2.5em; font-weight: bold; color: var(--brown-primary); margin: 1em 0; padding: 0.5em; background: var(--white); border-radius: 12px; box-shadow: 0 6px 12px var(--shadow-black-dark), 0 3px 6px var(--shadow-black-medium); min-height: 1.5em; display: flex; align-items: center; justify-content: center;}
 .pin-input-container {margin: 2em 0;}
 .pin-input {font-size: 2em; padding: 0.5em; width: 200px; text-align: center; border: 2px solid var(--brown-primary); border-radius: 8px; background: var(--white); box-shadow: 0 4px 8px var(--shadow-black-light);}
@@ -474,9 +483,21 @@ html,body{height:100%;margin:0;padding:0}body{display:flex;align-items:center;ju
 .secondary-button:hover {background: rgba(139, 111, 71, 0.2) !important; transform: scale(1.02);}
 .onboarding-step {display: none; opacity: 0; transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; max-width: 500px; margin: 0 auto; padding: 20px; box-sizing: border-box;}
 .onboarding-step.active {display: block; opacity: 1;}
-.onboarding-title {font-size: 2em; color: var(--brown-primary); text-align: center; margin-bottom: 30px; text-shadow: 0 2px 4px var(--shadow-black-light);}
-.onboarding-content {background: var(--overlay-green-05); border-radius: 20px; padding: 30px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);}
-.onboarding-subtitle {text-align: center; font-size: 1.2em; color: var(--brown-primary); margin-bottom: 30px; opacity: 0.8;}
+.onboarding-title {font-size: 2em; color: var(--brown-primary); text-align: center; margin-bottom: 30px; text-shadow: 0 2px 4px var(--shadow-black-light);
+  background: rgba(255, 255, 255, 0.7); /* Blanc 70% opacité */
+  padding: 10px 20px;
+  border-radius: 15px;
+  backdrop-filter: blur(5px); /* Flou du fond */}
+.onboarding-content {background: var(--overlay-green-05); border-radius: 20px; padding: 30px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  background: rgba(255, 255, 255, 0.7); /* Blanc 70% opacité */
+  padding: 10px 20px;
+  border-radius: 15px;
+  backdrop-filter: blur(5px); /* Flou du fond */}
+.onboarding-subtitle {text-align: center; font-size: 1.2em; color: var(--brown-primary); margin-bottom: 30px; opacity: 0.8;
+  background: rgba(255, 255, 255, 0.7); /* Blanc 70% opacité */
+  padding: 10px 20px;
+  border-radius: 15px;
+  backdrop-filter: blur(5px); /* Flou du fond */}
 .onboarding-buttons {display: flex; flex-direction: column; gap: 15px; margin: 30px auto 0; max-width: 400px; width: 100%; box-sizing: border-box;}
 .large-button {font-size: 1.3em !important; padding: 20px 30px !important; min-height: 70px;}
 .primary-button {background: linear-gradient(135deg, var(--green-primary), var(--green-medium)) !important; box-shadow: 0 4px 15px var(--overlay-green-40);}
@@ -984,6 +1005,26 @@ body::before,
 .menu.active ~ #quiz-flash {
   display: none !important;
 }
+/* Une seule carte englobant TOUT le contenu de la section Quiz */
+#quiz {
+  background: var(--beige-background);
+
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  margin: 20px auto;
+  max-width: 850px;
+}
+
+/* Carte uniquement pour le clavier de révision */
+#mode2 .revision-keyboard {
+  background: var(--beige-background);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  margin: 20px auto;
+  max-width: 600px;
+}
 </style>
 
 
@@ -1097,6 +1138,7 @@ body::before,
 
 <!-- Section Quiz -->
 <div id="quiz" class="section">
+<link rel="stylesheet" href="card-styles.css">
 <!--   <h1 data-i18n="quiz_title">🎌⛩️ Apprenez les Kanas ⛩️🎌</h1>  -->
   <div id="progressBarContainer"></div>
   <div class="level" id="levelDisplay"><span data-i18n="quiz_level_display">Niveau actuel :</span> <span id="levelNumber">1</span></div>
@@ -8689,7 +8731,7 @@ canvas.style.left = '50%';
 canvas.style.top = '50%';
 canvas.style.transform = 'translate(-50%, -50%)';
 canvas.style.pointerEvents = 'none';
-canvas.style.zIndex = '20';
+canvas.style.zIndex = '1000000';
 canvas.width = 400;
 canvas.height = 400;
 document.body.appendChild(canvas);  // ✅ Ajouter au body au lieu du container
