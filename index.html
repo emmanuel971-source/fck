@@ -753,6 +753,7 @@ html,body{height:100%;margin:0;padding:0}body{display:flex;align-items:center;ju
   border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
+/* Timer simplifié et performant */
 .timer-bar {
   height: 100%;
   width: 100%;
@@ -760,66 +761,16 @@ html,body{height:100%;margin:0;padding:0}body{display:flex;align-items:center;ju
   border-radius: 10px;
   transition: width 0.1s linear, background 0.3s;
   position: relative;
-  z-index: 1;
   box-shadow: 0 0 20px rgba(76, 175, 80, 0.6),
               inset 0 2px 6px rgba(255, 255, 255, 0.4);
-  animation: timerPulse 1s ease-in-out infinite;
+  will-change: width;
 }
 
+/* Pulse léger */
 @keyframes timerPulse {
-  0%, 100% { 
-    box-shadow: 0 0 15px rgba(76, 175, 80, 0.4),
-                inset 0 2px 6px rgba(255, 255, 255, 0.3);
-    filter: brightness(1);
-  }
-  50% { 
-    box-shadow: 0 0 30px rgba(76, 175, 80, 0.8),
-                inset 0 2px 6px rgba(255, 255, 255, 0.5);
-    filter: brightness(1.2);
-  }
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.2); }
 }
-
-/* Animation de reflet lumineux qui bouge - VERSION RAPIDE */
-.quiz-flash-timer::before {
-  content: '';
-  position: relative;
-  top: 0;
-  left: -100%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255,255,255,0.6),
-    transparent
-  );
-  animation: timerShine 1s linear infinite;
-  pointer-events: none;
-  z-index: 2;
-opacity: var(--shine-opacity, 1);  /* ✅ AJOUTER CETTE LIGNE */
-}
-.quiz-flash-timer::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -60%;
-  width: 60%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.8),
-    transparent
-  );
-  animation: timerShine 1s linear infinite;
-  pointer-events: none;
-  z-index: 2;
-
-  /* 🔥 LA CLÉ */
-  mix-blend-mode: screen;
-opacity: var(--shine-opacity, 1);  /* ✅ AJOUTER CETTE LIGNE */
-}
-
 
 @keyframes timerShine {
   0% { left: -100%; }
@@ -831,16 +782,15 @@ opacity: var(--shine-opacity, 1);  /* ✅ AJOUTER CETTE LIGNE */
   animation: flashGlow 0.3s ease-out;
 }
 
+/* Gardez juste le flash initial */
 @keyframes flashGlow {
   0% { 
-    box-shadow: 0 0 40px rgba(255, 255, 255, 1),
-                inset 0 0 20px rgba(255, 255, 255, 0.8);
-    filter: brightness(2);
+    filter: brightness(2.5);
+    transform: scale(1.05);
   }
   100% { 
-    box-shadow: 0 0 20px rgba(76, 175, 80, 0.6),
-                inset 0 2px 6px rgba(255, 255, 255, 0.4);
     filter: brightness(1);
+    transform: scale(1);
   }
 }
 
@@ -11618,11 +11568,11 @@ function showNextQuestion() {
   // ✅ MODIFICATION 1 : Démarrer le timer APRÈS l'animation de flip (600ms)
   setTimeout(() => {
     startFlashTimer(item);
-  }, 300);
-  // Son de pop
-  if (soundEnabled) {
-     playQuestionSound(); // ou un nom similaire
-  }
+  }, 3);
+    // Son de pop
+   //if (soundEnabled) {
+  //   playQuestionSound(); // ou un nom similaire
+ // }
 }
 
 function startFlashTimer(item) {
@@ -11642,7 +11592,6 @@ function startFlashTimer(item) {
   timerBar.classList.add('no-transition', 'no-shine');
   timerBar.classList.remove('warning', 'danger', 'flash-start');
 
- 
   // 🔄 Pop puis relancer le timer après 250ms
   setTimeout(() => {
     // ✅ EFFET POP sur toute la barre de timer
@@ -11651,14 +11600,24 @@ function startFlashTimer(item) {
       timerContainer.classList.add('timer-pop-effect');
       setTimeout(() => {
         timerContainer.classList.remove('timer-pop-effect');
-      }, 10);
+      }, 300);
     }
-  // 💥 Flash initial
-  timerBar.classList.add('flash-start');
-  setTimeout(() => timerBar.classList.remove('flash-start'), 200);
 
- timerBar.style.width = '100%';
-  timerBar.offsetHeight; // force repaint
+    // 💥 Flash initial DÉCALÉ de 100ms pour éviter la surcharge
+    setTimeout(() => {
+      timerBar.classList.add('flash-start');
+      setTimeout(() => timerBar.classList.remove('flash-start'), 200);
+    }, 100);
+
+    // 🔊 Son DÉCALÉ de 50ms pour meilleure synchro
+    setTimeout(() => {
+      if (soundEnabled) {
+        playQuestionSound();
+      }
+    }, 50);
+
+    timerBar.style.width = '100%';
+    timerBar.offsetHeight; // force repaint
 
     timerBar.classList.remove('no-transition', 'no-shine');
 
@@ -11672,14 +11631,17 @@ function startFlashTimer(item) {
       quizFlashState.timeRemaining = remaining;
       timerBar.style.width = percentage + '%';
       
+      // ✅ Gestion de l'opacité de la lueur (si vous la gardez)
       const timerContainer = document.querySelector('.quiz-flash-timer');
-      timerContainer.style.setProperty('--shine-opacity', percentage > 0 ? '1' : '0');
+      if (timerContainer) {
+        timerContainer.style.setProperty('--shine-opacity', percentage > 0 ? '1' : '0');
+      }
 
       timerBar.classList.remove('warning', 'danger');
       if (percentage <= 30) timerBar.classList.add('danger');
       else if (percentage <= 60) timerBar.classList.add('warning');
 
-      // 🔥 STOP lueur si barre vide
+      // 🔥 STOP timer quand terminé
       if (remaining <= 0) {
         timerBar.classList.add('no-shine');
         clearInterval(quizFlashState.timerInterval);
