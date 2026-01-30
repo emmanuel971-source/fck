@@ -285,7 +285,9 @@ body {background: var(--beige-background); font-family: 'Noto Sans JP', sans-ser
 body::before {content: ''; position: absolute; top: 0; left: 0; background: url('https://www.transparenttextures.com/patterns/paper-fibers.png'); opacity: 0.1; z-index: -1;}
 h1 {margin: 0.5em 0; font-size: 1.8em; text-align: center; color: var(--brown-primary); text-shadow: 0 1px 2px var(--shadow-brown-light)}
 h2 {margin: 0.1em 0; font-size: 2.5em; text-align: center; color: var(--brown-primary); text-shadow: 0 1px 2px var(--shadow-brown-light); margin-bottom: 5px;
-
+  -webkit-text-stroke: 4px white; /* Contour blanc de 4px */
+  text-stroke: 4px white;
+  paint-order: stroke fill; /* Le contour passe derrière le texte */
 }
 .menu {gap: 15px;}
 #welcome {display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100dvh; min-height: 100dvh; text-align: center;}
@@ -1086,11 +1088,11 @@ body::before,
     <div class="hamburger-bar"></div>
   </div>
 </button>
-<!-- Menu -->
+<!-- Menu-->
 <nav class="menu" id="menu">
-<div id="menu-emoji-header" class="menu-emoji-header">
-  <span id="menu-emoji"></span>
-</div>
+<!--  <div id="menu-emoji-header" class="menu-emoji-header">  -->
+<!--  <span id="menu-emoji"></span> -->
+<!-- </div> -->
     <button class="arcade-button" onclick="showSection('quiz')" data-i18n="menu_learn">Apprendre</button>
   <button class="arcade-button" id="revision-button" onclick="showSection('mode2')" data-i18n="menu_revision">Mode révisions</button>
   <button class="arcade-button" onclick="startQuizFlash(1)" data-i18n="menu_quiz_flash">Quiz Flash</button>
@@ -1187,13 +1189,14 @@ body::before,
 
 <!-- Section Options -->
 <div id="options" class="section">
-  <h1 data-i18n="options_title">Options</h1>
+ <!--  <h1 data-i18n="options_title">Options</h1>  -->
   <div class="options-menu">
     <button class="arcade-button" onclick="showSubOptions('difficulty')" data-i18n="options_difficulty">Difficulté</button>
     <button class="arcade-button" onclick="showSubOptions('sound')" data-i18n="options_sound">Son</button>
     <button class="arcade-button" onclick="showSubOptions('language')" data-i18n="options_language">Langue</button>
-   <button class="arcade-button" onclick="showSubOptions('landscape')">🎨 Paysage</button>
-
+    <button class="arcade-button" onclick="showSubOptions('landscape')">🎨 Paysage</button>
+    <button class="arcade-button" onclick="showSubOptions('contact')" data-i18n="contact_title">📨 Contact</button>
+    <button class="arcade-button" onclick="showSection('account')" data-i18n="account_title">Mon compte</button>
   </div>
 
 <!-- Sous-rubrique Difficulté -->
@@ -9342,14 +9345,6 @@ const menuEmojis = ['']
 function showSection(sectionId) {
   console.log('🔍 showSection appelée avec:', sectionId);
   
-  // ✅ DEBUG : Vérifier l'état de mode2
-  const mode2Section = document.getElementById('mode2');
-  console.log('📊 État mode2 AVANT:', {
-    display: mode2Section?.style.display,
-    hasActiveClass: mode2Section?.classList.contains('active'),
-    computedDisplay: window.getComputedStyle(mode2Section).display
-  });
-  
   // ✅ Arrêter le Quiz Flash si on quitte cette section
   if (sectionId !== 'quiz-flash' && typeof quizFlashState !== 'undefined' && quizFlashState.timerInterval) {
     console.log('🛑 Arrêt du Quiz Flash (changement de section)');
@@ -9384,7 +9379,7 @@ function showSection(sectionId) {
         const menu = document.getElementById('menu');
         const menuMessage = document.getElementById('menu-message');
         menu.classList.add('active');
-        menuMessage.innerText = t('menu_msg_blocked'); // ✅ MODIFIÉ
+        menuMessage.innerText = t('menu_msg_blocked');
         hasShownBlockedMenu = true;
       }, 500);
     } else if (!isNowBlocked && wasBlocked) {
@@ -9393,7 +9388,7 @@ function showSection(sectionId) {
         const menu = document.getElementById('menu');
         const menuMessage = document.getElementById('menu-message');
         menu.classList.add('active');
-        menuMessage.innerText = t('menu_msg_unblocked'); // ✅ MODIFIÉ
+        menuMessage.innerText = t('menu_msg_unblocked');
         hasShownBlockedMenu = false;
         hasShownUnblockedMenu = true;
       }, 500);
@@ -9402,14 +9397,14 @@ function showSection(sectionId) {
       setTimeout(() => {
         const menuMessage = document.getElementById('menu-message');
         if (menuMessage) {
-          menuMessage.innerText = t('menu_msg_still_blocked'); // ✅ MODIFIÉ
+          menuMessage.innerText = t('menu_msg_still_blocked');
         }
       }, 500);
     }
     // Si on quitte le mode révision
-  if (sectionId !== 'mode2') { // 'mode2' est l'ID de la section révision
+  if (sectionId !== 'mode2') {
     revisionMode.isActive = false;
-    hasUnlockedInRevision = false; // Réinitialiser pour la prochaine session
+    hasUnlockedInRevision = false;
   }
   }
 
@@ -9428,11 +9423,11 @@ function showSection(sectionId) {
   // SUPPRIMER la redirection automatique vers le mode révision
   // Le bouton bloqué ne doit plus rediriger, il doit juste être inopérant
   
-document.querySelectorAll('.section').forEach(section => {
+  document.querySelectorAll('.section').forEach(section => {
     section.classList.remove('active');
   });
   
-  // ✅ NOUVEAU : Forcer le masquage complet de mode2 si on le quitte
+  // ✅ Gérer le display des sections problématiques individuellement
   if (sectionId !== 'mode2') {
     const mode2Section = document.getElementById('mode2');
     if (mode2Section) {
@@ -9444,12 +9439,37 @@ document.querySelectorAll('.section').forEach(section => {
       mode2Section.style.display = 'block';
     }
   }
+
+  if (sectionId !== 'stats') {
+    const statsSection = document.getElementById('stats');
+    if (statsSection) {
+      statsSection.style.display = 'none';
+    }
+  } else {
+    const statsSection = document.getElementById('stats');
+    if (statsSection) {
+      statsSection.style.display = 'block';
+    }
+  }
+
+  if (sectionId !== 'account') {
+    const accountSection = document.getElementById('account');
+    if (accountSection) {
+      accountSection.style.display = 'none';
+    }
+  } else {
+    const accountSection = document.getElementById('account');
+    if (accountSection) {
+      accountSection.style.display = 'block';
+    }
+  }
   
   document.getElementById(sectionId).classList.add('active');
+  
   // ✅ Reset des Options à chaque entrée
-if (sectionId === 'options') {
-  resetOptionsView();
-}
+  if (sectionId === 'options') {
+    resetOptionsView();
+  }
 
   if (sectionId === 'create-account') {
     initPseudoCache();
@@ -9479,7 +9499,7 @@ if (sectionId === 'options') {
     setTimeout(() => {
       initRevisionKeyboard();
       startRevisionQuestion();
-      updateUnlockProgress(); // ✅ AJOUTE cette ligne
+      updateUnlockProgress();
     }, 100);
   } else {
     revisionMode.isActive = false;
@@ -9508,29 +9528,31 @@ if (sectionId === 'options') {
   }
   
   // ✅ NOUVEAU : Générer une question quand on ouvre le mode Apprendre
-if (sectionId === 'quiz') {
-  updateLevelProgress(HiraganaList, niveauActif);
-  renderProgressBar(niveauActif, getMaxLevel(HiraganaList));
-  renderHiraganaCards(HiraganaList, niveauActif);
+  if (sectionId === 'quiz') {
+    updateLevelProgress(HiraganaList, niveauActif);
+    renderProgressBar(niveauActif, getMaxLevel(HiraganaList));
+    renderHiraganaCards(HiraganaList, niveauActif);
 
-  if (!localStorage.getItem('quizTutorialSeen')) {
-    localStorage.setItem('quizTutorialSeen', 'true');
-    const wait = () => {
-      if (document.querySelectorAll('.hiragana-card').length > 0) {
-        setTimeout(startQuizTutorial, 500);
-      } else {
-        requestAnimationFrame(wait);
-      }
-    };
-    wait();
-  } else {
-    nextQuestion();
+    if (!localStorage.getItem('quizTutorialSeen')) {
+      localStorage.setItem('quizTutorialSeen', 'true');
+      const wait = () => {
+        if (document.querySelectorAll('.hiragana-card').length > 0) {
+          setTimeout(startQuizTutorial, 500);
+        } else {
+          requestAnimationFrame(wait);
+        }
+      };
+      wait();
+    } else {
+      nextQuestion();
+    }
   }
-}
-    // ✅ NOUVEAU : Générer les stats quand on ouvre la page stats
-if (sectionId === 'stats') {
+  
+  // ✅ NOUVEAU : Générer les stats quand on ouvre la page stats
+  if (sectionId === 'stats') {
     setTimeout(generateGarden, 100);
   }
+  
   // ✅ CORRECTION : Ne fermer le menu que s'il est ouvert
   if (sectionId !== 'create-account') {
     const menu = document.getElementById('menu');
@@ -9544,24 +9566,12 @@ if (sectionId === 'stats') {
     setTimeout(() => {
       const hamburger = document.querySelector('.hamburger');
       if (hamburger && sectionsWithHamburger.includes(sectionId)) {
-        hamburger.classList.remove('hidden'); // ✅ Changé
+        hamburger.classList.remove('hidden');
       }
     }, 100);
   }
-
-  // À la fin de la fonction, ajouter :
-  console.log('📊 État mode2 APRÈS:', {
-    display: mode2Section?.style.display,
-    hasActiveClass: mode2Section?.classList.contains('active'),
-    computedDisplay: window.getComputedStyle(mode2Section).display
-  });
-  
-  const revisionKeyboard = document.querySelector('.revision-keyboard');
-  console.log('⌨️ État clavier:', {
-    display: revisionKeyboard?.style.display,
-    computedDisplay: window.getComputedStyle(revisionKeyboard).display
-  });
 }
+
 function toggleMenu() {
   const menu = document.getElementById('menu');
   const hamburger = document.querySelector('.hamburger');
@@ -9579,9 +9589,24 @@ function toggleMenu() {
       console.warn('⚠️ Erreur arrêt quiz:', e);
     }
     
+    // ✅ NOUVEAU : Fermer les modales contact AVANT de masquer les sections
+    const contactFormModal = document.getElementById('contact-form-modal');
+    const contactInboxModal = document.getElementById('contact-inbox-modal');
+    
+    if (contactFormModal && contactFormModal.classList.contains('active')) {
+      contactFormModal.style.display = 'none';
+      contactFormModal.classList.remove('active');
+    }
+    
+    if (contactInboxModal && contactInboxModal.classList.contains('active')) {
+      contactInboxModal.style.display = 'none';
+      contactInboxModal.classList.remove('active');
+    }
+    
     // ✅ NOUVEAU : Masquer les sections actives quand on ouvre le menu
     const mode2Section = document.getElementById('mode2');
     const statsSection = document.getElementById('stats');
+    const accountSection = document.getElementById('account');
     
     if (mode2Section && mode2Section.classList.contains('active')) {
       mode2Section.style.display = 'none';
@@ -9592,10 +9617,16 @@ function toggleMenu() {
       statsSection.style.display = 'none';
       console.log('🔧 Stats masqué temporairement pour afficher le menu');
     }
+    
+    if (accountSection && accountSection.classList.contains('active')) {
+      accountSection.style.display = 'none';
+      console.log('🔧 Account masqué temporairement pour afficher le menu');
+    }
   } else {
     // Si on FERME le menu, réafficher les sections qui étaient actives
     const mode2Section = document.getElementById('mode2');
     const statsSection = document.getElementById('stats');
+    const accountSection = document.getElementById('account');
     
     if (mode2Section && mode2Section.classList.contains('active')) {
       mode2Section.style.display = 'block';
@@ -9605,6 +9636,11 @@ function toggleMenu() {
     if (statsSection && statsSection.classList.contains('active')) {
       statsSection.style.display = 'block';
       console.log('🔧 Stats réaffiché après fermeture du menu');
+    }
+    
+    if (accountSection && accountSection.classList.contains('active')) {
+      accountSection.style.display = 'block';
+      console.log('🔧 Account réaffiché après fermeture du menu');
     }
   }
   
@@ -9622,39 +9658,11 @@ function toggleMenu() {
   if (menu.classList.contains('active')) {
     setMenuEmojiOnOpen();
   }
-
-  // ✅ NOUVEAU : Fermer les modales contact si elles sont ouvertes
-  if (menu.classList.contains('active')) {
-    const contactFormModal = document.getElementById('contact-form-modal');
-    const contactInboxModal = document.getElementById('contact-inbox-modal');
-    
-    if (contactFormModal && contactFormModal.classList.contains('active')) {
-      contactFormModal.style.display = 'none';
-      contactFormModal.classList.remove('active');
-    }
-    
-    if (contactInboxModal && contactInboxModal.classList.contains('active')) {
-      contactInboxModal.style.display = 'none';
-      contactInboxModal.classList.remove('active');
-    }
-  }
   
   // Vérifier l'état des boutons à chaque ouverture du menu
   if (menu.classList.contains('active')) {
     updateMenuButtonStates();
   }
-}
-function setMenuEmoji(emoji) {
-  const el = document.getElementById('menu-emoji');
-  if (!el) return;
-
-  el.style.opacity = '0';
-
-  setTimeout(() => {
-    el.textContent = emoji;
-    el.style.opacity = '1';
-     safeConvertEmojis(el);
-  }, 180);
 }
 
 function setMenuEmojiOnOpen() {
