@@ -11642,13 +11642,7 @@ function startFlashTimer(item) {
   timerBar.classList.add('no-transition', 'no-shine');
   timerBar.classList.remove('warning', 'danger', 'flash-start');
 
-  timerBar.style.width = '100%';
-  timerBar.offsetHeight; // force repaint
-
-  // 💥 Flash initial
-  timerBar.classList.add('flash-start');
-  setTimeout(() => timerBar.classList.remove('flash-start'), 200);
-
+ 
   // 🔄 Pop puis relancer le timer après 250ms
   setTimeout(() => {
     // ✅ EFFET POP sur toute la barre de timer
@@ -11657,8 +11651,14 @@ function startFlashTimer(item) {
       timerContainer.classList.add('timer-pop-effect');
       setTimeout(() => {
         timerContainer.classList.remove('timer-pop-effect');
-      }, 300);
+      }, 10);
     }
+  // 💥 Flash initial
+  timerBar.classList.add('flash-start');
+  setTimeout(() => timerBar.classList.remove('flash-start'), 200);
+
+ timerBar.style.width = '100%';
+  timerBar.offsetHeight; // force repaint
 
     timerBar.classList.remove('no-transition', 'no-shine');
 
