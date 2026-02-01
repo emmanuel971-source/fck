@@ -1095,7 +1095,7 @@ body::before,
 <!-- </div> -->
     <button class="arcade-button" onclick="showSection('quiz')" data-i18n="menu_learn">Apprendre</button>
   <button class="arcade-button" id="revision-button" onclick="showSection('mode2')" data-i18n="menu_revision">Mode révisions</button>
-  <button class="arcade-button" onclick="startQuizFlash(1)" data-i18n="menu_quiz_flash">Quiz Flash</button>
+  <button class="arcade-button" onclick="showQuizFlashMenu()" data-i18n="menu_quiz_flash">Quiz Flash</button>
   <button class="arcade-button" onclick="showSection('stats')" data-i18n="menu_stats">Mes stats</button>
   <button class="arcade-button" onclick="showSection('options')" data-i18n="menu_options">Options</button>
 </nav>
@@ -1359,7 +1359,20 @@ body::before,
     </button>
   </div>
 </div>
+<!-- Sous-rubrique Quiz Flash -->
+<div id="options-quiz-flash-choice" class="options-sub hidden">
+  <h2 data-i18n="quiz_flash_choice_title">Quiz Flash</h2>
+  
+  <button class="arcade-button" onclick="startQuizFlash(1, 'hiragana')" data-i18n="quiz_flash_hiragana">
+    🌸 Hiragana
+  </button>
+  
+  <button class="arcade-button" onclick="startQuizFlash(1, 'katakana')" data-i18n="quiz_flash_katakana">
+    ⛩️ Katakana
+  </button>
 </div>
+</div>
+
 <!-- ========================================
      HTML À AJOUTER APRÈS LA SECTION OPTIONS
      ======================================== -->
@@ -3422,7 +3435,12 @@ token_expired_button: "Recharger la page",
     unlock_garden_title: 'Mon Jardin',
     unlock_garden_message: 'Ton jardin zen est maintenant accessible !',
     unlock_learning_title: 'Mode Apprendre Débloqué',
-    unlock_learning_message: 'Tu peux à nouveau apprendre de nouveaux kanas !'
+    unlock_learning_message: 'Tu peux à nouveau apprendre de nouveaux kanas !',
+
+quiz_flash_choice_title: 'Quiz Flash',
+quiz_flash_hiragana: '🌸 Hiragana',
+quiz_flash_katakana: '⛩️ Katakana'
+
   },
   
   en: {
@@ -3692,7 +3710,12 @@ quiz_flash_group_complete: "Group completed!",
     unlock_garden_title: 'My Garden',
     unlock_garden_message: 'Your zen garden is now accessible!',
     unlock_learning_title: 'Learning Mode Unlocked',
-    unlock_learning_message: 'You can learn new kanas again!'
+    unlock_learning_message: 'You can learn new kanas again!',
+
+quiz_flash_choice_title: 'Flash Quiz',
+quiz_flash_hiragana: '🌸 Hiragana',
+quiz_flash_katakana: '⛩️ Katakana'
+
   },
   
   es: {
@@ -3959,7 +3982,11 @@ unlock_revision_message: '¡Ahora puedes revisar tus kanas!',
 unlock_garden_title: 'Mi Jardín',
 unlock_garden_message: '¡Tu jardín zen ya está accesible!',
 unlock_learning_title: 'Modo Aprendizaje Desbloqueado',
-unlock_learning_message: '¡Puedes aprender nuevos kanas de nuevo!'
+unlock_learning_message: '¡Puedes aprender nuevos kanas de nuevo!',
+
+quiz_flash_choice_title: 'Flash Quiz',
+quiz_flash_hiragana: '🌸 Hiragana',
+quiz_flash_katakana: '⛩️ Katakana'
 }
 };  
 
@@ -7610,7 +7637,7 @@ function startRevisionQuestion() {
 
 
   const niveauActif = determineNiveauActif(HiraganaList);
-  const excludedKatakanaLevels = [3, 5, 7, 10, 11, 12, 14, 16, 17, 21, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 34, 35, 36, 37, 38];
+  const excludedKatakanaLevels = [3, 5, 7, 10, 11, 12, 14, 16, 17, 21, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 35, 36, 37, 38, 39];
   const hiraganaItems = HiraganaList.filter(h => 
     parseInt(h.Niveau || 1) < niveauActif && 
     revisionRomajiTable[h.Hiragana] &&
@@ -9354,7 +9381,7 @@ function showSection(sectionId) {
   // ✅ CORRECTION : Gestion de l'affichage du hamburger avec classe
   const hamburger = document.querySelector('.hamburger');
   const sectionsWithHamburger = ['quiz', 'mode2', 'account', 'stats', 'options', 
-                                'options-difficulty', 'options-sound', 'options-language', 'login', 'quiz-flash'];
+                                'options-difficulty', 'options-sound', 'options-language','options-quiz-flash-choice', 'login', 'quiz-flash'];
   
   if (hamburger) {
     if (sectionsWithHamburger.includes(sectionId)) {
@@ -9576,6 +9603,9 @@ function toggleMenu() {
   const menu = document.getElementById('menu');
   const hamburger = document.querySelector('.hamburger');
   
+  // ⬇️ AJOUTER CETTE LIGNE ICI (avec les autres déclarations)
+  const loginSection = document.getElementById('login');
+  
   // ✅ AJOUT : Arrêter le Quiz Flash avant d'ouvrir le menu
   if (!menu.classList.contains('active')) { // Si on OUVRE le menu
     console.log('🔍 Ouverture du menu - arrêt du Quiz Flash');
@@ -9622,6 +9652,12 @@ function toggleMenu() {
       accountSection.style.display = 'none';
       console.log('🔧 Account masqué temporairement pour afficher le menu');
     }
+// ⬇️ AJOUTER CES LIGNES (sans redéclarer loginSection)
+if (loginSection && loginSection.classList.contains('active')) {
+  loginSection.style.display = 'none';
+  console.log('🔧 Login masqué temporairement pour afficher le menu');
+}
+
   } else {
     // Si on FERME le menu, réafficher les sections qui étaient actives
     const mode2Section = document.getElementById('mode2');
@@ -9642,6 +9678,11 @@ function toggleMenu() {
       accountSection.style.display = 'block';
       console.log('🔧 Account réaffiché après fermeture du menu');
     }
+// ⬇️ AJOUTER CES LIGNES
+if (loginSection && loginSection.classList.contains('active')) {
+  loginSection.style.display = 'block';
+  console.log('🔧 Login réaffiché après fermeture du menu');
+}
   }
   
   menu.classList.toggle('active');
@@ -9655,9 +9696,9 @@ function toggleMenu() {
     }
   }
   
-  if (menu.classList.contains('active')) {
-    setMenuEmojiOnOpen();
-  }
+ // if (menu.classList.contains('active')) {
+ //   setMenuEmojiOnOpen();
+//  }
   
   // Vérifier l'état des boutons à chaque ouverture du menu
   if (menu.classList.contains('active')) {
@@ -11174,7 +11215,7 @@ document.querySelectorAll(".tutorial-highlight, .tutorial-highlight-hamburger, .
     hamburger.style.pointerEvents = "auto";
     hamburger.style.opacity = "1";
   }
- localStorage.removeItem('quizTutorialSeen');
+// localStorage.removeItem('quizTutorialSeen');
   nextQuestion();
 }
 // Fonctions utilitaires
@@ -11477,15 +11518,27 @@ const GROUPES_flashquiz = {
   2: { niveaux: [6, 8, 9], nom: "Groupe 2" },           // 3 niveaux
   3: { niveaux: [13, 15, 18], nom: "Groupe 3" },        // 3 niveaux
   4: { niveaux: [19, 20, 23], nom: "Groupe 4" },        // 3 niveaux
-  5: { niveaux: [33, 39, 40], nom: "Groupe 5" },        // 3 niveaux
-  6: { niveaux: [41, 42, 43], nom: "Groupe 6" },        // 3 niveaux
-  7: { niveaux: [44, 45, 46], nom: "Groupe 7" }         // 3 niveaux
+  5: { niveaux: [28, 30, 34], nom: "Groupe 5" },        // 3 niveaux
+  6: { niveaux: [40, 41, 42], nom: "Groupe 6" },        // 3 niveaux
+  7: { niveaux: [43, 44, 45, 46], nom: "Groupe 7" }         // 3 niveaux
 };
 
 // === 4️⃣ FONCTIONS PRINCIPALES ===
-
-function startQuizFlash(groupNumber = 1) {
-  console.log(`🎴 Démarrage Quiz Flash - Groupe ${groupNumber}`);
+function showQuizFlashMenu() {
+  // Fermer le menu principal
+  const menu = document.getElementById('menu');
+  if (menu && menu.classList.contains('active')) {
+    toggleMenu();
+  }
+  
+  // Aller directement dans Options
+  showSection('options');
+  
+  // Afficher immédiatement le sous-menu sans délai
+  showSubOptions('quiz-flash-choice');
+}
+function startQuizFlash(groupNumber = 1, type = 'hiragana') {
+  console.log(`🎴 Démarrage Quiz Flash - Groupe ${groupNumber} - Type: ${type}`);
   
   // ✅ NOUVEAU : Arrêter tout timer précédent avant de démarrer
   if (quizFlashState.timerInterval) {
@@ -11497,9 +11550,10 @@ function startQuizFlash(groupNumber = 1) {
   quizFlashState.currentGroup = groupNumber;
   quizFlashState.currentQuestionIndex = 0;
   quizFlashState.isFlipped = false;
+  quizFlashState.type = type; // ⬅️ AJOUTER CETTE LIGNE
   
   // Charger le groupe
-  loadQuizGroup(groupNumber);
+  loadQuizGroup(groupNumber, type); // ⬅️ PASSER LE TYPE
   
   // Afficher la section
   showSection('quiz-flash');
@@ -11507,7 +11561,7 @@ function startQuizFlash(groupNumber = 1) {
   // Démarrer la première question
   showNextQuestion();
 }
-function loadQuizGroup(groupNumber) {
+function loadQuizGroup(groupNumber, type = 'hiragana') {
   const group = GROUPES_flashquiz[groupNumber];
   
   if (!group) {
@@ -11515,10 +11569,13 @@ function loadQuizGroup(groupNumber) {
     return;
   }
   
-  console.log(`📚 Chargement ${group.nom} - Niveaux: ${group.niveaux.join(', ')}`);
+  console.log(`📚 Chargement ${group.nom} - Type: ${type} - Niveaux: ${group.niveaux.join(', ')}`);
+  
+  // ⬇️ UTILISER TOUJOURS HiraganaList (qui contient aussi les Katakana)
+  const sourceList = HiraganaList;
   
   // Filtrer les items du groupe
-  const groupItems = HiraganaList.filter(item => 
+  const groupItems = sourceList.filter(item => 
     group.niveaux.includes(parseInt(item.Niveau))
   );
   
@@ -11527,10 +11584,9 @@ function loadQuizGroup(groupNumber) {
   
   console.log(`✅ ${quizFlashState.questionsPool.length} questions chargées`);
 }
-
 function showNextQuestion() {
-  const { currentQuestionIndex, questionsPool, currentGroup } = quizFlashState;
-  
+  const { currentQuestionIndex, questionsPool, currentGroup, type } = quizFlashState; // ⬅️ AJOUTER type
+    
   // Vérifier si le groupe est terminé
   if (currentQuestionIndex >= questionsPool.length) {
     console.log('🏆 Groupe terminé !');
@@ -11557,15 +11613,17 @@ function showNextQuestion() {
   card.classList.remove('flipped');
   quizFlashState.isFlipped = false;
 
-  // Puis afficher le nouvel hiragana sur la face avant
-  document.getElementById('flashHiragana').textContent = item.Hiragana;
-
+  // Puis afficher le nouvel hiragana/katakana sur la face avant
+  const kanaToShow = type === 'katakana' ? item.Katakana : item.Hiragana; // ⬅️ AJOUTER
+  
+  document.getElementById('flashHiragana').textContent = kanaToShow; // ⬅️ MODIFIER
+  
   // ✅ ATTENDRE que l'animation soit terminée pour remplir la face arrière
   setTimeout(() => {
-    document.getElementById('flashHiraganaSmall').textContent = item.Hiragana;
+    document.getElementById('flashHiraganaSmall').textContent = kanaToShow; // ⬅️ MODIFIER
     document.getElementById('flashRomaji').textContent = item.Romaji;
     safeConvertEmojis(document.getElementById('flashHiraganaSmall'));
-  }, 600); // 600ms = durée de l'animation de flip
+  }, 600);
 
   // Convertir les emojis
   safeConvertEmojis(document.getElementById('flashHiragana'));
