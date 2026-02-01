@@ -11839,10 +11839,11 @@ function showTrophyFlashcard(completedGroup) {
       portal.classList.remove('active');
       portal.innerHTML = '';
       
-      // Passer au groupe suivant s'il existe
-      const nextGroup = completedGroup + 1;
-      if (GROUPES_flashquiz[nextGroup]) {
-        startQuizFlash(nextGroup);
+// Passer au groupe suivant s'il existe
+const nextGroup = completedGroup + 1;
+if (GROUPES_flashquiz[nextGroup]) {
+  const currentType = quizFlashState.type || 'hiragana'; // ⬅️ AJOUTER
+  startQuizFlash(nextGroup, currentType); // ⬅️ PASSER LE TYPE
       } else {
         // Tous les groupes terminés - retour au menu
         console.log('🎉 TOUS LES GROUPES TERMINÉS !');
