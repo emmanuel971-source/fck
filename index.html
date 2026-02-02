@@ -5267,14 +5267,12 @@ function generateRevisionRomajiTable(hiraganaList) {
     const hiragana = item.Hiragana;
     const romaji = item.Romaji;
     
-    // ✅ VÉRIFICATIONS ROBUSTES
     if (!hiragana || !romaji) {
       console.warn(`⚠️ Item ${index} ignoré - données manquantes:`, {hiragana, romaji});
       invalidItems++;
       return;
     }
     
-    // Convertir en string si ce n'est pas déjà le cas
     const hiraganaStr = String(hiragana).trim();
     const romajiStr = String(romaji).trim();
     
@@ -5285,8 +5283,8 @@ function generateRevisionRomajiTable(hiraganaList) {
     }
     
     try {
-      // Analyser le romaji pour créer les segments
-      const segments = analyzeRomajiSegments(romajiStr);
+      // ✅ PASSER LE KANA EN PARAMÈTRE
+      const segments = analyzeRomajiSegments(romajiStr, hiraganaStr);
       table[hiraganaStr] = {
         romaji: segments.segments,
         charCounts: segments.charCounts,
@@ -5295,6 +5293,11 @@ function generateRevisionRomajiTable(hiraganaList) {
         validation: item.Validation
       };
       validItems++;
+      
+      // Log seulement pour les cas multi-caractères
+      if (hiraganaStr.length > 1) {
+        console.log(`📝 ${hiraganaStr} (${romajiStr}) → ${JSON.stringify(segments.segments)} chars: ${JSON.stringify(segments.charCounts)}`);
+      }
     } catch (error) {
       console.error(`❌ Erreur lors de l'analyse de l'item ${index}:`, {hiragana: hiraganaStr, romaji: romajiStr}, error);
       invalidItems++;
@@ -5311,7 +5314,7 @@ function generateRevisionKatakanaTable(hiraganaList) {
   let invalidItems = 0;
   
   hiraganaList.forEach((item, index) => {
-    const katakana = getLocalizedKatakana(item); // ✅ NOUVEAU
+    const katakana = getLocalizedKatakana(item);
     const romaji = item.Romaji;
     
     if (!katakana || !romaji) {
@@ -5329,7 +5332,8 @@ function generateRevisionKatakanaTable(hiraganaList) {
     }
     
     try {
-      const segments = analyzeRomajiSegments(romajiStr);
+      // ✅ PASSER LE KANA EN PARAMÈTRE
+      const segments = analyzeRomajiSegments(romajiStr, katakanaStr);
       table[katakanaStr] = {
         romaji: segments.segments,
         charCounts: segments.charCounts,
@@ -5338,6 +5342,10 @@ function generateRevisionKatakanaTable(hiraganaList) {
         validation: item.Validation
       };
       validItems++;
+      
+      if (katakanaStr.length > 1) {
+        console.log(`📝 ${katakanaStr} (${romajiStr}) → ${JSON.stringify(segments.segments)} chars: ${JSON.stringify(segments.charCounts)}`);
+      }
     } catch (error) {
       invalidItems++;
     }
@@ -5346,25 +5354,96 @@ function generateRevisionKatakanaTable(hiraganaList) {
   console.log(`📊 Génération table katakana: ${validItems} items valides, ${invalidItems} items ignorés`);
   return table;
 }
-function analyzeRomajiSegments(romajiInput) {
+function analyzeRomajiSegments(romajiInput, kanaText = null) {
   if (!romajiInput) {
     throw new Error("Romaji vide ou null");
   }
   
   let romajiString = String(romajiInput).toLowerCase().trim();
   romajiString = romajiString.replace(/[^a-z]/g, '');
-
   if (romajiString === '') {
-    throw new Error(`Romaji vide après nettoyage des caractères spéciaux`);
+    throw new Error("Romaji vide après nettoyage des caractères spéciaux");
   }
-
-  // Segmenter intelligemment
+  
+  // Segmenter intelligemment le romaji
   const segments = smartSegmentRomaji(romajiString);
+  
+  // Si pas de kana fourni, utiliser l'ancienne logique (1 segment = 1 char)
+  if (!kanaText) {
+    return {
+      segments: segments,
+      charCounts: segments.map(() => 1)
+    };
+  }
+  
+  // ✅ NOUVEAU : Calculer les charCounts en fonction du texte kana
+  const charCounts = calculateCharCounts(segments, kanaText);
   
   return {
     segments: segments,
-    charCounts: segments.map(() => 1) // Chaque segment = 1 caractère visuel
+    charCounts: charCounts
   };
+}
+
+/**
+ * Calcule le nombre de caractères kana pour chaque segment romaji
+ */
+function calculateCharCounts(romajiSegments, kanaText) {
+  const smallKana = ['ゃ', 'ゅ', 'ょ', 'ャ', 'ュ', 'ョ', 'ぁ', 'ぃ', 'ぅ', 'ぇ', 'ぉ', 'ァ', 'ィ', 'ゥ', 'ェ', 'ォ', 'ゎ', 'ヮ'];
+  const smallTsu = ['っ', 'ッ'];
+  
+  const charCounts = [];
+  let kanaPos = 0;
+  
+  for (let segIndex = 0; segIndex < romajiSegments.length; segIndex++) {
+    const segment = romajiSegments[segIndex];
+    let charCount = 1; // Par défaut : 1 segment romaji = 1 char kana
+    
+    if (kanaPos >= kanaText.length) {
+      charCounts.push(1);
+      continue;
+    }
+    
+    const currentKana = kanaText[kanaPos];
+    const nextKana = kanaPos + 1 < kanaText.length ? kanaText[kanaPos + 1] : null;
+    
+    // CAS 1 : Petit tsu suivi d'un caractère (っぷ = "ppu" par exemple)
+    if (smallTsu.includes(currentKana) && nextKana) {
+      // Le っ + caractère suivant = 1 segment romaji avec double consonne
+      charCount = 2;
+      kanaPos += 2;
+    }
+    
+    // CAS 2 : Caractère + petit kana (き + ゅ = "kyu")
+    else if (nextKana && smallKana.includes(nextKana)) {
+      charCount = 2;
+      kanaPos += 2;
+    }
+    
+    // CAS 3 : Voyelle longue spéciale (お + よ = "oyo")
+    else if ('おオ'.includes(currentKana) && nextKana && 'よョ'.includes(nextKana)) {
+      charCount = 2;
+      kanaPos += 2;
+    }
+    
+    // CAS 4 : Caractère simple
+    else {
+      charCount = 1;
+      kanaPos += 1;
+    }
+    
+    charCounts.push(charCount);
+  }
+  
+  // Vérification de sécurité : si les comptes ne correspondent pas, fallback
+  const totalChars = charCounts.reduce((a, b) => a + b, 0);
+  if (totalChars !== kanaText.length) {
+    console.warn(`⚠️ Désynchronisation détectée pour "${kanaText}": ${totalChars} chars calculés vs ${kanaText.length} attendus`);
+    // Fallback : tous à 1
+    return romajiSegments.map(() => 1);
+  }
+  
+  return charCounts;
 }
 // ✅ AJOUT : Constantes pour la segmentation romaji (utilisées par smartSegmentRomaji)
 const ROMAJI_SPECIAL_SYLLABLES = [
