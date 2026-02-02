@@ -4787,7 +4787,7 @@ if (totalTime < requiredTotalTime) {
       await loadUserProgress();
       
       console.log('✅ Compte créé avec succès:', currentUser.pseudo);
-    //  localStorage.removeItem('quizTutorialSeen');
+      localStorage.removeItem('quizTutorialSeen');
       showWelcomeAnimation(currentUser.pseudo);
       
       setTimeout(() => {
