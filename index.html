@@ -321,7 +321,7 @@ h2 {margin: 0.1em 0; font-size: 2.5em; text-align: center; color: var(--brown-pr
 #progressBarContainer {display: flex; align-items: center; justify-content: space-between; gap: 0.1em; margin: 1em auto 0.3em auto; max-width: 80ch; width: 100%; margin-bottom: 10px;
 }
 .progress-bar-track {position: relative; height: 16px; background: linear-gradient(to right, var(--blue-gradient-start), var(--green-dark)); border-radius: 6px; flex: 1; box-shadow: 0 2px 4px var(--shadow-black-light);}
-.progress-marker {position: absolute; top: 45%; left: 0; transform: translate(-50%, -50%); font-size: 2em; transition: left 1.5s ease; color: var(--gray-dark);animation: pulse 2s ease-in-out infinite;}
+.progress-marker {position: absolute; top: 45%; left: 0; transform: translate(-50%, -50%); font-size: 3em; transition: left 1.5s ease; color: var(--gray-dark);animation: pulse 2s ease-in-out infinite;}
 .side-emoji {font-size: 2.5em; line-height: 1; color: var(--gray-dark);}
 @keyframes pulse {
   0%, 100% { transform: translate(-50%, -50%) scale(1); } 
@@ -962,7 +962,7 @@ body::before,
   padding: 30px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   margin: 20px auto;
-  max-width: 850px;
+  width: 680px;
 }
 
 /* Carte uniquement pour le clavier de révision */
@@ -8519,6 +8519,8 @@ if (typeof module !== 'undefined' && module.exports) {
     closeGardenModal
   };
 }
+
+
 // ============================================================================
 // 🎨 SECTION 10 : ANIMATIONS & EFFETS VISUELS
 // ============================================================================
@@ -10865,7 +10867,7 @@ document.querySelectorAll('.revision-key').forEach(key => {
 //                            SECTION 19 : TUTORIEL MODE QUIZ
 // =============================================================================
 // =============================================================================
-localStorage.removeItem('quizTutorialSeen');
+// localStorage.removeItem('quizTutorialSeen');
 const quizTutorialSteps = [
   {
     title: "tuto_step1_title",  // 👈 Clé de traduction
