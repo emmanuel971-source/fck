@@ -4865,8 +4865,11 @@ function showWelcomeAnimation(pseudo) {
   welcomeScreen.style.display = 'flex';
   
   triggerSakuraFall(welcomeScreen);
-  
-  playLevelUp();
+    playLevelUp();
+
+    setTimeout(() => {
+    toggleMenu();
+  }, 2500); // Délai pour laisser l'animation se terminer proprement
 }
 function showReturningUserWelcome(pseudo) {
   const messages = [
