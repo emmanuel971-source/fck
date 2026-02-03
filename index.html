@@ -7016,12 +7016,16 @@ function playOkSound() {
   audio.play().catch(err => console.log('Erreur son:', err));
 }
 
+// Créer l'instance une seule fois au chargement
+const clicAudio = new Audio('https://emmanuel971-source.github.io/hirakataquizz/clic.mp3');
+clicAudio.volume = 1;
+
 function playClicSound() {
   if (!soundEnabled) return;
   
-  const audio = new Audio('https://emmanuel971-source.github.io/hirakataquizz/clic.mp3');
-  audio.volume = 1; // Ajustez le volume si besoin
-  audio.play().catch(err => console.log('Erreur son:', err));
+  // Rembobiner le son au début avant de le jouer
+  clicAudio.currentTime = 0;
+  clicAudio.play().catch(err => console.log('Erreur son:', err));
 }
 
 function playMarioCoin() {
