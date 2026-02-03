@@ -9506,7 +9506,7 @@ function showSection(sectionId) {
     quizFlashState.timerInterval = null;
    }
   // ✅ ARRÊTER le Quiz Flash si on quitte cette section
-  if (sectionName !== 'quiz-flash') {
+  if (sectionId !== 'quiz-flash') {
     stopQuizFlash();
   }
 
