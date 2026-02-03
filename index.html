@@ -7027,7 +7027,14 @@ function playClicSound() {
   clicAudio.currentTime = 0;
   clicAudio.play().catch(err => console.log('Erreur son:', err));
 }
-
+function playMenuClicSound() {
+  if (!soundEnabled) return;
+  
+  const audio = new Audio('https://emmanuel971-source.github.io/hirakataquizz/menuclic.mp3');
+  audio.volume = 1; // Ajustez le volume si besoin
+  audio.play().catch(err => console.log('Erreur son:', err));
+}
+  
 function playMarioCoin() {
   playSound(() => playNotes([659.25, 1046.50], [0.1, 0.2]));
 }
@@ -11804,7 +11811,7 @@ function startFlashTimer(item) {
     // 🔊 NOUVEAU : Démarrer le son de timer
     setTimeout(() => {
       if (soundEnabled) {
-        playQuestionSound();
+        playMenuClicSound();
         
         // ✅ Démarrer le son de timer et le stocker
         quizFlashState.timerAudio = new Audio('https://emmanuel971-source.github.io/hirakataquizz/timer.mp3');
@@ -11863,9 +11870,11 @@ function flipCardAndReveal(item) {
   
   // Son de flip (réutilise un son existant)
   if (soundEnabled) {
-    playfireworksound2(); // Son différent pour la révélation
+      setTimeout(() => {
+ playQuestionSound(); // Son différent pour la révélation
+    }, 500);
   }
-  
+ 
   // Jouer le son du romaji immédiatement
   if (voiceEnabled) {
     const audioUrl = `https://emmanuel971-source.github.io/hirakataquizz/${encodeURIComponent(item.Hiragana)}.mp3`;
