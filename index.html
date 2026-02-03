@@ -11818,7 +11818,7 @@ function startFlashTimer(item) {
         quizFlashState.timerAudio.volume = 0.5; // Ajuste le volume
         quizFlashState.timerAudio.play().catch(err => console.log('Erreur timer audio:', err));
       }
-    }, 50);
+    }, 100);
 
     timerBar.style.width = '100%';
     timerBar.offsetHeight; // force repaint
@@ -11870,17 +11870,17 @@ function flipCardAndReveal(item) {
   
   // Son de flip (réutilise un son existant)
   if (soundEnabled) {
-      setTimeout(() => {
- playQuestionSound(); // Son différent pour la révélation
-    }, 500);
+    playQuestionSound(); // Son différent pour la révélation
   }
  
   // Jouer le son du romaji immédiatement
   if (voiceEnabled) {
+      setTimeout(() => {
     const audioUrl = `https://emmanuel971-source.github.io/hirakataquizz/${encodeURIComponent(item.Hiragana)}.mp3`;
     new Audio(audioUrl).play().catch(() => {
       console.warn('⚠️ Son romaji introuvable');
     });
+   }, 500);
   }
   
   // Attendre 2 secondes puis passer à la suivante
