@@ -12001,6 +12001,12 @@ function stopQuizFlash() {
     console.log('✅ Timer arrêté');
   }
   
+  // ✅ Arrêter le son de timer
+  if (quizFlashState.timerAudio) {
+    quizFlashState.timerAudio.pause();
+    quizFlashState.timerAudio.currentTime = 0;
+  }
+  
   // Réinitialiser l'état
   quizFlashState.isFlipped = false;
   quizFlashState.currentQuestionIndex = 0;
