@@ -4983,7 +4983,7 @@ function showReturningUserWelcome(pseudo) {
     setTimeout(() => sakura.remove(), 5000);
   }
   
-  playZenBell();
+  playEnterSound();
   
 setTimeout(() => {
   console.log('⏰ Timeout atteint, fermeture overlay');
@@ -6891,6 +6891,7 @@ function playNotes(notes, delays, type = 'sine', gainValue = 0.05) {
 // --- Effets sonores simples ---
 function playPopSound() {
   playSound(() => createOsc('triangle', 420, 0.15, 0.15));
+ 
 }
 
 function playTwinkle() {
@@ -6991,7 +6992,37 @@ function playQuestionSound() {
   audio.play().catch(err => console.log('Erreur son:', err));
 }
 
+function playValidationSound() {
+  if (!soundEnabled) return;
+  
+  const audio = new Audio('https://emmanuel971-source.github.io/hirakataquizz/validation.mp3');
+  audio.volume = 0.1; // Ajustez le volume si besoin
+  audio.play().catch(err => console.log('Erreur son:', err));
+}
 
+function playEnterSound() {
+  if (!soundEnabled) return;
+  
+  const audio = new Audio('https://emmanuel971-source.github.io/hirakataquizz/enter.mp3');
+  audio.volume = 0.4; // Ajustez le volume si besoin
+  audio.play().catch(err => console.log('Erreur son:', err));
+}
+
+function playOkSound() {
+  if (!soundEnabled) return;
+  
+  const audio = new Audio('https://emmanuel971-source.github.io/hirakataquizz/ok.mp3');
+  audio.volume = 1; // Ajustez le volume si besoin
+  audio.play().catch(err => console.log('Erreur son:', err));
+}
+
+function playClicSound() {
+  if (!soundEnabled) return;
+  
+  const audio = new Audio('https://emmanuel971-source.github.io/hirakataquizz/clic.mp3');
+  audio.volume = 1; // Ajustez le volume si besoin
+  audio.play().catch(err => console.log('Erreur son:', err));
+}
 
 function playMarioCoin() {
   playSound(() => playNotes([659.25, 1046.50], [0.1, 0.2]));
@@ -7922,7 +7953,7 @@ function updateRevisionFeedback() {
         // Ajouter animation "pop" et son si on valide un nouveau caractère
         if (inputLength > romStart && c === charStart && !card.classList.contains("pop-animation")) {
           card.classList.add("pop-animation");
-          playPopSound();
+          playClicSound();
           setTimeout(() => card.classList.remove("pop-animation"), 300);
         }
       }
@@ -8058,7 +8089,7 @@ openRevisionFlashcard(
 
         if (isCorrect) {
          
-          playZenBell();
+          playValidationSound();
         } else {
         
           playSoftError();
@@ -9337,7 +9368,8 @@ if (animateScore) {
                 spawnSparklesInFlashcard(plantGame, "flower");
                 
                 if (soundEnabled) {
-                  happySoundFlashcard();
+                  //happySoundFlashcard();
+                    playOkSound();
                 }
                 
                 setTimeout(() => {
