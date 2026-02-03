@@ -11766,6 +11766,12 @@ function startFlashTimer(item) {
     clearInterval(quizFlashState.timerInterval);
   }
 
+  // ✅ ARRÊTER le son de timer précédent s'il existe
+  if (quizFlashState.timerAudio) {
+    quizFlashState.timerAudio.pause();
+    quizFlashState.timerAudio.currentTime = 0;
+  }
+
   const difficulty = parseInt(localStorage.getItem('difficulty')) || 6;
   const duration = difficulty <= 4 ? 5 : difficulty <= 6 ? 4 : 3;
 
@@ -11795,10 +11801,15 @@ function startFlashTimer(item) {
       setTimeout(() => timerBar.classList.remove('flash-start'), 200);
     }, 100);
 
-    // 🔊 Son DÉCALÉ de 50ms pour meilleure synchro
+    // 🔊 NOUVEAU : Démarrer le son de timer
     setTimeout(() => {
       if (soundEnabled) {
         playQuestionSound();
+        
+        // ✅ Démarrer le son de timer et le stocker
+        quizFlashState.timerAudio = new Audio('https://emmanuel971-source.github.io/hirakataquizz/timer.mp3');
+        quizFlashState.timerAudio.volume = 0.5; // Ajuste le volume
+        quizFlashState.timerAudio.play().catch(err => console.log('Erreur timer audio:', err));
       }
     }, 50);
 
@@ -11831,13 +11842,19 @@ function startFlashTimer(item) {
       if (remaining <= 0) {
         timerBar.classList.add('no-shine');
         clearInterval(quizFlashState.timerInterval);
+        
+        // ✅ ARRÊTER le son de timer
+        if (quizFlashState.timerAudio) {
+          quizFlashState.timerAudio.pause();
+          quizFlashState.timerAudio.currentTime = 0;
+        }
+        
         flipCardAndReveal(item);
       }
     }, 50);
 
   }, 250);
 }
-
 
 function flipCardAndReveal(item) {
   const card = document.getElementById('flashCard');
