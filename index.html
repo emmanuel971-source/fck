@@ -9739,22 +9739,14 @@ function toggleMenu() {
   // ⬇️ AJOUTER CETTE LIGNE ICI (avec les autres déclarations)
   const loginSection = document.getElementById('login');
   
-  // ✅ AJOUT : Arrêter le Quiz Flash avant d'ouvrir le menu
-  if (!menu.classList.contains('active')) { // Si on OUVRE le menu
-    console.log('🔍 Ouverture du menu - arrêt du Quiz Flash');
-    try {
-      if (typeof quizFlashState !== 'undefined' && quizFlashState.timerInterval) {
-        clearInterval(quizFlashState.timerInterval);
-        quizFlashState.timerInterval = null;
-        console.log('✅ Quiz Flash arrêté via toggleMenu');
-      }
-    } catch (e) {
-      console.warn('⚠️ Erreur arrêt quiz:', e);
-    }
-    
-    // ✅ NOUVEAU : Fermer les modales contact AVANT de masquer les sections
-    const contactFormModal = document.getElementById('contact-form-modal');
-    const contactInboxModal = document.getElementById('contact-inbox-modal');
+// ✅ AJOUT : Arrêter le Quiz Flash avant d'ouvrir le menu
+if (!menu.classList.contains('active')) { // Si on OUVRE le menu
+  console.log('🔍 Ouverture du menu - arrêt du Quiz Flash');
+  stopQuizFlash();
+  
+  // ✅ NOUVEAU : Fermer les modales contact AVANT de masquer les sections
+  const contactFormModal = document.getElementById('contact-form-modal');
+  const contactInboxModal = document.getElementById('contact-inbox-modal');
     
     if (contactFormModal && contactFormModal.classList.contains('active')) {
       contactFormModal.style.display = 'none';
