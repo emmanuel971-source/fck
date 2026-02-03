@@ -9504,6 +9504,7 @@ function showSection(sectionId) {
     console.log('🛑 Arrêt du Quiz Flash (changement de section)');
     clearInterval(quizFlashState.timerInterval);
     quizFlashState.timerInterval = null;
+    stopQuizFlash();
   }
   // ✅ CORRECTION : Gestion de l'affichage du hamburger avec classe
   const hamburger = document.querySelector('.hamburger');
