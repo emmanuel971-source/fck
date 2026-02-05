@@ -1031,6 +1031,259 @@ const cssForFinalTrophy = `
   animation: unlockSparkle 1.5s ease-in-out infinite;
 }
 `;  
+
+/* Réglages du Paysage - Version harmonisée */
+/* Réglages du Paysage - Version multi-colonnes CORRIGÉE */
+#options-landscape {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 1em;
+  overflow-y: auto;
+  max-height: calc(100vh - 100px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+#landscape-menu {
+  background: var(--overlay-green-05);
+  border-radius: 20px;
+  padding: 2em 1.5em;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+#landscape-menu h2 {
+  font-size: 1.8em;
+  color: var(--brown-primary);
+  text-align: center;
+  margin: 0 0 1.5em 0;
+  text-shadow: 0 1px 2px var(--shadow-brown-light);
+}
+
+/* Grille de sections - CORRECTION IMPORTANTE */
+.landscape-sections-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(300px, 1fr));
+  gap: 2em;
+  margin-bottom: 1.5em;
+  width: 100%;
+}
+
+.landscape-section {
+  background: rgba(255, 255, 255, 0.5);
+  padding: 1.5em;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px var(--shadow-black-light);
+  min-width: 0; /* Important pour que le contenu ne déborde pas */
+}
+
+.landscape-section-title {
+  font-size: 1.4em;
+  color: var(--green-dark);
+  margin: 0 0 1.2em 0;
+  padding-bottom: 0.6em;
+  border-bottom: 2px solid var(--green-light);
+  font-weight: bold;
+  text-align: center;
+}
+
+.landscape-control {
+  margin-bottom: 1.3em;
+  background: var(--white);
+  padding: 1em;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px var(--shadow-black-light);
+  transition: all 0.3s ease;
+}
+
+.landscape-control:last-child {
+  margin-bottom: 0;
+}
+
+.landscape-control:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px var(--shadow-black-medium);
+}
+
+.landscape-control label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  color: var(--brown-primary);
+  margin-bottom: 0.6em;
+  font-size: 1em;
+}
+
+/* Inputs spécifiques */
+.landscape-control input[type="range"] {
+  width: 100%;
+  height: 8px;
+  border-radius: 5px;
+  background: linear-gradient(to right, var(--beige-light), var(--green-primary));
+  outline: none;
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.landscape-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--brown-primary);
+  cursor: pointer;
+  box-shadow: 0 2px 4px var(--shadow-black-medium);
+  transition: all 0.2s ease;
+}
+
+.landscape-control input[type="range"]::-webkit-slider-thumb:hover {
+  background: var(--green-primary);
+  transform: scale(1.2);
+}
+
+.landscape-control input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--brown-primary);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px var(--shadow-black-medium);
+  transition: all 0.2s ease;
+}
+
+.landscape-control input[type="range"]::-moz-range-thumb:hover {
+  background: var(--green-primary);
+  transform: scale(1.2);
+}
+
+.landscape-control select {
+  width: 100%;
+  padding: 0.7em;
+  font-size: 1.05em;
+  border: 2px solid var(--brown-primary);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--brown-primary);
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.landscape-control select:focus {
+  outline: none;
+  border-color: var(--green-primary);
+  box-shadow: 0 0 8px var(--overlay-green-30);
+}
+
+.landscape-control select:hover {
+  background: var(--beige-light);
+}
+
+/* Valeurs affichées à côté des sliders */
+.range-value {
+  font-weight: bold;
+  color: var(--green-dark);
+  font-size: 1em;
+  min-width: 45px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Bouton de régénération */
+#landscape-menu button#regen {
+  width: 100%;
+  max-width: 500px;
+  display: block;
+  margin: 2em auto 0;
+  padding: 1.2em 2em;
+  font-size: 1.4em;
+  font-weight: bold;
+  background: linear-gradient(135deg, var(--green-primary), var(--green-medium));
+  border: none;
+  border-radius: 12px;
+  color: var(--white);
+  cursor: pointer;
+  box-shadow: 0 6px 12px var(--shadow-black-medium);
+  transition: all 0.3s ease;
+  text-shadow: 0 2px 4px var(--shadow-black-light);
+}
+
+#landscape-menu button#regen:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 16px var(--shadow-black-strong);
+  background: linear-gradient(135deg, var(--green-medium), var(--green-bright));
+}
+
+#landscape-menu button#regen:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 4px 8px var(--shadow-black-medium);
+}
+
+#landscape-menu button#regen::before {
+  content: '🔄 ';
+  font-size: 1.2em;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .landscape-sections-grid {
+    grid-template-columns: repeat(2, minmax(280px, 1fr));
+    gap: 1.5em;
+  }
+}
+
+@media (max-width: 768px) {
+  .landscape-sections-grid {
+    grid-template-columns: 1fr;
+    gap: 1em;
+  }
+  
+  #landscape-menu {
+    padding: 1.5em 1em;
+  }
+  
+  .landscape-section {
+    padding: 1.2em;
+  }
+}
+
+@media (max-width: 480px) {
+  #options-landscape {
+    padding: 0.5em;
+  }
+  
+  #landscape-menu {
+    padding: 1em 0.8em;
+  }
+  
+  #landscape-menu h2 {
+    font-size: 1.4em;
+  }
+  
+  .landscape-section-title {
+    font-size: 1.2em;
+  }
+  
+  .landscape-control {
+    padding: 0.8em;
+  }
+  
+  .landscape-control label {
+    font-size: 0.95em;
+  }
+  
+  #landscape-menu button#regen {
+    font-size: 1.1em;
+    padding: 1em 1.5em;
+  }
+}
 </style>
 
 
@@ -1284,79 +1537,155 @@ const cssForFinalTrophy = `
 </div>
 
 <!------------------------------------------------------------------------------------------------- Sous-rubrique DECOR -->
-
 <div id="options-landscape" class="options-sub hidden">
-  <h2>Réglages du Paysage</h2>
   
-<div id="landscape-menu">
-    <h2>Paysage</h2>
-    <label>Rugosité <input type="range" id="roughness" min="0" max="1" step="0.01" value="0.1"></label>
-    <label>Horizon <input type="range" id="height" min="0.2" max="0.7" step="0.01" value="0.7"></label>
-    <label>Séparation <input type="range" id="separation" min="5" max="30" step="1" value="6"></label>
-    <label>Écartement sommets <input type="range" id="spread" min="3" max="20" step="1" value="8"></label>
-    <label>Saison
-      <select id="season">
-        <option value="summer">Été</option>
-        <option value="autumn">Automne</option>
-        <option value="spring">Printemps</option>
-        <option value="winter">Hiver</option>
-      </select>
-    </label>
-    <label>Moment
-      <select id="timeOfDay">
-        <option value="day">Jour</option>
-        <option value="dawn">Aube</option>
-        <option value="dusk">Crépuscule</option>
-        <option value="night">Nuit</option>
-      </select>
-    </label>
-    <label>Style relief
-      <select id="style">
-        <option value="hill">Collines</option>
-        <option value="dune">Dunes</option>
-        <option value="mountain">Montagnes</option>
-      </select>
-    </label>
-    <label>Sol
-      <select id="groundType">
-        <option value="grass">Nature</option>
-        <option value="desert">Désert</option>
-        <option value="sea">Mer</option>
-      </select>
-    </label>
-<label>Dominante couleur
-  <select id="colorDominant">
-    <option value="neutral">Neutre</option>
-    <option value="pink">Rose</option>
-    <option value="blue">Bleu</option>
-    <option value="green">Vert</option>
-    <option value="brown">Marron</option>
-    <option value="yellow">Jaune</option>
-  </select>
-</label>
-<label>Intensité
-  <select id="colorIntensity">
-    <option value="normal">Normale</option>
-    <option value="pastel">Pastel</option>
-    <option value="vivid">Vive</option>
-  </select>
-</label>
-<label>Dégradé ombre reliefs
-  <input type="range" id="reliefGradient" min="0" max="10" step="0.01" value="0">
-</label>
-
-<label>Couverture nuageuse
-  <input type="range" id="cloudCoverage" min="0" max="100" step="1" value="50">
-</label>
-<label>Force du vent
-  <input type="range" id="windForce" min="0" max="3" step="0.01" value="1">
-</label>
-<label>Profondeur floue <input type="range" id="depthBlur" min="0" max="3" step="0.1" value="1"></label>
-    <button id="regen">Régénérer</button>
-  </div>
-
-  
-</div>  
+    <h2>🎨 Réglages du Paysage</h2>
+    
+    <div class="landscape-sections-grid">
+      
+      <!-- Section Relief -->
+      <div class="landscape-section">
+        <div class="landscape-section-title">⛰️ Relief</div>
+        
+        <div class="landscape-control">
+          <label>
+            Rugosité
+            <span class="range-value" id="roughness-value">0.1</span>
+          </label>
+          <input type="range" id="roughness" min="0" max="1" step="0.01" value="0.1">
+        </div>
+        
+        <div class="landscape-control">
+          <label>
+            Horizon
+            <span class="range-value" id="height-value">0.7</span>
+          </label>
+          <input type="range" id="height" min="0.2" max="0.7" step="0.01" value="0.7">
+        </div>
+        
+        <div class="landscape-control">
+          <label>
+            Séparation
+            <span class="range-value" id="separation-value">6</span>
+          </label>
+          <input type="range" id="separation" min="5" max="30" step="1" value="6">
+        </div>
+        
+        <div class="landscape-control">
+          <label>
+            Écartement
+            <span class="range-value" id="spread-value">8</span>
+          </label>
+          <input type="range" id="spread" min="3" max="20" step="1" value="8">
+        </div>
+        
+        <div class="landscape-control">
+          <label>Style relief</label>
+          <select id="style">
+            <option value="hill">🏞️ Collines</option>
+            <option value="dune">🏜️ Dunes</option>
+            <option value="mountain">⛰️ Montagnes</option>
+          </select>
+        </div>
+        
+        <div class="landscape-control">
+          <label>
+            Ombre reliefs
+            <span class="range-value" id="reliefGradient-value">0</span>
+          </label>
+          <input type="range" id="reliefGradient" min="0" max="10" step="0.01" value="0">
+        </div>
+      </div>
+      
+      <!-- Section Atmosphère -->
+      <div class="landscape-section">
+        <div class="landscape-section-title">🌤️ Atmosphère</div>
+        
+        <div class="landscape-control">
+          <label>Saison</label>
+          <select id="season">
+            <option value="summer">☀️ Été</option>
+            <option value="autumn">🍂 Automne</option>
+            <option value="spring">🌸 Printemps</option>
+            <option value="winter">❄️ Hiver</option>
+          </select>
+        </div>
+        
+        <div class="landscape-control">
+          <label>Moment</label>
+          <select id="timeOfDay">
+            <option value="day">☀️ Jour</option>
+            <option value="dawn">🌅 Aube</option>
+            <option value="dusk">🌇 Crépuscule</option>
+            <option value="night">🌙 Nuit</option>
+          </select>
+        </div>
+        
+        <div class="landscape-control">
+          <label>
+            Nuages
+            <span class="range-value" id="cloudCoverage-value">50</span>
+          </label>
+          <input type="range" id="cloudCoverage" min="0" max="100" step="1" value="50">
+        </div>
+        
+        <div class="landscape-control">
+          <label>
+            Vent
+            <span class="range-value" id="windForce-value">1</span>
+          </label>
+          <input type="range" id="windForce" min="0" max="3" step="0.01" value="1">
+        </div>
+        
+        <div class="landscape-control">
+          <label>
+            Flou profondeur
+            <span class="range-value" id="depthBlur-value">1</span>
+          </label>
+          <input type="range" id="depthBlur" min="0" max="3" step="0.1" value="1">
+        </div>
+      </div>
+      
+      <!-- Section Couleurs -->
+      <div class="landscape-section">
+        <div class="landscape-section-title">🎨 Couleurs</div>
+        
+        <div class="landscape-control">
+          <label>Sol</label>
+          <select id="groundType">
+            <option value="grass">🌿 Nature</option>
+            <option value="desert">🏜️ Désert</option>
+            <option value="sea">🌊 Mer</option>
+          </select>
+        </div>
+        
+        <div class="landscape-control">
+          <label>Dominante</label>
+          <select id="colorDominant">
+            <option value="neutral">⚪ Neutre</option>
+            <option value="pink">🌸 Rose</option>
+            <option value="blue">💙 Bleu</option>
+            <option value="green">💚 Vert</option>
+            <option value="brown">🤎 Marron</option>
+            <option value="yellow">💛 Jaune</option>
+          </select>
+        </div>
+        
+        <div class="landscape-control">
+          <label>Intensité</label>
+          <select id="colorIntensity">
+            <option value="normal">🎨 Normale</option>
+            <option value="pastel">🌈 Pastel</option>
+            <option value="vivid">✨ Vive</option>
+          </select>
+        </div>
+      </div>
+      
+    </div>
+    
+    <button id="regen">Régénérer le paysage</button>
+ 
+</div>
 <!-- Sous-rubrique Langue -->
 <div id="options-language" class="options-sub hidden">
 <!--  <button class="arcade-button" onclick="backToOptions()"><span data-i18n="options_back">← Retour</span></button> -->
@@ -10929,6 +11258,8 @@ document.addEventListener('mousemove', () => {
   }
 });
 
+
+
 // --- Setters layout ---
 setAppHeight();
 window.addEventListener('resize', setAppHeight);
@@ -10940,7 +11271,15 @@ setTimeout(() => {
   window.scrollTo(0, 10);
 }, 100);
 
-
+// Mise à jour des valeurs affichées pour les sliders
+document.querySelectorAll('#landscape-menu input[type="range"]').forEach(slider => {
+  const valueSpan = document.getElementById(slider.id + '-value');
+  if (valueSpan) {
+    slider.addEventListener('input', function() {
+      valueSpan.textContent = this.value;
+    });
+  }
+});
 
 // --- Initialisation au chargement ---
 window.onload = () => {
