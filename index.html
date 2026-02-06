@@ -544,6 +544,19 @@ html,body{height:100%;margin:0;padding:0}body{display:flex;align-items:center;ju
 @media screen and (max-width: 768px), screen and (-webkit-min-device-pixel-ratio: 2) {#mode2 .title {margin: 0.1em 0; font-size: 1em; text-align: center; color: var(--brown-primary); text-shadow: 0 1px 2px var(--shadow-brown-light);}}  
 @supports(padding-top:env(safe-area-inset-top)){#unlock-progress-container{top:max(12px,env(safe-area-inset-top))}}
 /* ====================== MON JARDIN ====================== */
+#stats.section.active {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+}body:has(.menu.active) #stats.section.active {
+  display: none !important;
+}
+#stats .garden-container {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  min-height: 0 !important; /* Important pour le flex */
+}
 #stats h1 { margin-bottom: 0.2em; font-size: 2.2em; }
 .garden-legend { position: sticky; top: 0; background: var(--beige-background); padding: 0.6em 1em; font-size: 1em; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 10; opacity: 0; transition: opacity 0.4s; display: flex; justify-content: center; gap: 2em; border-bottom: 2px solid var(--brown-primary); }
 .garden-legend.visible { opacity: 1; }
