@@ -1032,31 +1032,19 @@ const cssForFinalTrophy = `
 }
 `;  
 
-/* Réglages du Paysage - Version harmonisée */
-/* Réglages du Paysage - Version multi-colonnes CORRIGÉE */
+/* Réglages du Paysage - Version centrée */
 #options-landscape {
   width: 100%;
   max-width: 100%;
   margin: 0;
-  padding: 1em;
-  overflow-y: auto;
-  max-height: calc(100vh - 100px);
+  padding: 1.5em;
+  box-sizing: border-box;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
 }
 
-#landscape-menu {
-  background: var(--overlay-green-05);
-  border-radius: 20px;
-  padding: 2em 1.5em;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-#landscape-menu h2 {
+#options-landscape h2 {
   font-size: 1.8em;
   color: var(--brown-primary);
   text-align: center;
@@ -1064,13 +1052,15 @@ const cssForFinalTrophy = `
   text-shadow: 0 1px 2px var(--shadow-brown-light);
 }
 
-/* Grille de sections - CORRECTION IMPORTANTE */
+/* Grille de sections */
 .landscape-sections-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(300px, 1fr));
   gap: 2em;
-  margin-bottom: 1.5em;
+  margin-bottom: 2em;
   width: 100%;
+  max-width: 1400px;
+  box-sizing: border-box;
 }
 
 .landscape-section {
@@ -1078,7 +1068,8 @@ const cssForFinalTrophy = `
   padding: 1.5em;
   border-radius: 15px;
   box-shadow: 0 4px 8px var(--shadow-black-light);
-  min-width: 0; /* Important pour que le contenu ne déborde pas */
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .landscape-section-title {
@@ -1098,6 +1089,7 @@ const cssForFinalTrophy = `
   border-radius: 10px;
   box-shadow: 0 2px 4px var(--shadow-black-light);
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 .landscape-control:last-child {
@@ -1119,7 +1111,7 @@ const cssForFinalTrophy = `
   font-size: 1em;
 }
 
-/* Inputs spécifiques */
+/* Inputs range */
 .landscape-control input[type="range"] {
   width: 100%;
   height: 8px;
@@ -1128,6 +1120,7 @@ const cssForFinalTrophy = `
   outline: none;
   -webkit-appearance: none;
   margin: 0;
+  box-sizing: border-box;
 }
 
 .landscape-control input[type="range"]::-webkit-slider-thumb {
@@ -1163,6 +1156,7 @@ const cssForFinalTrophy = `
   transform: scale(1.2);
 }
 
+/* Select */
 .landscape-control select {
   width: 100%;
   padding: 0.7em;
@@ -1174,6 +1168,7 @@ const cssForFinalTrophy = `
   font-family: inherit;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 .landscape-control select:focus {
@@ -1186,22 +1181,15 @@ const cssForFinalTrophy = `
   background: var(--beige-light);
 }
 
-/* Valeurs affichées à côté des sliders */
+/* Valeurs affichées */
 .range-value {
-  font-weight: bold;
-  color: var(--green-dark);
-  font-size: 1em;
-  min-width: 45px;
-  text-align: right;
-  flex-shrink: 0;
+  display: none;
 }
 
-/* Bouton de régénération */
-#landscape-menu button#regen {
+/* BOUTON RÉGÉNÉRER - LE STYLE QUI MANQUAIT */
+#options-landscape button#regen {
   width: 100%;
   max-width: 500px;
-  display: block;
-  margin: 2em auto 0;
   padding: 1.2em 2em;
   font-size: 1.4em;
   font-weight: bold;
@@ -1213,22 +1201,42 @@ const cssForFinalTrophy = `
   box-shadow: 0 6px 12px var(--shadow-black-medium);
   transition: all 0.3s ease;
   text-shadow: 0 2px 4px var(--shadow-black-light);
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
 }
 
-#landscape-menu button#regen:hover {
+#options-landscape button#regen::before {
+  content: '🔄 ';
+  font-size: 1.2em;
+  margin-right: 0.3em;
+}
+
+#options-landscape button#regen:hover {
   transform: translateY(-2px) scale(1.02);
   box-shadow: 0 8px 16px var(--shadow-black-strong);
   background: linear-gradient(135deg, var(--green-medium), var(--green-bright));
 }
 
-#landscape-menu button#regen:active {
+#options-landscape button#regen:active {
   transform: translateY(1px) scale(0.98);
   box-shadow: 0 4px 8px var(--shadow-black-medium);
 }
 
-#landscape-menu button#regen::before {
-  content: '🔄 ';
-  font-size: 1.2em;
+/* Effet de brillance au survol */
+#options-landscape button#regen::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+#options-landscape button#regen:hover::after {
+  left: 100%;
 }
 
 /* Responsive */
@@ -1245,12 +1253,12 @@ const cssForFinalTrophy = `
     gap: 1em;
   }
   
-  #landscape-menu {
-    padding: 1.5em 1em;
-  }
-  
   .landscape-section {
     padding: 1.2em;
+  }
+  
+  #options-landscape {
+    padding: 1em;
   }
 }
 
@@ -1259,11 +1267,7 @@ const cssForFinalTrophy = `
     padding: 0.5em;
   }
   
-  #landscape-menu {
-    padding: 1em 0.8em;
-  }
-  
-  #landscape-menu h2 {
+  #options-landscape h2 {
     font-size: 1.4em;
   }
   
@@ -1279,7 +1283,7 @@ const cssForFinalTrophy = `
     font-size: 0.95em;
   }
   
-  #landscape-menu button#regen {
+  #options-landscape button#regen {
     font-size: 1.1em;
     padding: 1em 1.5em;
   }
@@ -1470,7 +1474,7 @@ const cssForFinalTrophy = `
     <button class="arcade-button" onclick="showSubOptions('difficulty')" data-i18n="options_difficulty">Difficulté</button>
     <button class="arcade-button" onclick="showSubOptions('sound')" data-i18n="options_sound">Son</button>
     <button class="arcade-button" onclick="showSubOptions('language')" data-i18n="options_language">Langue</button>
-    <button class="arcade-button" onclick="showSubOptions('landscape')">🎨 Paysage</button>
+    <button class="arcade-button" onclick="showSubOptions('landscape')">Paysage</button>
     <button class="arcade-button" onclick="showSubOptions('contact')" data-i18n="contact_title">📨 Contact</button>
     <button class="arcade-button" onclick="showSection('account')" data-i18n="account_title">Mon compte</button>
   </div>
@@ -1539,152 +1543,129 @@ const cssForFinalTrophy = `
 <!------------------------------------------------------------------------------------------------- Sous-rubrique DECOR -->
 <div id="options-landscape" class="options-sub hidden">
   
-    <h2>🎨 Réglages du Paysage</h2>
+<!-- <h2 data-i18n="landscape_title">🎨 Réglages du Paysage</h2>  -->
+
     
     <div class="landscape-sections-grid">
       
-      <!-- Section Relief -->
-      <div class="landscape-section">
-        <div class="landscape-section-title">⛰️ Relief</div>
-        
-        <div class="landscape-control">
-          <label>
-            Rugosité
-            <span class="range-value" id="roughness-value">0.1</span>
-          </label>
-          <input type="range" id="roughness" min="0" max="1" step="0.01" value="0.1">
-        </div>
-        
-        <div class="landscape-control">
-          <label>
-            Horizon
-            <span class="range-value" id="height-value">0.7</span>
-          </label>
-          <input type="range" id="height" min="0.2" max="0.7" step="0.01" value="0.7">
-        </div>
-        
-        <div class="landscape-control">
-          <label>
-            Séparation
-            <span class="range-value" id="separation-value">6</span>
-          </label>
-          <input type="range" id="separation" min="5" max="30" step="1" value="6">
-        </div>
-        
-        <div class="landscape-control">
-          <label>
-            Écartement
-            <span class="range-value" id="spread-value">8</span>
-          </label>
-          <input type="range" id="spread" min="3" max="20" step="1" value="8">
-        </div>
-        
-        <div class="landscape-control">
-          <label>Style relief</label>
-          <select id="style">
-            <option value="hill">🏞️ Collines</option>
-            <option value="dune">🏜️ Dunes</option>
-            <option value="mountain">⛰️ Montagnes</option>
-          </select>
-        </div>
-        
-        <div class="landscape-control">
-          <label>
-            Ombre reliefs
-            <span class="range-value" id="reliefGradient-value">0</span>
-          </label>
-          <input type="range" id="reliefGradient" min="0" max="10" step="0.01" value="0">
-        </div>
+       <!-- Section Relief -->
+    <div class="landscape-section">
+      <div class="landscape-section-title" data-i18n="landscape_relief_title">⛰️ Relief</div>
+      
+      <div class="landscape-control">
+        <label data-i18n="landscape_roughness">Rugosité</label>
+        <input type="range" id="roughness" min="0" max="1" step="0.01" value="0.1">
       </div>
       
-      <!-- Section Atmosphère -->
-      <div class="landscape-section">
-        <div class="landscape-section-title">🌤️ Atmosphère</div>
-        
-        <div class="landscape-control">
-          <label>Saison</label>
-          <select id="season">
-            <option value="summer">☀️ Été</option>
-            <option value="autumn">🍂 Automne</option>
-            <option value="spring">🌸 Printemps</option>
-            <option value="winter">❄️ Hiver</option>
-          </select>
-        </div>
-        
-        <div class="landscape-control">
-          <label>Moment</label>
-          <select id="timeOfDay">
-            <option value="day">☀️ Jour</option>
-            <option value="dawn">🌅 Aube</option>
-            <option value="dusk">🌇 Crépuscule</option>
-            <option value="night">🌙 Nuit</option>
-          </select>
-        </div>
-        
-        <div class="landscape-control">
-          <label>
-            Nuages
-            <span class="range-value" id="cloudCoverage-value">50</span>
-          </label>
-          <input type="range" id="cloudCoverage" min="0" max="100" step="1" value="50">
-        </div>
-        
-        <div class="landscape-control">
-          <label>
-            Vent
-            <span class="range-value" id="windForce-value">1</span>
-          </label>
-          <input type="range" id="windForce" min="0" max="3" step="0.01" value="1">
-        </div>
-        
-        <div class="landscape-control">
-          <label>
-            Flou profondeur
-            <span class="range-value" id="depthBlur-value">1</span>
-          </label>
-          <input type="range" id="depthBlur" min="0" max="3" step="0.1" value="1">
-        </div>
+      <div class="landscape-control">
+        <label data-i18n="landscape_horizon">Horizon</label>
+        <input type="range" id="height" min="0.2" max="0.7" step="0.01" value="0.7">
       </div>
       
-      <!-- Section Couleurs -->
-      <div class="landscape-section">
-        <div class="landscape-section-title">🎨 Couleurs</div>
-        
-        <div class="landscape-control">
-          <label>Sol</label>
-          <select id="groundType">
-            <option value="grass">🌿 Nature</option>
-            <option value="desert">🏜️ Désert</option>
-            <option value="sea">🌊 Mer</option>
-          </select>
-        </div>
-        
-        <div class="landscape-control">
-          <label>Dominante</label>
-          <select id="colorDominant">
-            <option value="neutral">⚪ Neutre</option>
-            <option value="pink">🌸 Rose</option>
-            <option value="blue">💙 Bleu</option>
-            <option value="green">💚 Vert</option>
-            <option value="brown">🤎 Marron</option>
-            <option value="yellow">💛 Jaune</option>
-          </select>
-        </div>
-        
-        <div class="landscape-control">
-          <label>Intensité</label>
-          <select id="colorIntensity">
-            <option value="normal">🎨 Normale</option>
-            <option value="pastel">🌈 Pastel</option>
-            <option value="vivid">✨ Vive</option>
-          </select>
-        </div>
+      <div class="landscape-control">
+        <label data-i18n="landscape_separation">Séparation</label>
+        <input type="range" id="separation" min="5" max="30" step="1" value="6">
       </div>
       
+      <div class="landscape-control">
+        <label data-i18n="landscape_spacing">Écartement</label>
+        <input type="range" id="spread" min="3" max="20" step="1" value="8">
+      </div>
+      
+      <div class="landscape-control">
+        <label data-i18n="landscape_relief_style">Style relief</label>
+        <select id="style">
+          <option value="hill" data-i18n="landscape_style_hill">🏞️ Collines</option>
+          <option value="dune" data-i18n="landscape_style_dune">🏜️ Dunes</option>
+          <option value="mountain" data-i18n="landscape_style_mountain">⛰️ Montagnes</option>
+        </select>
+      </div>
+      
+      <div class="landscape-control">
+        <label data-i18n="landscape_relief_shadow">Ombre reliefs</label>
+        <input type="range" id="reliefGradient" min="0" max="10" step="0.01" value="0">
+      </div>
     </div>
     
-    <button id="regen">Régénérer le paysage</button>
- 
+    <!-- Section Atmosphère -->
+    <div class="landscape-section">
+      <div class="landscape-section-title" data-i18n="landscape_atmosphere_title">🌤️ Atmosphère</div>
+      
+      <div class="landscape-control">
+        <label data-i18n="landscape_season">Saison</label>
+        <select id="season">
+          <option value="summer" data-i18n="landscape_season_summer">☀️ Été</option>
+          <option value="autumn" data-i18n="landscape_season_autumn">🍂 Automne</option>
+          <option value="spring" data-i18n="landscape_season_spring">🌸 Printemps</option>
+          <option value="winter" data-i18n="landscape_season_winter">❄️ Hiver</option>
+        </select>
+      </div>
+      
+      <div class="landscape-control">
+        <label data-i18n="landscape_moment">Moment</label>
+        <select id="timeOfDay">
+          <option value="day" data-i18n="landscape_time_day">☀️ Jour</option>
+          <option value="dawn" data-i18n="landscape_time_dawn">🌅 Aube</option>
+          <option value="dusk" data-i18n="landscape_time_dusk">🌇 Crépuscule</option>
+          <option value="night" data-i18n="landscape_time_night">🌙 Nuit</option>
+        </select>
+      </div>
+      
+      <div class="landscape-control">
+        <label data-i18n="landscape_clouds">Nuages</label>
+        <input type="range" id="cloudCoverage" min="0" max="100" step="1" value="50">
+      </div>
+      
+      <div class="landscape-control">
+        <label data-i18n="landscape_wind">Vent</label>
+        <input type="range" id="windForce" min="0" max="3" step="0.01" value="1">
+      </div>
+      
+      <div class="landscape-control">
+        <label data-i18n="landscape_depth_blur">Flou profondeur</label>
+        <input type="range" id="depthBlur" min="0" max="3" step="0.1" value="1">
+      </div>
+    </div>
+    
+    <!-- Section Couleurs -->
+    <div class="landscape-section">
+      <div class="landscape-section-title" data-i18n="landscape_colors_title">🎨 Couleurs</div>
+      
+      <div class="landscape-control">
+        <label data-i18n="landscape_ground">Sol</label>
+        <select id="groundType">
+          <option value="grass" data-i18n="landscape_ground_grass">🌿 Nature</option>
+          <option value="desert" data-i18n="landscape_ground_desert">🏜️ Désert</option>
+          <option value="sea" data-i18n="landscape_ground_sea">🌊 Mer</option>
+        </select>
+      </div>
+      
+      <div class="landscape-control">
+        <label data-i18n="landscape_color_dominant">Dominante</label>
+        <select id="colorDominant">
+          <option value="neutral" data-i18n="landscape_dominant_neutral">⚪ Neutre</option>
+          <option value="pink" data-i18n="landscape_dominant_pink">🌸 Rose</option>
+          <option value="blue" data-i18n="landscape_dominant_blue">💙 Bleu</option>
+          <option value="green" data-i18n="landscape_dominant_green">💚 Vert</option>
+          <option value="brown" data-i18n="landscape_dominant_brown">🤎 Marron</option>
+          <option value="yellow" data-i18n="landscape_dominant_yellow">💛 Jaune</option>
+        </select>
+      </div>
+      
+      <div class="landscape-control">
+        <label data-i18n="landscape_color_intensity">Intensité</label>
+        <select id="colorIntensity">
+          <option value="normal" data-i18n="landscape_intensity_normal">🎨 Normale</option>
+          <option value="pastel" data-i18n="landscape_intensity_pastel">🌈 Pastel</option>
+          <option value="vivid" data-i18n="landscape_intensity_vivid">✨ Vive</option>
+        </select>
+      </div>
+    </div>
+    
+  </div>
+  
+  <button id="regen" data-i18n="landscape_regenerate">Régénérer le paysage</button>
+
 </div>
 <!-- Sous-rubrique Langue -->
 <div id="options-language" class="options-sub hidden">
@@ -3796,8 +3777,71 @@ quiz_flash_katakana: '⛩️ Katakana',
         quiz_flash_group_complete: "Groupe Terminé !",
     quiz_flash_all_complete: "Quiz Flash Terminé !",
     quiz_flash_all_complete_subtitle: "Félicitations ! Vous avez complété tous les groupes !",
-    quiz_flash_group_counter: "Groupe" // pour "Groupe : 2/7"
+    quiz_flash_group_counter: "Groupe", // pour "Groupe : 2/7"
 
+    // Réglages du Paysage
+    landscape_title: '🎨 Réglages du Paysage',
+    
+    // Section Relief
+    landscape_relief_title: '⛰️ Relief',
+    landscape_roughness: 'Rugosité',
+    landscape_horizon: 'Horizon',
+    landscape_separation: 'Séparation',
+    landscape_spacing: 'Écartement',
+    landscape_relief_style: 'Style relief',
+    landscape_relief_shadow: 'Ombre reliefs',
+    
+    // Styles de relief
+    landscape_style_hill: '🏞️ Collines',
+    landscape_style_dune: '🏜️ Dunes',
+    landscape_style_mountain: '⛰️ Montagnes',
+    
+    // Section Atmosphère
+    landscape_atmosphere_title: '🌤️ Atmosphère',
+    landscape_season: 'Saison',
+    landscape_moment: 'Moment',
+    landscape_clouds: 'Nuages',
+    landscape_wind: 'Vent',
+    landscape_depth_blur: 'Flou profondeur',
+    
+    // Saisons
+    landscape_season_summer: '☀️ Été',
+    landscape_season_autumn: '🍂 Automne',
+    landscape_season_spring: '🌸 Printemps',
+    landscape_season_winter: '❄️ Hiver',
+    
+    // Moments de la journée
+    landscape_time_day: '☀️ Jour',
+    landscape_time_dawn: '🌅 Aube',
+    landscape_time_dusk: '🌇 Crépuscule',
+    landscape_time_night: '🌙 Nuit',
+    
+    // Section Couleurs
+    landscape_colors_title: '🎨 Couleurs',
+    landscape_ground: 'Sol',
+    landscape_color_dominant: 'Dominante',
+    landscape_color_intensity: 'Intensité',
+    
+    // Types de sol
+    landscape_ground_grass: '🌿 Nature',
+    landscape_ground_desert: '🏜️ Désert',
+    landscape_ground_sea: '🌊 Mer',
+    
+    // Dominantes de couleur
+    landscape_dominant_neutral: '⚪ Neutre',
+    landscape_dominant_pink: '🌸 Rose',
+    landscape_dominant_blue: '💙 Bleu',
+    landscape_dominant_green: '💚 Vert',
+    landscape_dominant_brown: '🤎 Marron',
+    landscape_dominant_yellow: '💛 Jaune',
+    
+    // Intensités
+    landscape_intensity_normal: '🎨 Normale',
+    landscape_intensity_pastel: '🌈 Pastel',
+    landscape_intensity_vivid: '✨ Vive',
+    
+    // Bouton
+    landscape_regenerate: 'Régénérer le paysage'
   },
   
   en: {
@@ -4076,7 +4120,72 @@ quiz_flash_katakana: '⛩️ Katakana',
         quiz_flash_group_complete: "Group Complete!",
     quiz_flash_all_complete: "Flash Quiz Complete!",
     quiz_flash_all_complete_subtitle: "Congratulations! You completed all groups!",
-    quiz_flash_group_counter: "Group"
+    quiz_flash_group_counter: "Group",
+
+// Landscape Settings
+    landscape_title: '🎨 Landscape Settings',
+    
+    // Relief Section
+    landscape_relief_title: '⛰️ Relief',
+    landscape_roughness: 'Roughness',
+    landscape_horizon: 'Horizon',
+    landscape_separation: 'Separation',
+    landscape_spacing: 'Spacing',
+    landscape_relief_style: 'Relief style',
+    landscape_relief_shadow: 'Relief shadows',
+    
+    // Relief styles
+    landscape_style_hill: '🏞️ Hills',
+    landscape_style_dune: '🏜️ Dunes',
+    landscape_style_mountain: '⛰️ Mountains',
+    
+    // Atmosphere Section
+    landscape_atmosphere_title: '🌤️ Atmosphere',
+    landscape_season: 'Season',
+    landscape_moment: 'Time',
+    landscape_clouds: 'Clouds',
+    landscape_wind: 'Wind',
+    landscape_depth_blur: 'Depth blur',
+    
+    // Seasons
+    landscape_season_summer: '☀️ Summer',
+    landscape_season_autumn: '🍂 Autumn',
+    landscape_season_spring: '🌸 Spring',
+    landscape_season_winter: '❄️ Winter',
+    
+    // Times of day
+    landscape_time_day: '☀️ Day',
+    landscape_time_dawn: '🌅 Dawn',
+    landscape_time_dusk: '🌇 Dusk',
+    landscape_time_night: '🌙 Night',
+    
+    // Colors Section
+    landscape_colors_title: '🎨 Colors',
+    landscape_ground: 'Ground',
+    landscape_color_dominant: 'Dominant',
+    landscape_color_intensity: 'Intensity',
+    
+    // Ground types
+    landscape_ground_grass: '🌿 Nature',
+    landscape_ground_desert: '🏜️ Desert',
+    landscape_ground_sea: '🌊 Sea',
+    
+    // Color dominants
+    landscape_dominant_neutral: '⚪ Neutral',
+    landscape_dominant_pink: '🌸 Pink',
+    landscape_dominant_blue: '💙 Blue',
+    landscape_dominant_green: '💚 Green',
+    landscape_dominant_brown: '🤎 Brown',
+    landscape_dominant_yellow: '💛 Yellow',
+    
+    // Intensities
+    landscape_intensity_normal: '🎨 Normal',
+    landscape_intensity_pastel: '🌈 Pastel',
+    landscape_intensity_vivid: '✨ Vivid',
+    
+    // Button
+    landscape_regenerate: 'Regenerate landscape'
+
 
   },
   
@@ -4353,7 +4462,72 @@ quiz_flash_katakana: '⛩️ Katakana',
         quiz_flash_group_complete: "¡Grupo Completado!",
     quiz_flash_all_complete: "¡Quiz Flash Completado!",
     quiz_flash_all_complete_subtitle: "¡Felicitaciones! ¡Has completado todos los grupos!",
-    quiz_flash_group_counter: "Grupo"
+    quiz_flash_group_counter: "Grupo",
+
+ // Configuración del Paisaje
+    landscape_title: '🎨 Ajustes del Paisaje',
+    
+    // Sección Relieve
+    landscape_relief_title: '⛰️ Relieve',
+    landscape_roughness: 'Rugosidad',
+    landscape_horizon: 'Horizonte',
+    landscape_separation: 'Separación',
+    landscape_spacing: 'Espaciado',
+    landscape_relief_style: 'Estilo relieve',
+    landscape_relief_shadow: 'Sombras relieve',
+    
+    // Estilos de relieve
+    landscape_style_hill: '🏞️ Colinas',
+    landscape_style_dune: '🏜️ Dunas',
+    landscape_style_mountain: '⛰️ Montañas',
+    
+    // Sección Atmósfera
+    landscape_atmosphere_title: '🌤️ Atmósfera',
+    landscape_season: 'Estación',
+    landscape_moment: 'Momento',
+    landscape_clouds: 'Nubes',
+    landscape_wind: 'Viento',
+    landscape_depth_blur: 'Desenfoque profundidad',
+    
+    // Estaciones
+    landscape_season_summer: '☀️ Verano',
+    landscape_season_autumn: '🍂 Otoño',
+    landscape_season_spring: '🌸 Primavera',
+    landscape_season_winter: '❄️ Invierno',
+    
+    // Momentos del día
+    landscape_time_day: '☀️ Día',
+    landscape_time_dawn: '🌅 Amanecer',
+    landscape_time_dusk: '🌇 Atardecer',
+    landscape_time_night: '🌙 Noche',
+    
+    // Sección Colores
+    landscape_colors_title: '🎨 Colores',
+    landscape_ground: 'Suelo',
+    landscape_color_dominant: 'Dominante',
+    landscape_color_intensity: 'Intensidad',
+    
+    // Tipos de suelo
+    landscape_ground_grass: '🌿 Naturaleza',
+    landscape_ground_desert: '🏜️ Desierto',
+    landscape_ground_sea: '🌊 Mar',
+    
+    // Colores dominantes
+    landscape_dominant_neutral: '⚪ Neutro',
+    landscape_dominant_pink: '🌸 Rosa',
+    landscape_dominant_blue: '💙 Azul',
+    landscape_dominant_green: '💚 Verde',
+    landscape_dominant_brown: '🤎 Marrón',
+    landscape_dominant_yellow: '💛 Amarillo',
+    
+    // Intensidades
+    landscape_intensity_normal: '🎨 Normal',
+    landscape_intensity_pastel: '🌈 Pastel',
+    landscape_intensity_vivid: '✨ Viva',
+    
+    // Botón
+    landscape_regenerate: 'Regenerar paisaje'
+
 }
 };  
 
