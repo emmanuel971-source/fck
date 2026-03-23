@@ -1950,29 +1950,57 @@ body.battle-mode .enc-toast-box.show{display:block;animation:encRise 2.2s ease f
 .mbm-quiz{background:linear-gradient(135deg,#c77dff,#7c3aed);}
 
 /* ═══ MOBILE IN-GAME LAYOUT ═══ */
+/* ═══ MOBILE IN-GAME : layout full-width ═══ */
+
+/* Shell : pleine largeur, pas de max-width ni centrage */
 body.mobile-ingame #shell {
-  padding-top: 54px;       /* sous la navbar */
-  max-width: 100vw;        /* pleine largeur */
+  padding-top: 54px;
+  max-width: 100vw !important;
+  width: 100vw !important;
+  margin: 0 !important;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
 }
+
+/* Middle : contient uniquement le board-col (sidebar cachée) */
 body.mobile-ingame #middle {
-  flex-direction: column;  /* board + word-panel empilés */
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  min-height: 0;
+  overflow: hidden;
 }
+
+/* Board-col : toute la largeur du shell */
 body.mobile-ingame #board-col {
-  flex: none;
-  width: 100%;
-  /* hauteur calculée pour laisser de la place au word-panel */
+  flex: 1 1 auto;
+  width: 100% !important;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
 }
+
+/* Board : grille sur toute la largeur de board-col */
 body.mobile-ingame #board {
-  width: 100%;
+  width: 100% !important;
+  flex: 1;
 }
-/* Masquer la sidebar — son contenu est dans la navbar */
+
+/* Sidebar : cachée */
 body.mobile-ingame #side-panel {
   display: none !important;
 }
-/* Le word-panel passe sous la grille, hauteur limitée */
+
+/* Word-panel : collé sous la grille, hauteur naturelle (pousse la grille) */
 body.mobile-ingame #word-panel {
-  max-height: 28dvh;
+  flex-shrink: 0;
+  max-height: none;
   border-top: 2px solid var(--border);
+  overflow-y: auto;
 }
 
 /* ═══ NAVBAR IN-GAME : layout HUD ═══ */
@@ -3372,75 +3400,85 @@ function calcRows(){
   } else {
     // --- MODE SOLO ---
     const isMobile = document.body.classList.contains('mobile-ingame');
-    const navH = isMobile ? 54 : 0;
-    availH = (window.innerHeight || document.documentElement.clientHeight) - panH - navH;
-    availW = window.innerWidth;
-    maxBoardH = window.innerHeight - 80 - navH;
-    // Mobile : pleine largeur. Desktop : 75% (place pour la sidebar)
-    maxBoardW = isMobile ? availW : availW * 0.75;
-  }
 
-  // 1. Taille de case FIXE : la plus petite entre la contrainte de hauteur (15 lignes) et de largeur
-  const idealCellWFor15Rows = maxBoardH / 15;
-  const maxCellWForScreenWidth = maxBoardW / COLS;
-  
-  // La taille de la case est scellée ici et NE CHANGERA PLUS quand la wordlist grandit
-  const cellW = Math.min(idealCellWFor15Rows, maxCellWForScreenWidth);
+    if (isMobile) {
+      // ── MOBILE : cellW = largeur écran / 8 colonnes ──
+      // La taille de case est dictée par la largeur de l'écran
+      const screenW = window.innerWidth;
+      const cellW = Math.floor(screenW / COLS);
 
-  // 2. Mécanique de pression : ROWS diminue quand la wordlist grandit (availH diminue)
-  ROWS = Math.floor(availH / cellW);
-  ROWS = Math.min(15, Math.max(8, ROWS));
+      // Hauteur disponible = écran - navbar - word-panel
+      const navH = 54;
+      const totalH = window.innerHeight - navH - panH;
 
-  // 3. Application des dimensions au DOM
-  if (isBattle) {
-    // --- Appliquer au Battle ---
-    const boardW = Math.floor(cellW * COLS);
-    
-    if (dom.gameStackEl) {
-      dom.gameStackEl.style.width = boardW + 'px';
-      // On centre le jeu et on décolle les deux joueurs (fini les grilles collées !)
-      dom.gameStackEl.parentElement.style.justifyContent = 'center';
-       
-    } else {
-      dom.boardColEl.style.width = boardW + 'px';
-    }
-    
-    dom.boardColEl.style.flex = 'none';
-    dom.boardColEl.style.height = (ROWS * cellW) + 'px';
-    
-    // Taille de la police pour le mode battle (injectée dans la variable CSS)
-    const fs = Math.max(11, Math.floor(cellW * 0.55));
-    dom.boardEl.style.setProperty('--battle-cell-fs', fs + 'px');
-    
-  } else {
-    // --- Appliquer au Solo ---
-    const shellEl = document.getElementById('shell');
-    if (shellEl) {
-      if (document.body.classList.contains('mobile-ingame')) {
-        // Mobile : pleine largeur, pas de max-width
+      // Nombre de lignes : au max 15, au min 8
+      ROWS = Math.min(15, Math.max(8, Math.floor(totalH / cellW)));
+
+      // Appliquer : shell pleine largeur
+      const shellEl = document.getElementById('shell');
+      if (shellEl) {
         shellEl.style.maxWidth = '100vw';
-      } else {
+        shellEl.style.width = '100vw';
+        shellEl.style.margin = '0';
+      }
+
+      // board-col : exactement COLS * cellW de large et ROWS * cellW de haut
+      const boardW = cellW * COLS;
+      dom.boardColEl.style.width    = boardW + 'px';
+      dom.boardColEl.style.minWidth = boardW + 'px';
+      dom.boardColEl.style.maxWidth = boardW + 'px';
+      dom.boardColEl.style.height   = (ROWS * cellW) + 'px';
+      dom.boardColEl.style.flex     = 'none';
+
+      // #middle : hauteur exacte de la grille
+      const middleEl = document.getElementById('middle');
+      if (middleEl) {
+        middleEl.style.flex   = 'none';
+        middleEl.style.height = (ROWS * cellW) + 'px';
+      }
+
+      // Taille de la police
+      dom.boardEl.style.fontSize = Math.floor(cellW * 0.55) + 'px';
+
+    } else {
+      // ── DESKTOP : logique originale ──
+      availH = (window.innerHeight || document.documentElement.clientHeight) - panH;
+      availW = window.innerWidth;
+      maxBoardH = window.innerHeight - 80;
+      maxBoardW = availW * 0.75;
+
+      const cellW = Math.min(maxBoardH / 15, maxBoardW / COLS);
+      ROWS = Math.min(15, Math.max(8, Math.floor(availH / cellW)));
+
+      const shellEl = document.getElementById('shell');
+      if (shellEl) {
         const optimalShellWidth = Math.floor((cellW * COLS) / 0.75);
         shellEl.style.maxWidth = optimalShellWidth > 480 ? optimalShellWidth + 'px' : '480px';
       }
-    }
-    dom.boardEl.style.fontSize = Math.floor(cellW * 0.55) + 'px';
+      dom.boardEl.style.fontSize = Math.floor(cellW * 0.55) + 'px';
 
-    if (document.body.classList.contains('mobile-ingame')) {
-      // Mobile : forcer board-col exactement à COLS*cellW pour des cases carrées
-      const boardPx = Math.floor(COLS * cellW) + 'px';
-      dom.boardColEl.style.width  = boardPx;
-      dom.boardColEl.style.minWidth = boardPx;
-      dom.boardColEl.style.maxWidth = boardPx;
-      dom.boardEl.style.width = '100%';
+      const middleEl = document.getElementById('middle');
+      if (middleEl) {
+        middleEl.style.flex   = 'none';
+        middleEl.style.height = (ROWS * cellW) + 'px';
+      }
     }
 
-    const middleEl = document.getElementById('middle');
-    if (middleEl) {
-      middleEl.style.flex = 'none';
-      middleEl.style.height = (ROWS * cellW) + 'px';
-    }
+    return; // Pas de bloc battle apply
   }
+
+  // --- Appliquer au Battle ---
+  const boardW = Math.floor(cellW * COLS);
+  if (dom.gameStackEl) {
+    dom.gameStackEl.style.width = boardW + 'px';
+    dom.gameStackEl.parentElement.style.justifyContent = 'center';
+  } else {
+    dom.boardColEl.style.width = boardW + 'px';
+  }
+  dom.boardColEl.style.flex   = 'none';
+  dom.boardColEl.style.height = (ROWS * cellW) + 'px';
+  const fs = Math.max(11, Math.floor(cellW * 0.55));
+  dom.boardEl.style.setProperty('--battle-cell-fs', fs + 'px');
 }
 
 
