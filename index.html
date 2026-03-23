@@ -3632,6 +3632,8 @@ function renderPanel(){
       row.innerHTML=`<div class="wr-emoji">${w.emoji}</div><div class="wr-info"><span class="wr-kana">${w.kana}</span><span class="wr-romaji">${w.romaji}</span><span class="wr-meaning">${w.meaning}</span></div><div class="wr-mult" id="wm-${w.kana}">×${w.mult||1}</div>`;
       dom.wordPanelEl.appendChild(row);
     });
+    // Fluent 3D sur les emojis du word-panel
+    if(typeof fluent==='function') setTimeout(()=>fluent(dom.wordPanelEl),60);
     updateWordRowColors();
     if(puzzleMode){if(gameRunning)setTimeout(()=>safeSpawn(),350);return;}
     
@@ -3662,6 +3664,8 @@ function renderPanel(){
     // Préserver la classe de base + ajouter show/combo
     p.className=basePopupClass+(isCombo?' combo show':' show');
     void p.offsetWidth;
+    // Fluent 3D sur l'emoji de la popup
+    if(typeof fluent==='function') setTimeout(()=>fluent(p),40);
     if(isCombo){
       const b=dom.comboBannerEl;
       const baseBClass=b.className.replace(/\s*show\s*/g,'').trim()||'combo-banner';
@@ -4154,6 +4158,8 @@ const nextW = LEVEL_WORDS_LOCAL[wordIntroIdx];
         row.innerHTML=`<div class="wr-emoji">${w.emoji}</div><div class="wr-info"><span class="wr-kana">${w.kana}</span><span class="wr-romaji">${w.romaji}</span><span class="wr-meaning">${w.meaning}</span></div><div class="wr-mult" id="wm-${w.kana}">×${w.mult||1}</div>`;
         dom.wordPanelEl.appendChild(row);
       });
+      // Fluent 3D sur les emojis du word-panel (mode puzzle)
+      if(typeof fluent==='function') setTimeout(()=>fluent(dom.wordPanelEl),60);
       updateWordRowColors();
       calcRows();buildDOM();
       const gen=puzzleGenerate(currentLevelIdx, puzzleSNDef, ROWS);
@@ -5687,6 +5693,8 @@ const BOT={
     <button id="bot-toggle" style="background:linear-gradient(135deg,#a855f7,#4d96ff);border:none;border-radius:50%;width:46px;height:46px;font-size:22px;cursor:pointer;box-shadow:0 3px 14px rgba(168,85,247,.5);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;" title="Menu Kana-kun">🤖</button>
   `;
   document.body.appendChild(ui);
+  // Appliquer Fluent 3D sur le menu Kana-kun dès sa création
+  setTimeout(() => { if(typeof fluent==='function') fluent(document.getElementById('bot-ui')); }, 80);
 
   const panel=document.getElementById('bot-panel');
   const toggle=document.getElementById('bot-toggle');
@@ -5696,6 +5704,8 @@ const BOT={
     panel.style.display=open?'none':'flex';
     toggle.style.transform=open?'':'rotate(15deg) scale(1.08)';
     toggle.style.boxShadow=open?'0 3px 14px rgba(168,85,247,.5)':'0 4px 20px rgba(168,85,247,.75), 0 0 0 3px rgba(168,85,247,.25)';
+    // Re-fluenter à chaque ouverture (sécurité si DOM mis à jour)
+    if(!open && typeof fluent==='function') setTimeout(()=>fluent(document.getElementById('bot-ui')),50);
   });
 
   // Hover effect on nav buttons
@@ -6511,6 +6521,8 @@ function _statsRenderVocab(){
     cell.addEventListener('touchstart',e=>{e.preventDefault();_statsShowTooltip(e.touches[0],w.kana,s,w);},{passive:false});
     grid.appendChild(cell);
   });
+  // Fluent 3D sur les emojis de la grille vocabulaire
+  if(typeof fluent==='function') setTimeout(()=>fluent(grid),80);
 }
 
 function _statsShowTooltip(e, kana, s, word){
@@ -6658,177 +6670,98 @@ function splashEnter(){
   };
 })();
 
+
 // ═══ FLUENT EMOJI 3D — Microsoft (MIT License) ═══
-const FLUENT_EMOJI = {
-  '🐚': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Spiral%20Shell/3D/spiral_shell_3d.png',
-  '🐢': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Turtle/3D/turtle_3d.png',
-  '🦐': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Shrimp/3D/shrimp_3d.png',
-  '🐬': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Dolphin/3D/dolphin_3d.png',
-  '🐟': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Fish/3D/fish_3d.png',
-  '🐠': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Tropical%20Fish/3D/tropical_fish_3d.png',
-  '🐙': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Octopus/3D/octopus_3d.png',
-  '🦑': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Squid/3D/squid_3d.png',
-  '🦀': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Crab/3D/crab_3d.png',
-  '🐊': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Crocodile/3D/crocodile_3d.png',
-  '🐍': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Snake/3D/snake_3d.png',
-  '🦎': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Lizard/3D/lizard_3d.png',
-  '🐛': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Bug/3D/bug_3d.png',
-  '🕷️': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Spider/3D/spider_3d.png',
-  '🦅': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Eagle/3D/eagle_3d.png',
-  '🐦': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Bird/3D/bird_3d.png',
-  '🐒': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Monkey/3D/monkey_3d.png',
-  '🐻': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Bear/3D/bear_3d.png',
-  '🐯': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Tiger%20Face/3D/tiger_face_3d.png',
-  '🦊': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Fox/3D/fox_3d.png',
-  '🦌': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Deer/3D/deer_3d.png',
-  '🦛': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Hippopotamus/3D/hippopotamus_3d.png',
-  '🐄': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Cow/3D/cow_3d.png',
-  '🐴': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Horse%20Face/3D/horse_face_3d.png',
-  '🐶': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Dog%20Face/3D/dog_face_3d.png',
-  '🐱': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Cat%20Face/3D/cat_face_3d.png',
-  '🐰': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Rabbit%20Face/3D/rabbit_face_3d.png',
-  '🐭': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Mouse%20Face/3D/mouse_face_3d.png',
-  '🐸': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Frog/3D/frog_3d.png',
-  '🐿️': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Chipmunk/3D/chipmunk_3d.png',
-  '🐾': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Paw%20Prints/3D/paw_prints_3d.png',
-  '🌊': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Water%20Wave/3D/water_wave_3d.png',
-  '🌿': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Herb/3D/herb_3d.png',
-  '🌸': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Cherry%20Blossom/3D/cherry_blossom_3d.png',
-  '🌾': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Sheaf%20of%20Rice/3D/sheaf_of_rice_3d.png',
-  '🌲': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Evergreen%20Tree/3D/evergreen_tree_3d.png',
-  '🌰': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Chestnut/3D/chestnut_3d.png',
-  '🍁': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Maple%20Leaf/3D/maple_leaf_3d.png',
-  '🌍': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Globe%20Showing%20Europe-Africa/3D/globe_showing_europe-africa_3d.png',
-  '🌈': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Rainbow/3D/rainbow_3d.png',
-  '🌙': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Crescent%20Moon/3D/crescent_moon_3d.png',
-  '🌟': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Glowing%20Star/3D/glowing_star_3d.png',
-  '❄️': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Snowflake/3D/snowflake_3d.png',
-  '☁️': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Cloud/3D/cloud_3d.png',
-  '⛈️': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Cloud%20with%20Lightning%20and%20Rain/3D/cloud_with_lightning_and_rain_3d.png',
-  '🌧️': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Cloud%20with%20Rain/3D/cloud_with_rain_3d.png',
-  '⛰️': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Mountain/3D/mountain_3d.png',
-  '🏞️': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/National%20Park/3D/national_park_3d.png',
-  '💧': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Droplet/3D/droplet_3d.png',
-  '💨': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Dashing%20Away/3D/dashing_away_3d.png',
-  '🍚': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Cooked%20Rice/3D/cooked_rice_3d.png',
-  '🍙': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Rice%20Ball/3D/rice_ball_3d.png',
-  '🍅': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Tomato/3D/tomato_3d.png',
-  '🍆': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Eggplant/3D/eggplant_3d.png',
-  '🥕': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Carrot/3D/carrot_3d.png',
-  '🥔': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Potato/3D/potato_3d.png',
-  '🥜': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Peanuts/3D/peanuts_3d.png',
-  '🫛': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Pea%20Pod/3D/pea_pod_3d.png',
-  '🥣': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Bowl%20with%20Spoon/3D/bowl_with_spoon_3d.png',
-  '🥩': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Cut%20of%20Meat/3D/cut_of_meat_3d.png',
-  '🍋': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Lemon/3D/lemon_3d.png',
-  '🍑': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Peach/3D/peach_3d.png',
-  '🍉': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Watermelon/3D/watermelon_3d.png',
-  '🍭': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Lollipop/3D/lollipop_3d.png',
-  '👶': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Baby/3D/baby_3d.png',
-  '👦': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Boy/3D/boy_3d.png',
-  '👧': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Girl/3D/girl_3d.png',
-  '👨': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Man/3D/man_3d.png',
-  '👩': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Woman/3D/woman_3d.png',
-  '👰': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Person%20with%20Veil/3D/person_with_veil_3d.png',
-  '👔': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Necktie/3D/necktie_3d.png',
-  '👕': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/T-Shirt/3D/t-shirt_3d.png',
-  '👗': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Dress/3D/dress_3d.png',
-  '👘': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Kimono/3D/kimono_3d.png',
-  '👜': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Handbag/3D/handbag_3d.png',
-  '👟': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Running%20Shoe/3D/running_shoe_3d.png',
-  '🧦': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Socks/3D/socks_3d.png',
-  '🏠': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/House/3D/house_3d.png',
-  '🏯': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Japanese%20Castle/3D/japanese_castle_3d.png',
-  '🏘️': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Houses/3D/houses_3d.png',
-  '⛩️': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Shinto%20Shrine/3D/shinto_shrine_3d.png',
-  '🔑': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Key/3D/key_3d.png',
-  '📖': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Open%20Book/3D/open_book_3d.png',
-  '📝': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Memo/3D/memo_3d.png',
-  '📦': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Package/3D/package_3d.png',
-  '📄': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Page%20Facing%20Up/3D/page_facing_up_3d.png',
-  '📋': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Clipboard/3D/clipboard_3d.png',
-  '📌': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Pushpin/3D/pushpin_3d.png',
-  '📊': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Bar%20Chart/3D/bar_chart_3d.png',
-  '🖊️': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Pen/3D/pen_3d.png',
-  '💰': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Money%20Bag/3D/money_bag_3d.png',
-  '💴': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Yen%20Banknote/3D/yen_banknote_3d.png',
-  '💸': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Money%20with%20Wings/3D/money_with_wings_3d.png',
-  '🎮': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Video%20Game/3D/video_game_3d.png',
-  '🕹️': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Joystick/3D/joystick_3d.png',
-  '🏆': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Trophy/3D/trophy_3d.png',
-  '🥇': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/1st%20Place%20Medal/3D/1st_place_medal_3d.png',
-  '🥈': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/2nd%20Place%20Medal/3D/2nd_place_medal_3d.png',
-  '🥉': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/3rd%20Place%20Medal/3D/3rd_place_medal_3d.png',
-  '🎌': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Crossed%20Flags/3D/crossed_flags_3d.png',
-  '🎨': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Artist%20Palette/3D/artist_palette_3d.png',
-  '🎵': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Musical%20Note/3D/musical_note_3d.png',
-  '🎉': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Party%20Popper/3D/party_popper_3d.png',
-  '🚀': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Rocket/3D/rocket_3d.png',
-  '🔥': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Fire/3D/fire_3d.png',
-  '⚡': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/High%20Voltage/3D/high_voltage_3d.png',
-  '✨': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Sparkles/3D/sparkles_3d.png',
-  '💔': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Broken%20Heart/3D/broken_heart_3d.png',
-  '💚': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Green%20Heart/3D/green_heart_3d.png',
-  '💛': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Yellow%20Heart/3D/yellow_heart_3d.png',
-  '💜': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Purple%20Heart/3D/purple_heart_3d.png',
-  '💩': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Pile%20of%20Poo/3D/pile_of_poo_3d.png',
-  '💀': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Skull/3D/skull_3d.png',
-  '☠️': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Skull%20and%20Crossbones/3D/skull_and_crossbones_3d.png',
-  '⚔️': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Crossed%20Swords/3D/crossed_swords_3d.png',
-  '🧠': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Brain/3D/brain_3d.png',
-  '🪀': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Yo-Yo/3D/yo-yo_3d.png',
-  '🤖': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Robot/3D/robot_3d.png',
-  '🔄': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Counterclockwise%20Arrows%20Button/3D/counterclockwise_arrows_button_3d.png',
-  '🔴': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Red%20Circle/3D/red_circle_3d.png',
-  '🔵': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Blue%20Circle/3D/blue_circle_3d.png',
-  '🟤': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Brown%20Circle/3D/brown_circle_3d.png',
-  '⚪': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/White%20Circle/3D/white_circle_3d.png',
-  '⚫': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Black%20Circle/3D/black_circle_3d.png',
-  '💃': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Woman%20Dancing/3D/woman_dancing_3d.png',
-  '👇': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Backhand%20Index%20Pointing%20Down/3D/backhand_index_pointing_down_3d.png',
-  '👉': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Backhand%20Index%20Pointing%20Right/3D/backhand_index_pointing_right_3d.png',
-  '❓': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Red%20Question%20Mark/3D/red_question_mark_3d.png',
-  '❌': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Cross%20Mark/3D/cross_mark_3d.png',
-  '✅': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Check%20Mark%20Button/3D/check_mark_button_3d.png',
-  '⚠️': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Warning/3D/warning_3d.png',
-  '⚙️': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Gear/3D/gear_3d.png',
-  '🛌': 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Person%20in%20Bed/3D/person_in_bed_3d.png',
-};
+// Approche par codepoint unicode — URL calculée dynamiquement, sans dictionnaire
 
+// Convertit un graphème emoji en codepoint(s) hex séparés par des tirets
+// ex: '🐢' → '1f422'  |  '🕷️' → '1f577-fe0f'
+function _emojiToCP(emoji) {
+  return [...emoji]
+    .map(c => c.codePointAt(0).toString(16))
+    .filter(cp => cp !== 'fe0f') // strip variation selector-16
+    .join('-');
+}
 
-// Remplace les émojis par des images Fluent 3D dans un élément DOM
+const FLUENT_BASE = 'https://uwx.github.io/fluentui-twemoji-3d/export/3D_png/72x72/';
+function _fluentUrl(emoji) { return FLUENT_BASE + _emojiToCP(emoji) + '.png'; }
+
+// Cache des emojis dont l'image est absente → repli sur l'emoji natif
+const _fluentFailed = new Set();
+
+// Détecte si un graphème est un emoji (exclut les ASCII 0-9, #, *)
+const _emojiRe = /\p{Emoji}/u;
+function _isEmoji(g) {
+  if (g.length === 1 && g.codePointAt(0) < 127) return false;
+  return _emojiRe.test(g);
+}
+
+// Remplace les emojis dans un élément DOM par des images Fluent 3D.
+// Ne touche QUE les textNodes directs des éléments non encore traités (data-fd).
+// L'attribut data-fd sur le PARENT évite de retraiter le même noeud.
 function fluent(el) {
   if (!el) return;
-  el.querySelectorAll('*').forEach(node => {
-    // Ignorer les inputs, scripts, et les éléments déjà traités
-    if (node.tagName === 'SCRIPT' || node.tagName === 'STYLE' || node.dataset.fluentDone) return;
-    // Traiter les noeuds texte enfants
-    [...node.childNodes].forEach(child => {
-      if (child.nodeType !== Node.TEXT_NODE) return;
-      const txt = child.textContent;
-      let result = '';
-      let changed = false;
-      // Parcourir caractère par caractère (y compris séquences multi-codepoints)
-      const segs = [...new Intl.Segmenter(undefined, {granularity:'grapheme'}).segment(txt)];
-      segs.forEach(seg => {
-        const g = seg.segment;
-        if (FLUENT_EMOJI[g]) {
-          result += `<img src="${FLUENT_EMOJI[g]}" class="femoji" alt="${g}" title="${g}">`;
-          changed = true;
-        } else {
-          result += g.replace(/&/g,'&amp;').replace(/</g,'&lt;');
-        }
-      });
-      if (changed) {
-        const span = document.createElement('span');
-        span.innerHTML = result;
-        node.replaceWith(span);
+  const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+
+  // Walker sur tous les textNodes de l'élément, sauf ceux déjà traités
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      // Ignorer si le parent direct est déjà un span fluent
+      if (node.parentElement && node.parentElement.dataset.fd) return NodeFilter.FILTER_REJECT;
+      // Ignorer script/style
+      const tag = node.parentElement && node.parentElement.tagName;
+      if (tag === 'SCRIPT' || tag === 'STYLE') return NodeFilter.FILTER_REJECT;
+      // Ignorer les éléments que le JS du jeu écrit dynamiquement
+      const skipIds = ['mode-level-name','quiz-kana-card','qc0','qc1','qc2','qc3',
+                       'stats-grid','quiz-streak-display','quiz-progress-text',
+                       'quiz-score-display','tt-kana','tt-good','tt-bad','tt-tests',
+                       'tt-streak','tt-date','st-emoji','st-name','st-score',
+                       'score-val','next-kana','level-badge'];
+      let p = node.parentElement;
+      while (p && p !== el) {
+        if (skipIds.includes(p.id)) return NodeFilter.FILTER_REJECT;
+        p = p.parentElement;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+
+  const toReplace = [];
+  let node;
+  while ((node = walker.nextNode())) {
+    const txt = node.textContent;
+    const segs = [...segmenter.segment(txt)];
+    let result = '', changed = false;
+    segs.forEach(seg => {
+      const g = seg.segment;
+      if (_isEmoji(g) && !_fluentFailed.has(g)) {
+        result += `<img src="${_fluentUrl(g)}" class="femoji" alt="${g}" title="${g}" onerror="window._fluentErr&&window._fluentErr(this,'${g}')">`;
+        changed = true;
+      } else {
+        result += g.replace(/&/g,'&amp;').replace(/</g,'&lt;');
       }
     });
+    if (changed) toReplace.push({ node, result });
+  }
+
+  // Effectuer les remplacements après le walk (évite de perturber le TreeWalker)
+  toReplace.forEach(({ node, result }) => {
+    const span = document.createElement('span');
+    span.dataset.fd = '1';
+    span.innerHTML = result;
+    node.replaceWith(span);
   });
 }
 
-// Taille CSS des images emoji Fluent
+// Gestion des images manquantes : repli sur l'emoji natif
+window._fluentErr = function(img, emoji) {
+  _fluentFailed.add(emoji);
+  const span = document.createElement('span');
+  span.textContent = emoji;
+  img.replaceWith(span);
+};
+
+// CSS Fluent
 const _fStyle = document.createElement('style');
 _fStyle.textContent = [
   'img.femoji { height:1.15em; width:auto; vertical-align:-0.2em; display:inline-block; }',
@@ -6840,29 +6773,65 @@ _fStyle.textContent = [
 ].join('\n');
 document.head.appendChild(_fStyle);
 
-// Appliquer après chaque rendu important
+// Liste des zones statiques à traiter — le JS du jeu ne les modifie pas directement
 function applyFluent() {
+  // Zones statiques (HTML fixe, jamais réécrit par le jeu)
   fluent(document.getElementById('lvl-scroll'));
-  fluent(document.getElementById('word-panel'));
   fluent(document.getElementById('menu-overlay'));
+  fluent(document.getElementById('mobile-nav'));
+  fluent(document.getElementById('tuto-overlay'));
+
+  // Zones partiellement dynamiques — on exclut les sous-éléments JS via skipIds dans fluent()
   fluent(document.getElementById('mode-overlay'));
   fluent(document.getElementById('quiz-overlay'));
   fluent(document.getElementById('stats-overlay'));
   fluent(document.getElementById('wof-overlay'));
   fluent(document.getElementById('board-overlay'));
-  fluent(document.getElementById('mobile-nav'));
   fluent(document.getElementById('survie-transition'));
+
+  // word-panel : injecté par le JS mais avec des emojis statiques dans le template
+  fluent(document.getElementById('word-panel'));
+
+  // Menu Kana-kun : créé dynamiquement via appendChild, absent au premier passage
+  fluent(document.getElementById('bot-ui'));
 }
 
-// Lancement initial après chargement
-window.addEventListener('load', () => setTimeout(applyFluent, 300));
+// Lancement initial
+window.addEventListener('load', () => setTimeout(applyFluent, 400));
 
-// Observer les changements DOM pour appliquer Fluent sur le nouveau contenu
-const _fluentObserver = new MutationObserver(() => {
-  clearTimeout(window._fluentTimer);
-  window._fluentTimer = setTimeout(applyFluent, 80);
-});
-_fluentObserver.observe(document.body, { childList: true, subtree: true });
+// ── Hook sur les fonctions qui affichent des overlays ──
+// On ré-applique fluent() juste après chaque ouverture d'overlay,
+// sans MutationObserver (trop risqué avec le DOM dynamique du jeu).
+(function _hookOverlays() {
+  const _patch = (fnName, delay = 80) => {
+    const orig = window[fnName];
+    if (typeof orig !== 'function') return;
+    window[fnName] = function(...args) {
+      const r = orig.apply(this, args);
+      setTimeout(applyFluent, delay);
+      return r;
+    };
+  };
+  // Attendre que toutes les fonctions du jeu soient définies
+  window.addEventListener('load', () => {
+    _patch('showModeSelect', 60);
+    _patch('showQuiz', 60);
+    _patch('showStats', 60);
+    _patch('showWallOfFame', 60);
+    _patch('showTuto', 60);
+    _patch('showKeybinds', 60);
+    _patch('quizSetMode', 60);
+    _patch('statsSetTab', 150);      // délai augmenté : grille vocab injectée après le tab switch
+    _patch('_statsRenderVocab', 150); // délai augmenté : idem
+    // word-panel : patché sur renderWords si elle existe
+    _patch('renderWords', 150);
+    _patch('_renderWordPanel', 150);
+    // popups de mots trouvés
+    _patch('showWordPopup', 80);
+    _patch('_showPopup', 80);
+    _patch('showWordFound', 80);
+  });
+})();
 
 </script>
 </body>
