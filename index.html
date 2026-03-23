@@ -6115,7 +6115,9 @@ function _quizRender(){
   if(isVocab){
     // MODE VOCAB : afficher le grand emoji
     card.className='emoji-mode';
-    card.textContent=item.emoji;
+    // Au lieu de : card.textContent = item.emoji;
+const fUrl = _fluentUrl(item.emoji);
+card.innerHTML = `<img src="${fUrl}" class="femoji" alt="${item.emoji}" style="width:1em;height:1em" onerror="this.replaceWith(document.createTextNode('${item.emoji}'))">`;
     card.style.fontSize='';
     card.style.background='transparent';
     void card.offsetWidth;
@@ -6289,7 +6291,8 @@ function _quizReveal(choiceIdx){
 
     setTimeout(()=>{
       card.className='emoji-mode';
-      card.textContent=exWord.emoji;
+     const fUrl = _fluentUrl(exWord.emoji);
+card.innerHTML = `<img src="${fUrl}" class="femoji" alt="${exWord.emoji}" style="width:1em;height:1em" onerror="this.replaceWith(document.createTextNode('${exWord.emoji}'))">`;
       card.style.fontSize='';
       card.style.background='transparent';
       void card.offsetWidth;
@@ -6529,7 +6532,13 @@ function _statsShowTooltip(e, kana, s, word){
   const tt = document.getElementById('stats-tooltip');
   if(!s || s.tests===0){ tt.classList.add('hidden'); return; }
   // Afficher emoji + kana ou juste kana
-  document.getElementById('tt-kana').textContent = word ? word.emoji+' '+kana : kana;
+const ttKana = document.getElementById('tt-kana');
+if(word) {
+  const fUrl = _fluentUrl(word.emoji);
+  ttKana.innerHTML = `<img src="${fUrl}" class="femoji" alt="${word.emoji}" style="width:1em;height:1em;vertical-align:middle" onerror="this.replaceWith(document.createTextNode('${word.emoji}'))"> ${kana}`;
+} else {
+  ttKana.textContent = kana;
+}
   document.getElementById('tt-good').textContent = s.correct;
   document.getElementById('tt-bad').textContent = s.wrong;
   document.getElementById('tt-tests').textContent = s.tests;
