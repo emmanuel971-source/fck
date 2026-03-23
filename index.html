@@ -112,7 +112,7 @@ body::before{
   box-shadow:0 3px 0 rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.7);
   animation:activePulse .65s ease infinite alternate;
 }
-@keyframes activePulse{from{transform:scale(1);filter:brightness(1)}to{transform:scale(1.06);filter:brightness(1.08)}}
+@keyframes activePulse{from{transform:scale(1);opacity:.92}to{transform:scale(1.06);opacity:1}}
 .cell.ghost{background:rgba(0,0,0,.04);border:1.5px dashed rgba(0,0,0,.15)!important;color:rgba(0,0,0,.2);border-radius:6px;}
 .cell.land{animation:landBounce .32s cubic-bezier(.36,.07,.19,.97) forwards;}
 .cell.malus{background:linear-gradient(135deg,#fdf3ea,#f7e8d5)!important;color:#1a1040!important;border:1px solid rgba(100,200,220,.12)!important;border-radius:8px;box-shadow:0 3px 0 rgba(139,69,19,.12),inset 0 1px 0 rgba(255,255,255,.7)!important;font-size:clamp(20px,7vw,32px)!important;line-height:1!important;padding-top:2px!important;}
@@ -595,7 +595,7 @@ body::before{
 .kana-outline-d{position:absolute;inset:0;font-family:"Noto Sans JP",sans-serif;font-weight:900;font-size:clamp(64px,18vw,96px);letter-spacing:-2px;line-height:1;-webkit-text-fill-color:transparent;-webkit-text-stroke:20px #1a0050;z-index:0;pointer-events:none;}
 .drop-group{position:relative;display:inline-block;line-height:1;margin-top:-2px;}
 .drop-main{font-family:"Black Han Sans",sans-serif;font-weight:900;font-size:clamp(42px,12vw,64px);letter-spacing:4px;display:block;background:linear-gradient(180deg,#fff700 0%,#ffb300 30%,#ff6b6b 65%,#cc0000 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative;z-index:2;filter:drop-shadow(2px 3px 0 #1a0050);animation:shimmerDrop 2.2s ease-in-out infinite;}
-@keyframes shimmerDrop{0%,100%{filter:drop-shadow(2px 3px 0 #1a0050) brightness(1)}50%{filter:drop-shadow(2px 3px 0 #1a0050) brightness(1.3) drop-shadow(0 0 12px rgba(255,120,120,.6))}}
+@keyframes shimmerDrop{0%,100%{filter:drop-shadow(2px 3px 0 #1a0050);opacity:1}50%{filter:drop-shadow(2px 3px 0 #1a0050);opacity:.82}}
 .drop-outline-w{position:absolute;inset:0;font-family:"Black Han Sans",sans-serif;font-weight:900;font-size:clamp(42px,12vw,64px);letter-spacing:4px;-webkit-text-fill-color:transparent;-webkit-text-stroke:12px #ffffff;z-index:1;pointer-events:none;}
 .drop-outline-d{position:absolute;inset:0;font-family:"Black Han Sans",sans-serif;font-weight:900;font-size:clamp(42px,12vw,64px);letter-spacing:4px;-webkit-text-fill-color:transparent;-webkit-text-stroke:18px #1a0050;z-index:0;pointer-events:none;}
 .logo-droplet{position:absolute;animation:dropBounce 2.4s ease-in-out infinite;}
@@ -1124,16 +1124,62 @@ body::before{
   margin: 0 auto;
   flex: 1;
   min-height: 0;
+  padding-top: 54px; /* hauteur de la top-bar HUD */
   padding-bottom: 52px;
   isolation: isolate;
 }
+
+/* ── Top-bar HUD simulée (remplace la sidebar desktop) ── */
+#tuto-hud {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 54px;
+  z-index: 10;
+  background: rgba(255,248,232,.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 2px solid rgba(255,160,60,.3);
+  box-shadow: 0 2px 10px rgba(255,120,30,.1);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 10px;
+}
+#tuto-hud .th-kanakun {
+  font-size: 26px; flex-shrink: 0; margin-right: 8px;
+  filter: drop-shadow(0 1px 4px rgba(168,85,247,.4));
+}
+#tuto-hud .th-level {
+  flex: 1;
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(12px, 3.5vw, 15px);
+  color: var(--sky); text-align: center;
+}
+#tuto-hud .th-score {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(15px, 4.5vw, 20px);
+  color: var(--neon-violet);
+  flex-shrink: 0; min-width: 52px; text-align: right; margin-right: 8px;
+}
+#tuto-hud .th-next {
+  flex-shrink: 0;
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: white;
+  border: 2.5px solid var(--border);
+  box-shadow: 0 3px 10px rgba(0,170,238,.15), inset 0 1px 0 rgba(255,255,255,.9);
+  display: flex; align-items: center; justify-content: center;
+  font-size: clamp(18px, 6vw, 26px); font-weight: 900;
+  font-family: 'Noto Sans JP', sans-serif; color: var(--text-dark);
+}
+
 #tuto-middle {
   flex: 1;
   display: flex;
   min-height: 0;
 }
 #tuto-board-col{
-  flex:3;display:flex;flex-direction:column;min-height:0;position:relative;overflow:hidden;
+  flex: 1; display:flex;flex-direction:column;min-height:0;position:relative;overflow:hidden;
 }
 #tuto-board{
   flex:1;display:grid;grid-template-columns:repeat(8,1fr);
@@ -1143,19 +1189,13 @@ body::before{
   border-top:2px solid rgba(255,160,60,.3);
   overflow:hidden;
 }
-#tuto-side{
-  flex:1;display:flex;flex-direction:column;
-  background:rgba(255,240,210,.85);
-  border-left:2px solid rgba(255,160,60,.35);border-right:3px solid rgba(255,160,60,.35);border-top:3px solid rgba(255,160,60,.35);
-  padding:10px 4px 8px;gap:12px;align-items:center;overflow:hidden;
-}
-#tuto-next{
-  width:88%;aspect-ratio:1;max-width:68px;border-radius:16px;
-  background:white;border:3px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  font-size:clamp(22px,7.5vw,36px);font-weight:900;font-family:'Noto Sans JP',sans-serif;color:var(--text-dark);
-}
-#tuto-score{font-family:'Fredoka One',cursive;font-size:clamp(18px,5.5vw,26px);color:var(--neon-violet);text-align:center;}
+/* Sidebar desktop : cachée en mode mobile */
+#tuto-side { display: none; }
+
+/* On garde les anciens IDs pour compatibilité JS mais ils sont maintenant dans le HUD */
+#tuto-next { display: none; }
+#tuto-score { display: none; }
+
 #tuto-word-panel {
   background: rgba(255,244,224,.95);
   border-top: 3px solid rgba(255,160,60,.4);
@@ -1911,11 +1951,6 @@ body.battle-mode .enc-toast-box.show{display:block;animation:encRise 2.2s ease f
   transition:opacity .5s ease;
 }
 #splash-screen.fade-out{opacity:0;pointer-events:none;}
-#splash-screen .splash-subtitle{
-  font-family:'Nunito',sans-serif;font-weight:800;font-size:clamp(14px,4vw,18px);
-  color:var(--text-mid);letter-spacing:1.5px;margin-top:18px;
-  animation:waveIt .9s ease-in-out infinite alternate;
-}
 #splash-screen .splash-tap{
   font-family:'Nunito',sans-serif;font-weight:700;font-size:clamp(12px,3.5vw,15px);
   color:var(--text-dim);margin-top:32px;letter-spacing:1px;
@@ -2104,7 +2139,6 @@ body.mobile-ingame #word-panel {
         </div>
       </div>
     </div>
-  <div class="splash-subtitle"><span class="menu-wave">🌊</span> Apprends les kana en jouant !</div>
   <div class="splash-tap">Touche pour commencer</div>
 </div>
 
@@ -2361,11 +2395,19 @@ body.mobile-ingame #word-panel {
   <div id="confetti-tuto" style="position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;"></div>
   <!-- Shell de jeu intégré dans le tuto (clone visuel) -->
   <div id="tuto-shell">
+    <!-- Top-bar HUD (remplace la sidebar desktop) -->
+    <div id="tuto-hud">
+      <span class="th-kanakun">🤖</span>
+      <span class="th-level" id="tuto-hud-level">Niveau 1 🌊</span>
+      <span class="th-score" id="tuto-hud-score">0</span>
+      <div class="th-next" id="tuto-hud-next">？</div>
+    </div>
     <div id="tuto-middle">
       <div id="tuto-board-col">
         <div id="tuto-board"></div>
       </div>
-      <div id="tuto-side">
+      <!-- Sidebar cachée — IDs conservés pour compatibilité JS -->
+      <div id="tuto-side" style="display:none">
         <div class="side-block"><div class="side-label">NEXT</div><div id="tuto-next">？</div></div>
         <div class="side-block"><div class="side-label">SCORE</div><div id="tuto-score">0</div></div>
 <div class="side-block">
@@ -2794,10 +2836,18 @@ let ROWS=12;
     }
   }
   [
-    'confetti','confetti-menu','confetti-mode',
+    'confetti','confetti-splash','confetti-menu','confetti-mode',
     'confetti-wof','confetti-tuto','confetti-kb','confetti-quiz','confetti-stats'
   ].forEach(id=>{ const el=document.getElementById(id); if(el) fillConfetti(el); });
 })();
+
+// ── Confettis : pause pendant la partie, reprise au menu ──
+function pauseConfetti(){
+  document.querySelectorAll('.cdot').forEach(d=>{ d.style.animationPlayState='paused'; });
+}
+function resumeConfetti(){
+  document.querySelectorAll('.cdot').forEach(d=>{ d.style.animationPlayState='running'; });
+}
 
 // ═══════════════════════════════════════════════════════════════════
 //  AUDIO
@@ -2856,22 +2906,11 @@ function playKanaSound(kana){if(muted)return;try{if(!kanaCache[kana])kanaCache[k
 // ═══════════════════════════════════════════════════════════════════
 const P_COLORS=['#00c8e8','#5cb85c','#e8833a','#c4a8ff','#72e8b8','#ffaa7a'];
 function spawnParticles(cellEl,boardColEl,count=12){
-  if(!cellEl||!boardColEl)return;
+  // Redirige vers le canvas burst existant — zéro création de divs DOM
+  if(!cellEl) return;
   const rect=cellEl.getBoundingClientRect();
-  const bRect=boardColEl.getBoundingClientRect();
-  const cx=rect.left-bRect.left+rect.width/2;
-  const cy=rect.top-bRect.top+rect.height/2;
-  for(let i=0;i<count;i++){
-    const p=document.createElement('div');p.className='particle';
-    const sz=Math.random()*7+3;
-    const angle=(Math.PI*2/count)*i+Math.random()*.5;
-    const dist=Math.random()*50+22;
-    const col=P_COLORS[Math.floor(Math.random()*P_COLORS.length)];
-    const dur=(Math.random()*.3+.4).toFixed(2)+'s';
-    p.style.cssText=`width:${sz}px;height:${sz}px;left:${cx-sz/2}px;top:${cy-sz/2}px;background:${col};--tx:${Math.cos(angle)*dist}px;--ty:${Math.sin(angle)*dist-16}px;--dur:${dur};box-shadow:0 0 ${sz}px ${col};`;
-    boardColEl.appendChild(p);
-    setTimeout(()=>p.remove(),900);
-  }
+  const cx=rect.left+rect.width/2, cy=rect.top+rect.height/2;
+  burst(cx, cy, count, count>=18?'combo':'normal');
 }
 
 function screenShake(c=false){
@@ -2915,12 +2954,16 @@ function resizeBurst(){BURST_CANVAS.width=window.innerWidth;BURST_CANVAS.height=
 resizeBurst();
 window.addEventListener('resize',resizeBurst);
 const BURST_COLORS={normal:['#ff6b6b','#ffbe0b','#6bcb77','#4d96ff','#c77dff','#ff3fab','#00cfff','#ffffff'],combo:['#ff0066','#ff6b35','#ffbe0b','#ffffff','#ff3fab','#fff700'],boss:['#ff0066','#c77dff','#4d96ff','#ffffff','#ffbe0b','#ff6b6b'],logo:['#ff6b6b','#ffbe0b','#6bcb77','#4d96ff','#c77dff','#ff3fab','#00cfff','#ffffff']};
+// Détection appareil bas de gamme : ≤ 4 cœurs logiques ou écran tactile seul
+const _lowEnd = (navigator.hardwareConcurrency||4) <= 4 && window.matchMedia('(pointer:coarse)').matches;
 let burstParticles=[];
 function burst(x,y,count=18,mode='normal'){
+  // Réduction du nombre de particules sur mobile bas de gamme
+  const c = _lowEnd ? Math.ceil(count * 0.45) : count;
   const cols=BURST_COLORS[mode]||BURST_COLORS.normal;
   const isCombo=mode==='combo'||mode==='boss';
-  for(let i=0;i<count;i++){
-    const angle=(Math.PI*2/count)*i+(Math.random()-.5)*.5;
+  for(let i=0;i<c;i++){
+    const angle=(Math.PI*2/c)*i+(Math.random()-.5)*.5;
     const speed=(isCombo?5:3.5)+Math.random()*(isCombo?5:3);
     const size=(isCombo?4:2.5)+Math.random()*(isCombo?5:4);
     const isStar=Math.random()>(isCombo?.4:.65);
@@ -2936,7 +2979,7 @@ function burstLoop(){
   for(const p of burstParticles){
     p.life++;p.x+=p.vx;p.y+=p.vy;p.vy+=.18;p.alpha=Math.max(0,1-p.life/p.maxLife);p.rot+=p.rotSpeed;
     BURST_CTX.save();BURST_CTX.globalAlpha=p.alpha;BURST_CTX.translate(p.x,p.y);BURST_CTX.rotate(p.rot);
-    BURST_CTX.fillStyle=p.color;BURST_CTX.shadowColor=p.color;BURST_CTX.shadowBlur=6;
+    BURST_CTX.fillStyle=p.color;if(!_lowEnd){BURST_CTX.shadowColor=p.color;BURST_CTX.shadowBlur=6;}else{BURST_CTX.shadowBlur=0;}
     if(p.isStar){
       const r1=p.size,r2=p.size*.4;BURST_CTX.beginPath();
       for(let i=0;i<8;i++){const a=(i/8)*Math.PI*2;const r=i%2===0?r1:r2;i===0?BURST_CTX.moveTo(Math.cos(a)*r,Math.sin(a)*r):BURST_CTX.lineTo(Math.cos(a)*r,Math.sin(a)*r);}
@@ -2947,7 +2990,7 @@ function burstLoop(){
   if(burstParticles.length>0){requestAnimationFrame(burstLoop);}
   else{burstAnimRunning=false;BURST_CTX.clearRect(0,0,BURST_CANVAS.width,BURST_CANVAS.height);}
 }
-document.addEventListener('click',e=>{const logo=e.target.closest('.logo-wrap');if(logo)burst(e.clientX,e.clientY,28,'logo');});
+document.addEventListener('click',e=>{const logo=e.target.closest('.logo-wrap');if(logo&&!e.target.closest('#splash-screen'))burst(e.clientX,e.clientY,28,'logo');});
 
 // ═══════════════════════════════════════════════════════════════════
 //  SIMSTATE + BOT (partagés, pas de DOM)
@@ -4132,6 +4175,7 @@ const nextW = LEVEL_WORDS_LOCAL[wordIntroIdx];
       }
     }
     hideOverlay();gameRunning=true;
+    if(typeof pauseConfetti==='function') pauseConfetti();
     const lv=currentLevelIdx+1;
     const root=document.documentElement.style;
     root.setProperty('--bg-top',`var(--lv${lv}-top,var(--lv1-top))`);
@@ -4327,10 +4371,9 @@ document.addEventListener('touchend',e=>{
   if(dt<LP_MS&&adx<12&&ady<12)return;
   if(ady>adx&&dy>50){player1.hardDrop();return;}
   if(adx>ady&&adx>10){
-    const screenW=Math.min(window.innerWidth,480);const cellW=Math.floor(screenW*.75/COLS);
+    const screenW=Math.min(window.innerWidth,480);const cellW=Math.floor(screenW/COLS);
     const steps=Math.max(1,Math.round(adx/cellW));const dir=dx>0?1:-1;
-    for(let i=0;i<steps;i++){if(i===0)dir>0?player1.moveRight():player1.moveLeft();}
-    player1.render();
+    for(let i=0;i<steps;i++){dir>0?player1.moveRight():player1.moveLeft();}
   }
 },{passive:true});
 document.addEventListener('touchmove',e=>{
@@ -4346,6 +4389,7 @@ window.addEventListener('resize',()=>{ if(player1) player1.triggerCalcRows(); })
 function showMenu(){
   player1.stopGame();
   if(typeof _mobileNavHide==='function') _mobileNavHide();
+  if(typeof resumeConfetti==='function') resumeConfetti();
   document.getElementById('board-overlay').classList.add('hidden');
   document.getElementById('mode-overlay').classList.add('hidden');
   document.getElementById('menu-overlay').classList.remove('hidden');
@@ -4426,7 +4470,7 @@ function skipTuto(){
 function startFromTuto(){
   _stopTutoCinematic();
   document.getElementById('tuto-overlay').classList.add('hidden');
-  gameMode='solo'; startGame(0);
+  showMenu();
 }
 function _tutoDelay(ms){ return new Promise(r=>{ const t=setTimeout(r,ms); _tutoTimers.push(t); }); }
 function _stopTutoCinematic(){ _tutoRunning=false; _tutoTimers.forEach(t=>clearTimeout(t)); _tutoTimers=[]; _hideTutoBubble(); }
@@ -4434,13 +4478,13 @@ function _tutoCell(r,c){ return document.querySelector('#tuto-board [data-r="'+r
 function _tutoBuildBoard(){
   const totalH = window.innerHeight || document.documentElement.clientHeight;
   const screenW = Math.min(window.innerWidth, 480);
-  const cellW = Math.floor(screenW * 0.75 / TUTO_COLS);
+  // Grille pleine largeur (plus de sidebar)
+  const cellW = Math.floor(screenW / TUTO_COLS);
 
   // Hauteur fixe du word-panel (comme le vrai jeu ~22% de l'écran)
   const panH = Math.round(totalH * 0.22);
-
-  // Calculer les lignes avec l'espace restant
-  const avail = totalH - panH;
+  // Soustraire aussi la hauteur de la top-bar HUD (54px)
+  const avail = totalH - panH - 54;
   const rows = Math.min(15, Math.max(8, Math.floor(avail / cellW)));
   window._tutoRows = rows;
 
@@ -4455,7 +4499,7 @@ function _tutoBuildBoard(){
   const wordPanel = document.getElementById('tuto-word-panel');
   if(wordPanel) {
     wordPanel.style.flex = 'none';
-    wordPanel.style.height = (totalH - middleH) + 'px';
+    wordPanel.style.height = (totalH - middleH - 54) + 'px';
   }
 
   const board=document.getElementById('tuto-board');
@@ -4526,6 +4570,11 @@ async function _startTutoCinematic(){
   _stopTutoCinematic(); _tutoRunning=true;
   _tutoBuildBoard();
   const R = window._tutoRows || 12;
+  // Sync HUD
+  const hudNext  = document.getElementById('tuto-hud-next');
+  const hudScore = document.getElementById('tuto-hud-score');
+  if(hudNext)  hudNext.textContent='？';
+  if(hudScore) hudScore.textContent='0';
   document.getElementById('tuto-next').textContent='\uff1f'; document.getElementById('tuto-next').style.background='';
   document.getElementById('tuto-score').textContent='0'; document.getElementById('tuto-word-panel').innerHTML='';
   document.getElementById('tuto-start-btn').classList.add('hidden');
@@ -4536,9 +4585,11 @@ async function _startTutoCinematic(){
   _showTutoBubble('🌊 Bienvenue dans かなDROP !\nApprends le japonais en jouant !', null);
   await _tutoDelay(3000); if(!_tutoRunning) return;
 
-  // 2. Barre droite — 3s
+  // 2. Top-bar HUD — 3s (en haut désormais)
+  const hudNextVal = 'か';
+  if(hudNext){ hudNext.textContent=hudNextVal; hudNext.style.background=kanaBg(hudNextVal); }
   document.getElementById('tuto-next').textContent='か'; document.getElementById('tuto-next').style.background=kanaBg('か');
-  _showTutoBubble('👉 À droite : le prochain kana\nà faire tomber, et ton score', 'right');
+  _showTutoBubble('☝️ En haut à droite : le prochain kana\nà faire tomber, et ton score !', 'up');
   await _tutoDelay(3000); if(!_tutoRunning) return;
 
   // 3. Panel bas — 3s
@@ -4581,6 +4632,7 @@ async function _startTutoCinematic(){
 
   // 7. い descend — 3s
   document.getElementById('tuto-next').textContent='い'; document.getElementById('tuto-next').style.background=kanaBg('い');
+  const hudN7=document.getElementById('tuto-hud-next'); if(hudN7){hudN7.textContent='い';hudN7.style.background=kanaBg('い');}
   _showTutoBubble('Maintenant pose い\njuste à côté de か !', null);
   col=5;
   const midRow2=Math.floor(R*0.32);
@@ -4616,6 +4668,7 @@ async function _startTutoCinematic(){
   await _tutoDelay(600); if(!_tutoRunning) return;
   document.getElementById('tuto-score').textContent='200';
   document.getElementById('tuto-score').classList.add('bump');
+  const hudScore9=document.getElementById('tuto-hud-score'); if(hudScore9){hudScore9.textContent='200';}
   setTimeout(()=>document.getElementById('tuto-score').classList.remove('bump'),400);
   await _tutoDelay(1600); if(!_tutoRunning) return;
   _tutoClearCell(R-1,3); _tutoClearCell(R-1,4);
@@ -4628,6 +4681,7 @@ async function _startTutoCinematic(){
   await _tutoDelay(600); if(!_tutoRunning) return;
   _tutoWordPanel('かめ','kame','tortue','🐢', false);
   document.getElementById('tuto-next').textContent='め'; document.getElementById('tuto-next').style.background=kanaBg('め');
+  const hudNme=document.getElementById('tuto-hud-next'); if(hudNme){hudNme.textContent='め';hudNme.style.background=kanaBg('め');}
   _showTutoBubble('🐢 Nouveau mot : かめ !\nLes mots peuvent aussi\nse former verticalement !', null);
   await _tutoDelay(3000); if(!_tutoRunning) return;
 
@@ -4646,6 +4700,7 @@ async function _startTutoCinematic(){
 
   // か descend col 4 — s'arrête juste au-dessus de め — 3s
   document.getElementById('tuto-next').textContent='か'; document.getElementById('tuto-next').style.background=kanaBg('か');
+  const hudNka=document.getElementById('tuto-hud-next'); if(hudNka){hudNka.textContent='か';hudNka.style.background=kanaBg('か');}
   _showTutoBubble('か descend dans la\nmême colonne, par-dessus め !', null);
   for(let r=0;r<R-2;r++){
     if(!_tutoRunning) return;
@@ -4667,6 +4722,7 @@ async function _startTutoCinematic(){
   await _tutoDelay(600); if(!_tutoRunning) return;
   document.getElementById('tuto-score').textContent='600';
   document.getElementById('tuto-score').classList.add('bump');
+  const hudScore6=document.getElementById('tuto-hud-score'); if(hudScore6){hudScore6.textContent='600';}
   setTimeout(()=>document.getElementById('tuto-score').classList.remove('bump'),400);
   await _tutoDelay(1400); if(!_tutoRunning) return;
   _tutoValidateWord('かめ');
@@ -6616,6 +6672,7 @@ function showPuzzlePanel(){
 function splashEnter(){
   const s=document.getElementById('splash-screen');
   s.classList.add('fade-out');
+  if(typeof BURST_CTX!=='undefined'&&BURST_CTX) BURST_CTX.clearRect(0,0,BURST_CANVAS.width,BURST_CANVAS.height);
   setTimeout(()=>{s.style.display='none';},500);
 }
 
