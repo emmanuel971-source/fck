@@ -595,7 +595,7 @@ body::before{
 .kana-outline-d{position:absolute;inset:0;font-family:"Noto Sans JP",sans-serif;font-weight:900;font-size:clamp(64px,18vw,96px);letter-spacing:-2px;line-height:1;-webkit-text-fill-color:transparent;-webkit-text-stroke:20px #1a0050;z-index:0;pointer-events:none;}
 .drop-group{position:relative;display:inline-block;line-height:1;margin-top:-2px;}
 .drop-main{font-family:"Black Han Sans",sans-serif;font-weight:900;font-size:clamp(42px,12vw,64px);letter-spacing:4px;display:block;background:linear-gradient(180deg,#fff700 0%,#ffb300 30%,#ff6b6b 65%,#cc0000 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative;z-index:2;filter:drop-shadow(2px 3px 0 #1a0050);animation:shimmerDrop 2.2s ease-in-out infinite;}
-@keyframes shimmerDrop{0%,100%{opacity:1}50%{opacity:.82}}
+@keyframes shimmerDrop{0%,100%{filter:drop-shadow(2px 3px 0 #1a0050) brightness(1)}50%{filter:drop-shadow(2px 3px 0 #1a0050) brightness(1.3) drop-shadow(0 0 12px rgba(255,120,120,.6))}}
 .drop-outline-w{position:absolute;inset:0;font-family:"Black Han Sans",sans-serif;font-weight:900;font-size:clamp(42px,12vw,64px);letter-spacing:4px;-webkit-text-fill-color:transparent;-webkit-text-stroke:12px #ffffff;z-index:1;pointer-events:none;}
 .drop-outline-d{position:absolute;inset:0;font-family:"Black Han Sans",sans-serif;font-weight:900;font-size:clamp(42px,12vw,64px);letter-spacing:4px;-webkit-text-fill-color:transparent;-webkit-text-stroke:18px #1a0050;z-index:0;pointer-events:none;}
 .logo-droplet{position:absolute;animation:dropBounce 2.4s ease-in-out infinite;}
