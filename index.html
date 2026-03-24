@@ -2924,22 +2924,64 @@ function screenShake(c=false){
 const ENCS=[{jp:'すごい！',fr:'Incroyable !'},{jp:'やった！',fr:'On l\'a eu !'},{jp:'完璧！',fr:'Parfait !'},{jp:'天才！',fr:'Génie !'},{jp:'最高！',fr:'Excellent !'}];
 const COMBO_ENCS=[{jp:'コンボ！すごい！',fr:'Combo incroyable !'},{jp:'連続！天才！',fr:'Enchaînement de génie !'},{jp:'最高のコンボ！',fr:'Combo parfait !'},{jp:'パーフェクト！',fr:'Parfait !'}];
 
-if(window.speechSynthesis)window.speechSynthesis.getVoices();
-function speakWord(kana,isCombo){
-  if(muted||!window.speechSynthesis)return;
+// ── Synthèse vocale — chargement asynchrone des voix (obligatoire sur Android) ──
+let _ttsVoices = [];
+function _loadVoices(){
+  _ttsVoices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+}
+if(window.speechSynthesis){
+  _loadVoices();
+  // Sur Android/Chrome les voix arrivent de façon asynchrone
+  window.speechSynthesis.addEventListener('voiceschanged', _loadVoices);
+}
+
+// Trouve le romaji d'un kana dans les données du jeu (pour le fallback)
+function _romajiFor(kana){
+  // 1. Kana isolé (ex: か → ka) — table directe du quiz
+  if(typeof KANA_TO_ROMAJI !== 'undefined' && KANA_TO_ROMAJI[kana]) return KANA_TO_ROMAJI[kana];
+  // 2. Mot complet : cherche dans les mots actifs du niveau en cours
+  if(typeof activeWords !== 'undefined'){
+    const w = activeWords.find(w=>w.kana===kana);
+    if(w) return w.romaji;
+  }
+  // 3. Puis dans tous les niveaux
+  for(const lv of ALL_LEVELS){
+    const w = lv.words.find(w=>w.kana===kana);
+    if(w) return w.romaji;
+  }
+  return null;
+}
+
+function speakWord(kana, isCombo){
+  if(muted || !window.speechSynthesis) return;
   window.speechSynthesis.cancel();
-  const voices=window.speechSynthesis.getVoices();
-  const jv=voices.find(v=>v.lang&&v.lang.startsWith('ja'))||null;
-  const u=new SpeechSynthesisUtterance(kana);
-  u.lang='ja-JP';u.rate=.85;u.pitch=isCombo?1.25:1.05;u.volume=.9;
-  if(jv)u.voice=jv;
-  window.speechSynthesis.speak(u);
-  if(isCombo){
-    const enc=COMBO_ENCS[Math.floor(Math.random()*COMBO_ENCS.length)];
-    const u2=new SpeechSynthesisUtterance(enc.jp);
-    u2.lang='ja-JP';u2.rate=1.05;u2.pitch=1.35;u2.volume=.85;
-    if(jv)u2.voice=jv;
-    window.speechSynthesis.speak(u2);
+
+  const voices = _ttsVoices.length ? _ttsVoices : window.speechSynthesis.getVoices();
+  const jv = voices.find(v => v.lang && v.lang.startsWith('ja')) || null;
+
+  if(jv){
+    // ── Voix japonaise disponible : lecture native ──
+    const u = new SpeechSynthesisUtterance(kana);
+    u.lang='ja-JP'; u.voice=jv; u.rate=.85; u.pitch=isCombo?1.25:1.05; u.volume=.9;
+    window.speechSynthesis.speak(u);
+    if(isCombo){
+      const enc=COMBO_ENCS[Math.floor(Math.random()*COMBO_ENCS.length)];
+      const u2=new SpeechSynthesisUtterance(enc.jp);
+      u2.lang='ja-JP'; u2.voice=jv; u2.rate=1.05; u2.pitch=1.35; u2.volume=.85;
+      window.speechSynthesis.speak(u2);
+    }
+  } else {
+    // ── Fallback : lecture du romaji avec la voix locale disponible ──
+    // Pédagogiquement utile : le joueur entend la prononciation approximative
+    const romaji = _romajiFor(kana);
+    if(!romaji) return; // kana inconnu, on ne lit rien plutôt que du bruit
+    // Voix française ou anglaise en priorité, sinon la première disponible
+    const fv = voices.find(v=>v.lang&&(v.lang.startsWith('fr')||v.lang.startsWith('en')))
+             || voices[0] || null;
+    const u = new SpeechSynthesisUtterance(romaji);
+    u.rate = .8; u.pitch = isCombo ? 1.2 : 1.0; u.volume = .85;
+    if(fv) u.voice = fv;
+    window.speechSynthesis.speak(u);
   }
 }
 
