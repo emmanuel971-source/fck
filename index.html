@@ -81,11 +81,7 @@ body::before {
   animation: blobDrift 15s ease-in-out infinite alternate;
 }
 
-/* PAUSE uniquement pendant les modes de jeu d'action
-/* body.mobile-ingame::before {
-/*   animation: none !important; /* Coupe carrément le calcul d'animation */
-/*   background: #f0faff; /* Optionnel : simplifie le fond pour booster les FPS */
-/* } */
+
 @keyframes blobDrift{from{opacity:.7}to{opacity:1}}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden;}
 .cdot{position:absolute;border-radius:50%;opacity:0;animation:cdotFloat var(--cd) ease-in-out var(--cdelay) infinite;}
