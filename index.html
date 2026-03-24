@@ -3425,6 +3425,7 @@ function _survieVictory(){
 // ── Retour au menu niveaux ──
 function modeBack(){
   document.getElementById('mode-overlay').classList.add('hidden');
+  if(typeof _mobileNavHide==='function') _mobileNavHide();
   document.getElementById('menu-overlay').classList.remove('hidden');
 }
 
@@ -5957,6 +5958,8 @@ function showWallOfFame(hiIdx){
 }
 function hideWallOfFame(){
   document.getElementById('wof-overlay').classList.add('hidden');
+  if(typeof _mobileNavHide==='function') _mobileNavHide();
+  if(typeof resumeConfetti==='function') resumeConfetti();
   document.getElementById('menu-overlay').classList.remove('hidden');
 }
 
@@ -6156,6 +6159,7 @@ function hideQuiz(){
   _quizStopTimer();
   if(_quizAutoTimeout){clearTimeout(_quizAutoTimeout);_quizAutoTimeout=null;}
   document.getElementById('quiz-overlay').classList.add('hidden');
+  if(typeof _mobileNavHide==='function') _mobileNavHide();
   document.getElementById('menu-overlay').classList.remove('hidden');
 }
 
@@ -6542,6 +6546,7 @@ function showStats(){
 
 function hideStats(){
   document.getElementById('stats-overlay').classList.add('hidden');
+  if(typeof _mobileNavHide==='function') _mobileNavHide();
   document.getElementById('menu-overlay').classList.remove('hidden');
   document.getElementById('stats-tooltip').classList.add('hidden');
 }
