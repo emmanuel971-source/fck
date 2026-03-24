@@ -706,7 +706,7 @@ body::before {
   height: 100dvh;
   display: flex; flex-direction: column;
   align-items: center;
-  padding: 0 16px 24px;
+  padding: 0 16px 16px;
 }
 
 /* Header quiz */
@@ -731,10 +731,14 @@ body::before {
 }
 #quiz-streak-display {
   font-family: 'Fredoka One', cursive;
-  font-size: clamp(13px, 3vw, 16px);
+  font-size: clamp(15px, 3.8vw, 19px);
   color: var(--neon-gold);
   min-width: 60px;
   text-align: right;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: flex-end;
 }
 
 /* Mode selector */
@@ -759,21 +763,44 @@ body::before {
   transform: scale(1.02);
 }
 
-/* Zone kana principal */
+/* Zone kana principal — centré avec légère marge haute */
 #quiz-kana-stage {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  padding-top: 0;
+  padding-bottom: clamp(10px,2dvh,24px);
+  gap: 0;
   width: 100%;
   min-height: 0;
+  position: relative;
 }
 
-/* La grande carte kana — carrée avec bordure arrondie UNIQUEMENT quand c'est un kana */
+/* ── ARCHITECTURE FINALE QUIZ STAGE ──
+   L'anchor a une hauteur fixe = carte + espace textes.
+   La kana-card est en absolute centrée en HAUT de l'anchor → elle ne bouge jamais.
+   Le quiz-reveal est en flow normal SOUS la carte → les textes apparaissent dessous sans décalage. */
+
+.quiz-stage-anchor {
+  position: relative;
+  width: 100%;
+  /* Hauteur = carte + 220px pour les textes reveal plus grands */
+  height: calc(clamp(150px, 42vw, 210px) + 220px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* La carte : absolute en haut, centrée — ne prend PAS de place dans le flow */
 #quiz-kana-card {
-  width: clamp(130px, 38vw, 190px);
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  width: clamp(150px, 42vw, 210px);
   aspect-ratio: 1;
   border-radius: 28px;
   display: flex;
@@ -782,62 +809,78 @@ body::before {
   flex-direction: column;
   font-family: 'Noto Sans JP', sans-serif;
   font-weight: 900;
-  font-size: clamp(68px, 19vw, 108px);
+  font-size: clamp(72px, 20vw, 116px);
   color: #1a1040;
   box-shadow: 0 10px 0 rgba(0,0,0,.16), 0 18px 36px rgba(0,0,0,.13), inset 0 2px 0 rgba(255,255,255,.85);
   border: 3px solid rgba(255,255,255,.6);
-  position: relative;
   line-height: 1;
   overflow: hidden;
   white-space: nowrap;
 }
+
+/* Reveal : en flow normal, margin-top = hauteur de la carte → apparaît juste en dessous */
+#quiz-reveal {
+  position: relative;
+  z-index: 3;
+  margin-top: calc(clamp(150px, 42vw, 210px) + 14px);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 0 8px;
+  pointer-events: none;
+}
+#quiz-reveal.hidden { display: none !important; }
 /* Digraphes (2 kana) : taille réduite pour tenir dans le bloc */
 #quiz-kana-card.digraph {
   font-size: clamp(40px, 11vw, 64px);
   line-height: 1.05;
   letter-spacing: -2px;
 }
-/* Mode emoji : pas de fond ni bordure */
+/* Mode emoji : pas de fond ni bordure, plus grand */
 #quiz-kana-card.emoji-mode {
   background: transparent !important;
   box-shadow: none !important;
   border: none !important;
   border-radius: 0 !important;
-  font-size: clamp(90px, 26vw, 140px);
+  font-size: clamp(110px, 32vw, 170px);
 }
 #quiz-kana-card.drop-in {
   animation: quizKanaDrop .5s cubic-bezier(.36,.07,.19,.97) forwards;
 }
 @keyframes quizKanaDrop {
-  0%   { transform: translateY(-160px) scale(.5); opacity: 0; }
-  55%  { transform: translateY(14px) scaleY(.82) scaleX(1.12); opacity: 1; }
-  72%  { transform: translateY(-8px) scaleY(1.06) scaleX(.95); }
-  88%  { transform: translateY(4px) scaleY(.97) scaleX(1.02); }
-  100% { transform: translateY(0) scale(1); opacity: 1; }
+  0%   { transform: translateX(-50%) translateY(-160px) scale(.5); opacity: 0; }
+  55%  { transform: translateX(-50%) translateY(14px) scaleY(.82) scaleX(1.12); opacity: 1; }
+  72%  { transform: translateX(-50%) translateY(-8px) scaleY(1.06) scaleX(.95); }
+  88%  { transform: translateX(-50%) translateY(4px) scaleY(.97) scaleX(1.02); }
+  100% { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; }
 }
 #quiz-kana-card.explode {
   animation: quizKanaExplode .35s ease forwards;
 }
 @keyframes quizKanaExplode {
-  0%  { transform: scale(1); opacity: 1; }
-  35% { transform: scale(1.3); opacity: .7; filter: brightness(1.6); }
-  100%{ transform: scale(0); opacity: 0; }
+  0%  { transform: translateX(-50%) scale(1); opacity: 1; }
+  35% { transform: translateX(-50%) scale(1.3); opacity: .7; filter: brightness(1.6); }
+  100%{ transform: translateX(-50%) scale(0); opacity: 0; }
 }
 #quiz-kana-card.emoji-in {
   animation: quizEmojiIn .42s cubic-bezier(.34,1.56,.64,1) both;
 }
 @keyframes quizEmojiIn {
-  from { opacity:0; transform: scale(.3) rotate(-12deg); }
-  to   { opacity:1; transform: scale(1) rotate(0deg); }
+  from { opacity:0; transform: translateX(-50%) scale(.3) rotate(-12deg); }
+  to   { opacity:1; transform: translateX(-50%) scale(1) rotate(0deg); }
 }
 
-/* Jauge timer */
+/* Jauge timer — juste au-dessus des boutons */
 #quiz-timer-bar {
-  width: 100%; height: 8px;
+  width: 100%; height: 10px;
   background: rgba(0,0,0,.08);
   border-radius: 50px;
   overflow: hidden;
   flex-shrink: 0;
+  margin-bottom: 10px;
 }
 #quiz-timer-fill {
   height: 100%;
@@ -848,23 +891,17 @@ body::before {
 }
 #quiz-timer-bar.hidden { display: none; }
 
-/* Révélation épurée */
-#quiz-reveal {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-  padding: 0 4px;
+/* Highlight sur le kana ciblé dans le mot */
+#quiz-reveal-word-kana .kana-highlight {
+  color: #a855f7;
+  text-shadow: 0 0 12px rgba(168,85,247,.4);
 }
-#quiz-reveal.hidden { display: none !important; }
 
-/* Mot en hiragana avec kana ciblé en couleur */
+/* Mot en hiragana de la réponse — grand et lisible */
 #quiz-reveal-word-kana {
   font-family: 'Noto Sans JP', sans-serif;
   font-weight: 900;
-  font-size: clamp(16px, 6vw, 38px);
+  font-size: clamp(42px, 13vw, 70px);
   line-height: 1.1;
   color: var(--text-dark);
   white-space: nowrap;
@@ -872,25 +909,38 @@ body::before {
   text-align: center;
   display: block;
 }
-#quiz-reveal-word-kana .kana-highlight {
-  color: #a855f7;
-  text-shadow: 0 0 12px rgba(168,85,247,.4);
-}
 #quiz-reveal-word-meaning {
   font-family: 'Nunito', sans-serif;
   font-weight: 800;
-  font-size: clamp(16px, 4.2vw, 20px);
+  font-size: clamp(30px, 9vw, 46px);
   color: var(--text-mid);
+  margin-top: 4px;
 }
-/* Résultat correct/incorrect — petit et discret */
+/* Résultat correct/incorrect — bien visible */
 #quiz-reveal-result {
   font-family: 'Fredoka One', cursive;
-  font-size: clamp(13px, 3.2vw, 16px);
-  line-height: 1;
-  opacity: .85;
+  font-size: clamp(20px, 5.5vw, 28px);
+  line-height: 1.2;
+  letter-spacing: .5px;
+  padding: 6px 22px;
+  border-radius: 50px;
 }
-#quiz-reveal-result.correct { color: #00cc66; }
-#quiz-reveal-result.wrong   { color: #ff3333; }
+#quiz-reveal-result.correct {
+  color: #fff;
+  background: linear-gradient(135deg, #00c96e, #00a854);
+  box-shadow: 0 4px 16px rgba(0,180,90,.35);
+  animation: resultPop .3s cubic-bezier(.34,1.56,.64,1) both;
+}
+#quiz-reveal-result.wrong {
+  color: #fff;
+  background: linear-gradient(135deg, #ff4d6d, #cc2244);
+  box-shadow: 0 4px 16px rgba(255,60,80,.35);
+  animation: resultPop .3s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes resultPop {
+  from { transform: scale(.7); opacity: 0; }
+  to   { transform: scale(1);  opacity: 1; }
+}
 /* Romaji — caché, on n'en a plus besoin */
 #quiz-reveal-romaji { display: none; }
 #quiz-reveal-emoji  { display: none; }
@@ -904,20 +954,6 @@ body::before {
   width: 100%;
   flex-shrink: 0;
   margin-top: 8px;
-}
-/* Back btn — bien espacé des boutons */
-#quiz-back-btn {
-  font-family: 'Fredoka One', cursive;
-  font-size: clamp(14px, 3.5vw, 17px);
-  padding: 10px 26px;
-  border: 2px solid rgba(168,85,247,.35);
-  border-radius: 50px;
-  background: rgba(255,255,255,.6);
-  color: #a855f7;
-  cursor: pointer;
-  transition: transform .15s;
-  flex-shrink: 0;
-  margin-top: 14px;
 }
 .quiz-choice-btn {
   font-family: 'Fredoka One', cursive;
@@ -950,17 +986,43 @@ body::before {
   background: #ff3333; color: #fff;
   border-color: #cc0000;
   box-shadow: 0 4px 0 #990000;
-  animation: wrongShake .35s ease;
+  animation: wrongShakeBig .55s cubic-bezier(.36,.07,.19,.97);
 }
-@keyframes wrongShake {
-  0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)}
+@keyframes wrongShakeBig {
+  0%   { transform: translateX(0) rotate(0deg) scale(1); }
+  8%   { transform: translateX(-12px) rotate(-3deg) scale(1.06); }
+  18%  { transform: translateX(14px) rotate(3deg) scale(1.08); }
+  28%  { transform: translateX(-14px) rotate(-2.5deg) scale(1.06); }
+  38%  { transform: translateX(12px) rotate(2deg) scale(1.04); }
+  48%  { transform: translateX(-10px) rotate(-1.5deg) scale(1.02); }
+  58%  { transform: translateX(8px) rotate(1deg) scale(1.01); }
+  68%  { transform: translateX(-5px) rotate(-.5deg) scale(1); }
+  80%  { transform: translateX(4px) rotate(0deg) scale(1); }
+  92%  { transform: translateX(-2px); }
+  100% { transform: translateX(0) rotate(0deg) scale(1); }
 }
 
 /* Bouton suivant — caché (auto-advance) */
 #quiz-next-btn { display: none !important; }
 
-/* Back btn */
-#quiz-back-btn:hover { transform: translateY(-1px); }
+/* Back btn — stylisé comme Stats mais en corail/rose */
+#quiz-back-btn {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(15px, 4vw, 18px);
+  padding: 13px 36px;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #ff5fa0, #ff8c42);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 5px 18px rgba(255,95,160,.4), inset 0 1px 0 rgba(255,255,255,.2);
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s;
+  flex-shrink: 0;
+  margin-top: 12px;
+  align-self: center;
+}
+#quiz-back-btn:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 8px 24px rgba(255,95,160,.5); }
+#quiz-back-btn:active { transform: scale(.97); }
 /* ═══ STATS OVERLAY ═══ */
 #stats-overlay {
   position: fixed; inset: 0; z-index: 290;
@@ -1426,23 +1488,29 @@ body::before {
 }
 .mode-level-badge{
   font-family:'Fredoka One',cursive;
-  font-size:clamp(18px,5vw,24px);
+  font-size:clamp(20px,5.5vw,26px);
   color:var(--text-dark);text-align:center;
-  margin: 10px auto 0;
+  margin: 24px auto 0;
   position:relative;z-index:1;
   animation:rowSlideIn .35s cubic-bezier(.34,1.56,.64,1) both;
-  display:inline-flex;align-items:center;justify-content:center;gap:10px;
-  background: rgba(255,255,255,.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1.5px solid rgba(255,255,255,.85);
-  border-radius: 20px;
-  padding: 10px 22px 10px 16px;
-  box-shadow: 0 4px 18px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.9);
+  display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
   max-width: calc(100% - 48px);
+  text-shadow: 0 2px 16px rgba(0,0,0,.13), 0 4px 24px rgba(0,0,0,.10);
 }
 .mode-level-badge .femoji,
-.mode-level-badge img { width:clamp(32px,9vw,44px)!important; height:clamp(32px,9vw,44px)!important; vertical-align:middle; filter:drop-shadow(0 3px 8px rgba(0,0,0,.18)); }
+.mode-level-badge img { 
+  width:clamp(52px,15vw,72px)!important; 
+  height:clamp(52px,15vw,72px)!important; 
+  vertical-align:middle; 
+  filter:drop-shadow(0 6px 18px rgba(0,0,0,.28)) drop-shadow(0 2px 6px rgba(0,0,0,.18)); 
+  display:block;
+  margin-bottom:4px;
+}
 
 /* ── Tabs ── */
 .mode-tabs{
@@ -1612,11 +1680,26 @@ body::before {
   color:#fff;cursor:pointer;
   box-shadow:0 5px 18px rgba(0,200,200,.38);
   transition:transform .18s cubic-bezier(.34,1.56,.64,1);
-  flex-shrink:0;margin:16px auto 20px;
+  flex-shrink:0;
   display:block;position:relative;z-index:1;
 }
 .mode-back-btn:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 8px 24px rgba(0,200,200,.5);}
 .mode-back-btn:active{transform:scale(.97);}
+/* Bouton retour principal — collé en bas de l'écran */
+#mode-overlay > .mode-back-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  margin: 0;
+}
+#mode-overlay > .mode-back-btn:hover {
+  transform: translateX(-50%) translateY(-2px) scale(1.03);
+}
+#mode-overlay > .mode-back-btn:active {
+  transform: translateX(-50%) scale(.97);
+}
 
 /* ═══ PUZZLE TRIGGER PULSE ═══ */
 .cell.puzzle-trigger{
@@ -2328,27 +2411,30 @@ body.mobile-ingame #word-panel {
 
     <!-- Stage kana -->
     <div id="quiz-kana-stage">
-      <!-- Timer bar (mode vitesse) -->
-      <div id="quiz-timer-bar" class="hidden">
-        <div id="quiz-timer-fill"></div>
-      </div>
+      <!-- Anchor : kana-card et reveal se superposent exactement ici -->
+      <div class="quiz-stage-anchor">
+        <!-- Grande carte kana / emoji -->
+        <div id="quiz-kana-card">あ</div>
 
-      <!-- Grande carte kana / emoji -->
-      <div id="quiz-kana-card">あ</div>
-
-      <!-- Révélation épurée -->
-      <div id="quiz-reveal" class="hidden">
-        <!-- Mot en hiragana avec kana ciblé coloré -->
-        <div id="quiz-reveal-word-kana">かい</div>
-        <!-- Traduction -->
-        <div id="quiz-reveal-word-meaning">coquillage</div>
-        <!-- Résultat (petit, discret) -->
-        <div id="quiz-reveal-result"></div>
-        <!-- Éléments cachés conservés pour compatibilité JS -->
-        <span id="quiz-reveal-emoji" style="display:none"></span>
-        <span id="quiz-reveal-romaji" style="display:none"></span>
-        <div id="quiz-reveal-word" style="display:none"></div>
+        <!-- Révélation — positionnée en absolute sur la même zone -->
+        <div id="quiz-reveal" class="hidden">
+          <!-- Mot en hiragana avec kana ciblé coloré -->
+          <div id="quiz-reveal-word-kana">かい</div>
+          <!-- Traduction -->
+          <div id="quiz-reveal-word-meaning">coquillage</div>
+          <!-- Résultat (pill colorée) -->
+          <div id="quiz-reveal-result"></div>
+          <!-- Éléments cachés conservés pour compatibilité JS -->
+          <span id="quiz-reveal-emoji" style="display:none"></span>
+          <span id="quiz-reveal-romaji" style="display:none"></span>
+          <div id="quiz-reveal-word" style="display:none"></div>
+        </div>
       </div>
+    </div>
+
+    <!-- Timer bar — juste au-dessus des boutons de réponse -->
+    <div id="quiz-timer-bar" class="hidden">
+      <div id="quiz-timer-fill"></div>
     </div>
 
     <!-- Choix QCM -->
@@ -6289,9 +6375,9 @@ function _quizRender(){
   const label=isVocab?'Mot':'Kana';
   document.getElementById('quiz-progress-text').textContent=`${label} ${qNum}/${total}`;
   document.getElementById('quiz-score-display').textContent=_quizScore.toLocaleString('fr-FR')+' pts';
-  const streakTxt=_quizStreak>=3?`🔥×${_quizStreak}`:'';
-  const errTxt=_quizErrors.size>0?`💀${_quizErrors.size}`:'';
-  document.getElementById('quiz-streak-display').textContent=[streakTxt,errTxt].filter(Boolean).join(' ');
+  const streakTxt=_quizStreak>=3?`<img src="${_fluentUrl('🔥')}" style="height:1.3em;vertical-align:-.25em" alt="🔥">×${_quizStreak}`:'';
+  const errTxt=_quizErrors.size>0?`<img src="${_fluentUrl('💀')}" style="height:1.4em;vertical-align:-.28em" alt="💀">${_quizErrors.size}`:'';
+  document.getElementById('quiz-streak-display').innerHTML=[streakTxt,errTxt].filter(Boolean).join(' ');
 
   const card=document.getElementById('quiz-kana-card');
 
@@ -6434,9 +6520,9 @@ function _quizReveal(choiceIdx){
   }
 
   document.getElementById('quiz-score-display').textContent=_quizScore.toLocaleString('fr-FR')+' pts';
-  const st=_quizStreak>=3?`🔥×${_quizStreak}`:'';
-  const et=_quizErrors.size>0?`💀${_quizErrors.size}`:'';
-  document.getElementById('quiz-streak-display').textContent=[st,et].filter(Boolean).join(' ');
+  const st=_quizStreak>=3?`<img src="${_fluentUrl('🔥')}" style="height:1.3em;vertical-align:-.25em" alt="🔥">×${_quizStreak}`:'';
+  const et=_quizErrors.size>0?`<img src="${_fluentUrl('💀')}" style="height:1.4em;vertical-align:-.28em" alt="💀">${_quizErrors.size}`:'';
+  document.getElementById('quiz-streak-display').innerHTML=[st,et].filter(Boolean).join(' ');
   const total=isVocab?QUIZ_VOCAB_LIST.length:QUIZ_KANA_LIST.length;
   const qNum=total-_quizQueue.length+1;
   document.getElementById('quiz-progress-text').textContent=`${isVocab?'Mot':'Kana'} ${Math.min(qNum,total)}/${total}`;
@@ -6461,7 +6547,7 @@ function _quizReveal(choiceIdx){
     const wordEl=document.getElementById('quiz-reveal-word-kana');
     wordEl.style.fontSize='clamp(16px,6vw,38px)'; // reset
     wordEl.textContent=item.kana;
-    document.getElementById('quiz-reveal-word-meaning').textContent=item.emoji+' '+item.meaning;
+    document.getElementById('quiz-reveal-word-meaning').textContent=item.meaning;
     // Auto-fit : réduire jusqu'à tenir dans la largeur
     requestAnimationFrame(()=>_quizFitWordEl(wordEl));
   } else {
@@ -6496,7 +6582,7 @@ card.innerHTML = `<img src="${fUrl}" class="femoji" alt="${exWord.emoji}" style=
   }
 
   const resultEl=document.getElementById('quiz-reveal-result');
-  resultEl.textContent=correct?'✅':'❌';
+  resultEl.textContent=correct?'Correct !':'Raté !';
   resultEl.className=correct?'correct':'wrong';
 
   const reveal=document.getElementById('quiz-reveal');
