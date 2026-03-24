@@ -607,9 +607,11 @@ body::before {
   width: 100%;
   max-width: 480px;
 }#menu-overlay.hidden{display:none;}
-.menu-header{flex-shrink:0;width:100%;text-align:center;padding:clamp(10px,3dvh,22px) 16px clamp(4px,1.5dvh,10px);}
+.menu-header{flex-shrink:0;width:100%;text-align:center;padding:clamp(18px,5dvh,32px) 16px clamp(4px,1.5dvh,10px);}
 .logo-wrap{display:flex;flex-direction:column;align-items:center;animation:floatPulse 3s ease-in-out infinite;cursor:default;position:relative;}
 @keyframes floatPulse{0%,100%{transform:translateY(0) scale(1) rotate(-4deg)}50%{transform:translateY(-6px) scale(1.02) rotate(-4deg)}}
+@keyframes floatPulseSplash{0%,100%{transform:translateY(0) scale(1.3) rotate(-4deg)}50%{transform:translateY(-6px) scale(1.4) rotate(-4deg)}}
+#splash-screen .logo-wrap { animation-name: floatPulseSplash; }
 .logo-card{position:relative;padding:0 20px;display:flex;flex-direction:column;align-items:center;gap:4px;overflow:visible;}
 .kana-group{position:relative;display:inline-block;line-height:1;}
 .kana-main{font-family:"Noto Sans JP",sans-serif;font-weight:900;font-size:clamp(64px,18vw,96px);letter-spacing:-2px;line-height:1;display:block;background:linear-gradient(135deg,#ff6b35,#ffbe0b,#6bcb77,#4d96ff,#c77dff,#ff6b6b,#ffbe0b,#ff6b35);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:kanaRainbow 3s linear infinite;position:relative;z-index:2;filter:drop-shadow(2px 4px 0 #1a0050);}
@@ -704,7 +706,7 @@ body::before {
   height: 100dvh;
   display: flex; flex-direction: column;
   align-items: center;
-  padding: 0 16px 20px;
+  padding: 0 16px 24px;
 }
 
 /* Header quiz */
@@ -713,7 +715,7 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: clamp(10px,2.5dvh,18px) 0 8px;
+  padding: clamp(14px,3dvh,22px) 0 10px;
   flex-shrink: 0;
 }
 #quiz-progress-text {
@@ -741,7 +743,7 @@ body::before {
   background: rgba(255,255,255,.45);
   border-radius: 20px; padding: 5px;
   box-shadow: 0 4px 18px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.8);
-  flex-shrink: 0; margin-bottom: 10px;
+  flex-shrink: 0; margin-bottom: 14px;
 }
 .quiz-mode-tab {
   flex: 1; font-family: 'Fredoka One', cursive;
@@ -898,16 +900,16 @@ body::before {
 #quiz-choices {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
   flex-shrink: 0;
-  margin-top: 4px;
+  margin-top: 8px;
 }
 /* Back btn — bien espacé des boutons */
 #quiz-back-btn {
   font-family: 'Fredoka One', cursive;
   font-size: clamp(14px, 3.5vw, 17px);
-  padding: 8px 22px;
+  padding: 10px 26px;
   border: 2px solid rgba(168,85,247,.35);
   border-radius: 50px;
   background: rgba(255,255,255,.6);
@@ -915,14 +917,14 @@ body::before {
   cursor: pointer;
   transition: transform .15s;
   flex-shrink: 0;
-  margin-top: 18px;
+  margin-top: 14px;
 }
 .quiz-choice-btn {
   font-family: 'Fredoka One', cursive;
   font-size: clamp(18px, 5vw, 24px);
   border: 3px solid transparent;
   border-radius: 18px;
-  padding: 16px 10px;
+  padding: 18px 10px;
   cursor: pointer;
   background: rgba(255,255,255,.85);
   color: var(--text-dark);
@@ -958,19 +960,6 @@ body::before {
 #quiz-next-btn { display: none !important; }
 
 /* Back btn */
-#quiz-back-btn {
-  font-family: 'Fredoka One', cursive;
-  font-size: clamp(14px, 3.5vw, 17px);
-  padding: 8px 22px;
-  border: 2px solid rgba(168,85,247,.35);
-  border-radius: 50px;
-  background: rgba(255,255,255,.6);
-  color: #a855f7;
-  cursor: pointer;
-  transition: transform .15s;
-  flex-shrink: 0;
-  margin-top: 8px;
-}
 #quiz-back-btn:hover { transform: translateY(-1px); }
 /* ═══ STATS OVERLAY ═══ */
 #stats-overlay {
@@ -1417,6 +1406,7 @@ body::before {
   background: linear-gradient(160deg, var(--bg-top) 0%, var(--bg-mid) 50%, var(--bg-bot) 100%);
   display: flex; flex-direction: column; align-items: center;
   overflow-y: auto; overflow-x: hidden;
+  padding-bottom: 8px;
   /* SUPPRESSION du max-width ici */
 }
 #mode-overlay::before {
@@ -1430,17 +1420,29 @@ body::before {
 #mode-overlay.hidden{display:none !important;}
 .mode-logo-header {
   flex-shrink: 0; width: 100%; text-align: center;
-  padding: clamp(8px,2.5dvh,18px) 16px clamp(2px,0.8dvh,6px);
+  padding: clamp(14px,3.5dvh,26px) 16px clamp(8px,1.8dvh,14px);
   position: relative; z-index: 1;
   max-width: 480px; /* On limite juste l'en-tête */
 }
 .mode-level-badge{
   font-family:'Fredoka One',cursive;
-  font-size:clamp(17px,4.8vw,23px);
-  color:var(--text-mid);text-align:center;
-  margin-bottom:4px;position:relative;z-index:1;
+  font-size:clamp(18px,5vw,24px);
+  color:var(--text-dark);text-align:center;
+  margin: 10px auto 0;
+  position:relative;z-index:1;
   animation:rowSlideIn .35s cubic-bezier(.34,1.56,.64,1) both;
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  background: rgba(255,255,255,.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(255,255,255,.85);
+  border-radius: 20px;
+  padding: 10px 22px 10px 16px;
+  box-shadow: 0 4px 18px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.9);
+  max-width: calc(100% - 48px);
 }
+.mode-level-badge .femoji,
+.mode-level-badge img { width:clamp(32px,9vw,44px)!important; height:clamp(32px,9vw,44px)!important; vertical-align:middle; filter:drop-shadow(0 3px 8px rgba(0,0,0,.18)); }
 
 /* ── Tabs ── */
 .mode-tabs{
@@ -1604,14 +1606,17 @@ body::before {
 
 /* ── Bouton retour ── */
 .mode-back-btn{
-  font-family:'Fredoka One',cursive;font-size:clamp(15px,4vw,17px);
-  padding:10px 28px;border:2.5px solid var(--border);border-radius:50px;
-  background:white;color:var(--text-dim);cursor:pointer;
-  transition:transform .15s,box-shadow .15s;flex-shrink:0;
-  box-shadow:0 3px 10px rgba(0,0,0,.06);position:relative;z-index:1;
-  margin-bottom:16px;
+  font-family:'Fredoka One',cursive;font-size:clamp(15px,4vw,18px);
+  padding:13px 36px;border:none;border-radius:50px;
+  background:linear-gradient(135deg,#00e5c8,#00aaee);
+  color:#fff;cursor:pointer;
+  box-shadow:0 5px 18px rgba(0,200,200,.38);
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1);
+  flex-shrink:0;margin:16px auto 20px;
+  display:block;position:relative;z-index:1;
 }
-.mode-back-btn:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(0,0,0,.1);}
+.mode-back-btn:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 8px 24px rgba(0,200,200,.5);}
+.mode-back-btn:active{transform:scale(.97);}
 
 /* ═══ PUZZLE TRIGGER PULSE ═══ */
 .cell.puzzle-trigger{
@@ -1988,24 +1993,33 @@ body.battle-mode .enc-toast-box.show{display:block;animation:encRise 2.2s ease f
 
 /* ═══ MODE SELECT MOBILE 2×2 ═══ */
 .mode-grid-2x2{
-  display:grid;grid-template-columns:1fr 1fr;gap:14px;
-  padding:16px;width:100%;max-width:420px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr;gap:16px;
+  padding:16px;width:100%;max-width:420px;margin:16px auto 0;
 }
 .mode-btn-mobile{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
-  padding:20px 12px;border-radius:20px;border:none;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  padding:22px 12px 18px;border-radius:24px;border:none;cursor:pointer;
   font-family:'Fredoka One',cursive;font-size:16px;color:white;
-  box-shadow:0 4px 14px rgba(0,0,0,.15);transition:transform .15s,box-shadow .15s;
-  min-height:100px;
+  box-shadow:0 6px 20px rgba(0,0,0,.18);transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s;
+  min-height:110px;position:relative;overflow:hidden;
 }
+.mode-btn-mobile::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.22) 0%,transparent 55%);pointer-events:none;}
 .mode-btn-mobile:active{transform:scale(.95);}
-.mode-btn-mobile .mbm-emoji{font-size:32px;line-height:1;}
-.mode-btn-mobile .mbm-label{font-size:15px;text-shadow:0 1px 3px rgba(0,0,0,.25);}
-.mode-btn-mobile .mbm-sub{font-family:'Nunito',sans-serif;font-size:11px;opacity:.85;font-weight:700;text-align:center;}
-.mbm-solo{background:linear-gradient(135deg,#00c8e8,#0099cc);}
-.mbm-puzzle{background:linear-gradient(135deg,#f9d000,#e8a000);}
-.mbm-survie{background:linear-gradient(135deg,#ff6b35,#cc3300);}
-.mbm-quiz{background:linear-gradient(135deg,#c77dff,#7c3aed);}
+.mode-btn-mobile:hover{transform:translateY(-3px) scale(1.03);}
+.mode-btn-mobile .mbm-emoji{
+  font-size:44px;line-height:1;
+  filter:drop-shadow(0 4px 10px rgba(0,0,0,.25)) drop-shadow(0 0 8px rgba(255,255,255,.6));
+  transform:translateY(-2px);
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1);
+}
+.mode-btn-mobile:hover .mbm-emoji { transform: translateY(-6px) scale(1.15); }
+.mode-btn-mobile .mbm-label{font-size:16px;font-weight:900;text-shadow:0 1px 4px rgba(0,0,0,.3);}
+.mode-btn-mobile .mbm-sub{font-family:'Nunito',sans-serif;font-size:11px;opacity:.9;font-weight:700;text-align:center;}
+/* Couleurs fraîches et pétantes */
+.mbm-solo{background:linear-gradient(135deg,#00e5ff,#0099cc);box-shadow:0 6px 22px rgba(0,180,255,.45);}
+.mbm-puzzle{background:linear-gradient(135deg,#ffdd00,#ff9500);box-shadow:0 6px 22px rgba(255,160,0,.45);}
+.mbm-survie{background:linear-gradient(135deg,#ff4d6d,#c9184a);box-shadow:0 6px 22px rgba(255,50,80,.45);}
+.mbm-quiz{background:linear-gradient(135deg,#b14fff,#7209b7);box-shadow:0 6px 22px rgba(160,50,255,.45);}
 
 /* ═══ MOBILE IN-GAME LAYOUT ═══ */
 /* ═══ MOBILE IN-GAME : layout full-width ═══ */
@@ -2162,13 +2176,12 @@ body.mobile-ingame #word-panel {
         </div>
       </div>
     </div>
-  <div class="splash-tap">Touche pour commencer</div>
+
 </div>
 
 <div id="menu-overlay">
   <div id="confetti-menu" style="position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;"></div>
   <div class="menu-header" style="position:relative;">
-    <button class="menu-settings-btn" onclick="showKeybinds()" title="Config touches">⚙️</button>
     <div class="logo-wrap">
       <div class="logo-card">
         <div class="logo-droplet ld1"><svg width="16" height="21" viewBox="0 0 16 22"><path d="M8 0C8 0 16 10 16 14A8 8 0 0 1 0 14C0 10 8 0 8 0Z" fill="#ff6b6b" stroke="#fff" stroke-width="3"/></svg></div>
@@ -2194,11 +2207,6 @@ body.mobile-ingame #word-panel {
     <div class="menu-sub"><span class="menu-wave">🌊</span> Apprends les kana en jouant !</div>
   </div>
   <div class="menu-section-lbl">✨ Choisis ton clan</div>
-  <button class="menu-quiz-btn" onclick="showQuiz()">
-    <span style="font-size:24px">🎌</span>
-    <span>Mode Quiz · Apprends les kana</span>
-    <span style="font-size:18px;opacity:.8">🧠</span>
-  </button>
   <div id="lvl-scroll"></div>
   <div class="menu-scroll-hint">↕ Fais défiler pour voir tous les niveaux</div>
 </div>
@@ -2242,6 +2250,14 @@ body.mobile-ingame #word-panel {
   <div class="mode-logo-header">
     <div class="logo-wrap">
       <div class="logo-card">
+        <div class="logo-droplet ld1"><svg width="16" height="21" viewBox="0 0 16 22"><path d="M8 0C8 0 16 10 16 14A8 8 0 0 1 0 14C0 10 8 0 8 0Z" fill="#ff6b6b" stroke="#fff" stroke-width="3"/></svg></div>
+        <div class="logo-droplet ld2"><svg width="14" height="19" viewBox="0 0 16 22"><path d="M8 0C8 0 16 10 16 14A8 8 0 0 1 0 14C0 10 8 0 8 0Z" fill="#4d96ff" stroke="#fff" stroke-width="3"/></svg></div>
+        <div class="logo-droplet ld3"><svg width="14" height="19" viewBox="0 0 16 22"><path d="M8 0C8 0 16 10 16 14A8 8 0 0 1 0 14C0 10 8 0 8 0Z" fill="#6bcb77" stroke="#fff" stroke-width="3"/></svg></div>
+        <div class="logo-droplet ld4"><svg width="12" height="17" viewBox="0 0 16 22"><path d="M8 0C8 0 16 10 16 14A8 8 0 0 1 0 14C0 10 8 0 8 0Z" fill="#ffbe0b" stroke="#fff" stroke-width="3"/></svg></div>
+        <div class="logo-droplet ld5"><svg width="11" height="16" viewBox="0 0 16 22"><path d="M8 0C8 0 16 10 16 14A8 8 0 0 1 0 14C0 10 8 0 8 0Z" fill="#c77dff" stroke="#fff" stroke-width="3"/></svg></div>
+        <div class="logo-bubble lb1"></div>
+        <div class="logo-bubble lb2"></div>
+        <div class="logo-bubble lb3"></div>
         <div class="kana-group">
           <span class="kana-outline-d">かな</span>
           <span class="kana-outline-w">かな</span>
@@ -3279,7 +3295,9 @@ function puzzleGenerate(levelIdx, snDef, customRows){
 function showModeSelect(levelIdx){
   pendingLevelIdx=levelIdx;
   const lvl=ALL_LEVELS[levelIdx];
-  document.getElementById('mode-level-name').textContent=`${lvl.emoji} ${lvl.theme}`;
+  const fUrl = _fluentUrl(lvl.emoji);
+  document.getElementById('mode-level-name').innerHTML =
+    `<img src="${fUrl}" class="femoji" alt="${lvl.emoji}" style="width:clamp(32px,9vw,44px);height:clamp(32px,9vw,44px);vertical-align:middle;filter:drop-shadow(0 3px 8px rgba(0,0,0,.18))" onerror="this.replaceWith(document.createTextNode('${lvl.emoji}'))"> ${lvl.theme}`;
   // Remplir les cards SN puzzle
   const snContainer=document.getElementById('mode-sn-cards');
   snContainer.innerHTML='';
