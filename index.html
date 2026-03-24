@@ -4463,7 +4463,7 @@ document.addEventListener('touchmove', e => {
   // --- RÉGLAGE DE LA SENSIBILITÉ ---
   // On divise la largeur de cellule par 2 (0.5) ou moins pour que le bloc 
   // bouge plus vite que le doigt. 0.45 est un excellent ratio pour le "x2".
-  const sensitivity = 0.45; 
+  const sensitivity = 0.65; 
   const thresholdX = cellW * sensitivity; 
 
   if (Math.abs(dx) >= thresholdX) {
