@@ -2687,7 +2687,7 @@ const ALL_LEVELS=[
 // ═══════════════════════════════════════════════════════════════════
 //  ÉTAT GLOBAL DE SESSION
 // ═══════════════════════════════════════════════════════════════════
-let currentTouchColOffset = 0;
+// let currentTouchColOffset = 0;
 let currentLevelIdx = 0;
 let LEVEL_WORDS = ALL_LEVELS[0].words;
 let pendingLevelIdx = 0;
@@ -4452,52 +4452,36 @@ document.addEventListener('touchmove', e => {
   if (!player1.gameRunning || player1.resolvingWords || !player1.active) return;
   
   const t = e.touches[0];
-  // Distance totale depuis le TOUT DÉBUT du glissement
-  const totalDx = t.clientX - txStart; 
+  const dx = t.clientX - txStart;
   const dy = t.clientY - tyStart;
 
-  // 1. Annulation du long press si mouvement détecté
-  if (Math.abs(totalDx) > 10 || Math.abs(dy) > 10) {
+  if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
     clearTimeout(lpTimer);
     lpTimer = null;
   }
 
-  // 2. CALCUL DE L'ACCÉLÉRATION PROGRESSIVE
-  // On calcule combien de colonnes on DEVRAIT avoir parcouru
-  // La puissance 1.2 crée l'accélération (1.0 = linéaire, 1.5 = très violent)
-  const direction = totalDx > 0 ? 1 : -1;
-  const absDx = Math.abs(totalDx);
-  
-  // Cette formule magique augmente la "vitesse" perçue au fur et à mesure du glissement
-  const virtualDistance = Math.pow(absDx, 1.15) * 0.8; 
-  
-  // Nombre de colonnes cibles selon la distance parcourue
-  const targetColDiff = Math.floor(virtualDistance / cellW) * direction;
+  // --- RÉGLAGE DE LA SENSIBILITÉ ---
+  // On divise la largeur de cellule par 2 (0.5) ou moins pour que le bloc 
+  // bouge plus vite que le doigt. 0.45 est un excellent ratio pour le "x2".
+  const sensitivity = 0.45; 
+  const thresholdX = cellW * sensitivity; 
 
-  // On ne bouge que si le calcul demande un changement de colonne 
-  // par rapport à la position au début du touch
-  if (targetColDiff !== currentTouchColOffset) {
-    const diff = targetColDiff - currentTouchColOffset;
+  if (Math.abs(dx) >= thresholdX) {
+    if (dx > 0) player1.moveRight();
+    else player1.moveLeft();
     
-    // On applique le nombre de déplacements nécessaires
-    for(let i = 0; i < Math.abs(diff); i++) {
-      if (diff > 0) player1.moveRight();
-      else player1.moveLeft();
-    }
-    
-    currentTouchColOffset = targetColDiff;
+    // Crucial : on reset le point de départ pour permettre le mouvement continu
+    txStart = t.clientX;
+    tyStart = t.clientY; 
     swipeHandled = true;
   }
   
-  // 3. Hard Drop (vertical) reste classique
-  if (dy > 65 && !swipeHandled) { 
+  // Swipe vers le bas (Hard Drop) - on garde un seuil un peu plus haut pour éviter les erreurs
+  if (dy > 60 && !swipeHandled) { 
     player1.hardDrop();
     swipeHandled = true; 
   }
 }, {passive: true});
-
-// Note : il faudra ajouter "let currentTouchColOffset = 0;" 
-// dans ton 'touchstart' pour réinitialiser le compteur à chaque nouveau doigt posé.
   
   
 
