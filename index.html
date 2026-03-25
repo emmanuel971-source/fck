@@ -1784,14 +1784,6 @@ flex: 0 0 42%;
 
 #board-overlay.hidden { display: none; }
 
-/* Masquer le word-panel et le side-panel quand l'overlay de fin de niveau est actif */
-#shell:has(#board-overlay:not(.hidden)) #word-panel,
-#shell:has(#board-overlay:not(.hidden)) #side-panel {
-  visibility: hidden;
-  pointer-events: none;
-  transition: visibility 0s;
-}
-
 .ov-title {
   font-family: 'Fredoka One', cursive;
   font-size: clamp(28px, 8.5vw, 44px);
@@ -4009,10 +4001,20 @@ function renderPanel(){
     if(btn2){b2.textContent=btn2;b2.onclick=act2;b2.style.display='';}else b2.style.display='none';
     document.getElementById('ov-lvlsel').onclick=showMenu;
     document.getElementById('board-overlay').classList.remove('hidden');
+    // Masquer word-panel et side-panel (Chrome mobile : position:fixed confiné par isolation:isolate sur #board-col)
+    const _wp = document.getElementById('word-panel');
+    const _sp = document.getElementById('side-panel');
+    if(_wp) _wp.style.visibility = 'hidden';
+    if(_sp) _sp.style.visibility = 'hidden';
   }
   function hideOverlay(){
     if(dom._pid){document.getElementById(`overlay-${dom._pid}`).classList.add('hidden');return;}
     document.getElementById('board-overlay').classList.add('hidden');
+    // Restaurer word-panel et side-panel
+    const _wp = document.getElementById('word-panel');
+    const _sp = document.getElementById('side-panel');
+    if(_wp) _wp.style.visibility = '';
+    if(_sp) _sp.style.visibility = '';
   }
 
   // ── Jeu principal ──
