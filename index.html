@@ -109,7 +109,6 @@ body::before {
   /* contain:strict bloque le backdrop-filter → on utilise layout+style */
   contain: layout style;
   will-change: contents;
-  will-change: transform;  /* ← stabilise le calque du board entier */
 }
 
 .cell{
@@ -133,7 +132,9 @@ body::before {
   box-shadow: 0 3px 0 rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.7);
   animation: activePulse .65s ease infinite alternate;
   
-
+  /* --- AJOUTS POUR L'OPTIMISATION --- */
+  will-change: transform, opacity, background-color;
+  transform: translateZ(0); /* Force la création d'un calque GPU dédié */
 }
 @keyframes activePulse{from{transform:scale(1);opacity:.92}to{transform:scale(1.06);opacity:1}}
 .cell.ghost{background:rgba(0,0,0,.04);border:1.5px dashed rgba(0,0,0,.15)!important;color:rgba(0,0,0,.2);border-radius:6px;}
@@ -582,8 +583,8 @@ body::before {
 @keyframes encRise{0%{opacity:0;transform:translateX(-50%) translateY(0) scale(.7)}12%{opacity:1;transform:translateX(-50%) translateY(-8px) scale(1.08)}65%{opacity:1;transform:translateX(-50%) translateY(-18px) scale(1)}100%{opacity:0;transform:translateX(-50%) translateY(-70px) scale(.9)}}
 
 @keyframes screenShake{0%,100%{transform:translate(0,0)}20%{transform:translate(-4px,3px)}40%{transform:translate(4px,-3px)}60%{transform:translate(-3px,2px)}80%{transform:translate(3px,-2px)}}
-#board-col.shake { animation: screenShake .35s ease forwards; }
-#board-col.shake-combo { animation: screenShake .5s ease forwards; }
+#shell.shake{animation:screenShake .35s ease forwards;}
+#shell.shake-combo{animation:screenShake .5s ease forwards;}
 
 /* ═══ MENU ═══ */
 /* 1. On libère le conteneur principal pour qu'il prenne tout l'écran */
@@ -3101,11 +3102,8 @@ function screenShake(c=false){
   const sh=document.getElementById('shell');
   sh.classList.remove('shake','shake-combo');
   void sh.offsetWidth;
-const bc = document.getElementById('board-col');
-bc.classList.remove('shake', 'shake-combo');
-void bc.offsetWidth;
-bc.classList.add(c ? 'shake-combo' : 'shake');
-setTimeout(() => bc.classList.remove('shake', 'shake-combo'), 500);
+  sh.classList.add(c?'shake-combo':'shake');
+  setTimeout(()=>sh.classList.remove('shake','shake-combo'),500);
 }
 
 const ENCS=[{jp:'すごい！',fr:'Incroyable !'},{jp:'やった！',fr:'On l\'a eu !'},{jp:'完璧！',fr:'Parfait !'},{jp:'天才！',fr:'Génie !'},{jp:'最高！',fr:'Excellent !'}];
