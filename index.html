@@ -99,14 +99,15 @@ body::before {
   flex: 1;
   display: grid;
   grid-template-columns: repeat(8,1fr);
-  background: var(--board-bg);
-  border-left: 2px solid rgba(100,200,220,.25);
-  border-right: 2px solid rgba(100,200,220,.25);
-  border-top: 2px solid rgba(100,200,220,.25);
+  background: rgba(255,255,255,0.18);
+  backdrop-filter: blur(8px) saturate(1.4);
+  -webkit-backdrop-filter: blur(8px) saturate(1.4);
+  border-left: 2px solid rgba(255,255,255,.35);
+  border-right: 2px solid rgba(255,255,255,.35);
+  border-top: 2px solid rgba(255,255,255,.35);
   overflow: hidden;
-  
-  /* --- AJOUTS POUR L'OPTIMISATION --- */
-  contain: strict; /* Dit au navigateur que ce qui se passe ici n'affecte pas le reste de la page */
+  /* contain:strict bloque le backdrop-filter → on utilise layout+style */
+  contain: layout style;
   will-change: contents;
 }
 
@@ -474,7 +475,7 @@ body::before {
 }
 .word-row{
   display:flex;align-items:center;gap:8px;
-  background:#edfaf3;border:2px solid var(--border);border-radius:16px;padding:7px 10px;
+  background:#edfaf3;border:2px solid var(--border);border-radius:16px;padding:2px 10px;
   animation:rowSlideIn .45s cubic-bezier(.34,1.56,.64,1) forwards;
   position:relative;overflow:hidden;
   box-shadow:0 3px 10px rgba(0,150,100,.1);
@@ -539,13 +540,12 @@ body::before {
 .word-row.boss.pending { border-color: #ff3d6d !important; }
 .word-row.boss.validated { border-color: #52c97a !important; }
 
-.wr-emoji{font-size:clamp(24px,7vw,30px);flex-shrink:0;line-height:1;}
-.wr-info{flex:1;min-width:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap;
-}
-.wr-kana{font-size:clamp(18px,6vw,24px);font-weight:900;color:var(--text-dark);line-height:1;font-family:'Noto Sans JP',sans-serif;}
-.wr-romaji{font-size:clamp(14px,4vw,18px);color:var(--sky);font-weight:900;font-family:'Fredoka One',sans-serif;}
-.wr-meaning{font-size:clamp(13px,3.5vw,16px);color:var(--text-mid);font-family:'Nunito',sans-serif;font-weight:700;}
-.wr-mult{font-family:'Fredoka One',cursive;font-size:clamp(16px,5vw,21px);color:var(--mint);text-shadow:0 0 5px rgba(46,216,160,.4);min-width:32px;text-align:right;flex-shrink:0;}
+.wr-emoji{font-size:clamp(28px,8vw,36px);flex-shrink:0;line-height:1;}
+.wr-info{flex:1;min-width:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.wr-kana{font-size:clamp(22px,7vw,30px);font-weight:900;color:var(--text-dark);line-height:1;font-family:'Noto Sans JP',sans-serif;}
+.wr-romaji{font-size:clamp(17px,5vw,22px);color:var(--sky);font-weight:900;font-family:'Fredoka One',sans-serif;}
+.wr-meaning{font-size:clamp(15px,4.2vw,19px);color:var(--text-mid);font-family:'Nunito',sans-serif;font-weight:700;}
+.wr-mult{font-family:'Fredoka One',cursive;font-size:clamp(19px,6vw,25px);color:var(--mint);text-shadow:0 0 5px rgba(46,216,160,.4);min-width:36px;text-align:right;flex-shrink:0;}
 .word-row.boss .wr-mult{color:var(--coral);}
 .wr-mult.bump{animation:multBump .32s cubic-bezier(.34,1.56,.64,1);}
 @keyframes multBump{0%{transform:scale(1)}50%{transform:scale(1.7) rotate(-5deg)}100%{transform:scale(1)}}
@@ -1203,45 +1203,73 @@ body::before {
   isolation: isolate;
 }
 
-/* ── Top-bar HUD simulée (remplace la sidebar desktop) ── */
+/* ── Top-bar HUD tuto — identique au mobile-nav in-game ── */
 #tuto-hud {
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 54px;
   z-index: 10;
-  background: rgba(255,248,232,.92);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-bottom: 2px solid rgba(255,160,60,.3);
-  box-shadow: 0 2px 10px rgba(255,120,30,.1);
+  background: rgba(200,240,255,0.45);
+  backdrop-filter: blur(18px) saturate(1.6);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  border-bottom: 1px solid rgba(255,255,255,.55);
+  box-shadow: 0 2px 16px rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.7);
   display: flex;
   align-items: center;
-  gap: 0;
-  padding: 0 10px;
+  justify-content: space-between;
+  padding: 0 16px;
+  gap: 12px;
 }
+/* Robot à gauche */
 #tuto-hud .th-kanakun {
-  font-size: 26px; flex-shrink: 0; margin-right: 8px;
-  filter: drop-shadow(0 1px 4px rgba(168,85,247,.4));
+  font-size: 36px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 6px rgba(168,85,247,.5));
+  line-height: 1;
+  display: flex;
+  align-items: center;
 }
+/* Niveau — groupé près du robot */
 #tuto-hud .th-level {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  height: 100%;
+}
+#tuto-hud .th-lv-emoji {
+  font-size: 28px;
+  line-height: 1;
+  display: block;
+}
+#tuto-hud .th-lv-num {
+  font-family: 'Fredoka One', cursive;
+  font-size: 11px;
+  color: var(--text-mid);
+  font-weight: 900;
+  letter-spacing: .3px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+/* Score — centré, flex:1 */
+#tuto-hud .th-score {
   flex: 1;
   font-family: 'Fredoka One', cursive;
-  font-size: clamp(12px, 3.5vw, 15px);
-  color: var(--sky); text-align: center;
-}
-#tuto-hud .th-score {
-  font-family: 'Fredoka One', cursive;
-  font-size: clamp(15px, 4.5vw, 20px);
+  font-size: clamp(20px, 6vw, 28px);
   color: var(--neon-violet);
-  flex-shrink: 0; min-width: 52px; text-align: right; margin-right: 8px;
+  text-shadow: 0 0 10px rgba(0,102,255,.25), 0 1px 0 rgba(255,255,255,.6);
+  text-align: center;
 }
+/* Next kana — coin droit */
 #tuto-hud .th-next {
   flex-shrink: 0;
   width: 40px; height: 40px;
   border-radius: 12px;
-  background: white;
-  border: 2.5px solid var(--border);
-  box-shadow: 0 3px 10px rgba(0,170,238,.15), inset 0 1px 0 rgba(255,255,255,.9);
+  background: rgba(255,255,255,.85);
+  border: none;
+  box-shadow: 0 4px 14px rgba(0,0,0,.18), 0 1px 3px rgba(0,0,0,.1), inset 0 1px 0 rgba(255,255,255,.9);
   display: flex; align-items: center; justify-content: center;
   font-size: clamp(18px, 6vw, 26px); font-weight: 900;
   font-family: 'Noto Sans JP', sans-serif; color: var(--text-dark);
@@ -1299,16 +1327,17 @@ body::before {
   border:2.5px solid #a855f7;
   pointer-events:none;
 }
-/* Encart robot en bas à gauche de la bulle */
-#tuto-bubble::before{
-  content:'🤖';
+/* Encart robot en bas à gauche de la bulle — image Fluent injectée par JS */
+#tuto-bubble-robot{
   position:absolute;
   left:-4px;bottom:-38px;
   font-size:32px;
   line-height:1;
   filter:drop-shadow(0 2px 6px rgba(168,85,247,.5));
   animation:robotBobble 1.6s ease-in-out infinite alternate;
+  pointer-events:none;
 }
+#tuto-bubble-robot img.femoji { height: 32px; width: auto; vertical-align: middle; }
 @keyframes robotBobble{from{transform:translateY(0) rotate(-4deg)}to{transform:translateY(-4px) rotate(4deg)}}
 /* Petite queue de bulle en bas à gauche (style manga) */
 #tuto-bubble::after{
@@ -2106,7 +2135,10 @@ body.battle-mode .enc-toast-box.show{display:block;animation:encRise 2.2s ease f
 
 /* ═══ MOBILE IN-GAME LAYOUT ═══ */
 /* ═══ MOBILE IN-GAME : layout full-width ═══ */
-
+/* Cache le bouton flottant Kana-kun pendant le jeu */
+body.mobile-ingame #bot-toggle {
+  display: none !important;
+}
 /* Shell : pleine largeur, pas de max-width ni centrage */
 body.mobile-ingame #shell {
   padding-top: 54px;
@@ -2159,65 +2191,88 @@ body.mobile-ingame #word-panel {
 }
 
 /* ═══ NAVBAR IN-GAME : layout HUD ═══ */
+/* ═══ NAVBAR IN-GAME : layout HUD ═══ */
 #mobile-nav {
   display: none;
   position: fixed;
   top: 0; left: 0; right: 0;
   height: 54px;
   z-index: 200;
-  background: rgba(255,255,255,.88);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 2px solid rgba(100,200,220,.2);
-  box-shadow: 0 2px 10px rgba(0,0,0,.07);
+  background: rgba(var(--nav-tint-rgb, 200,240,255), 0.45);
+  backdrop-filter: blur(18px) saturate(1.6);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  border-bottom: 1px solid rgba(255,255,255,.55);
+  box-shadow: 0 2px 16px rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.7);
   align-items: center;
-  gap: 0;
-  padding: 0 8px;
+  justify-content: space-between; /* Assure une belle répartition globale */
+  padding: 0 16px; /* Plus d'espace sur les bords de l'écran */
+  gap: 12px; /* Espacement harmonieux entre le robot, le niveau, etc. */
+  transition: background 0.5s ease;
+  touch-action: auto;
 }
 #mobile-nav.visible { display: flex; }
 
-/* Kana-kun — fixe à gauche */
+/* Kana-kun — fixe à gauche, plus grand */
 #mobile-nav .mn-kanakun {
-  font-size: 28px;
+  font-size: 36px;
   flex-shrink: 0;
   cursor: pointer;
-  filter: drop-shadow(0 1px 4px rgba(168,85,247,.4));
-  margin-right: 6px;
+  filter: drop-shadow(0 1px 6px rgba(168,85,247,.5));
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  touch-action: auto;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
-/* Niveau — centre, flex:1 */
+
+/* Niveau — groupé à gauche près du robot */
 #mobile-nav .mn-level {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  height: 100%;
+}
+
+/* L'emoji de niveau dans la nav */
+#mobile-nav .mn-level .mn-lv-emoji {
+  font-size: 28px;
+  line-height: 1;
+  display: block;
+}
+#mobile-nav .mn-level .mn-lv-num {
+  font-family: 'Fredoka One', cursive;
+  font-size: 11px;
+  color: var(--text-mid);
+  font-weight: 900;
+  letter-spacing: .3px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Score — flex:1, centré, bien visible */
+#mobile-nav .mn-score {
   flex: 1;
   font-family: 'Fredoka One', cursive;
-  font-size: clamp(12px, 3.5vw, 15px);
-  color: var(--sky);
-  text-align: center;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  padding: 0 4px;
-}
-/* Score — à droite du level */
-#mobile-nav .mn-score {
-  font-family: 'Fredoka One', cursive;
-  font-size: clamp(15px, 4.5vw, 20px);
+  font-size: clamp(20px, 6vw, 28px);
   color: var(--neon-violet);
-  text-shadow: 0 0 8px rgba(0,102,255,.2);
-  flex-shrink: 0;
-  min-width: 52px;
-  text-align: right;
-  margin-right: 8px;
+  text-shadow: 0 0 10px rgba(0,102,255,.25), 0 1px 0 rgba(255,255,255,.6);
+  text-align: center;
 }
 #mobile-nav .mn-score.bump { animation: scoreBump .38s ease; }
 
-/* Next kana — coin droit, avec ses animations */
+/* Next kana — coin droit */
 #mobile-nav .mn-next {
   flex-shrink: 0;
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background: white;
-  border: 2.5px solid var(--border);
-  box-shadow: 0 3px 10px rgba(0,170,238,.15), inset 0 1px 0 rgba(255,255,255,.9);
+  background: rgba(255,255,255,.85);
+  border: none;
+  box-shadow: 0 4px 14px rgba(0,0,0,.18), 0 1px 3px rgba(0,0,0,.1), inset 0 1px 0 rgba(255,255,255,.9);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2523,7 +2578,10 @@ body.mobile-ingame #word-panel {
     <!-- Top-bar HUD (remplace la sidebar desktop) -->
     <div id="tuto-hud">
       <span class="th-kanakun">🤖</span>
-      <span class="th-level" id="tuto-hud-level">Niveau 1 🌊</span>
+      <span class="th-level" id="tuto-hud-level">
+        <span class="th-lv-emoji" id="tuto-hud-lv-emoji">🌊</span>
+        <span class="th-lv-num" id="tuto-hud-lv-num">Niv. 1</span>
+      </span>
       <span class="th-score" id="tuto-hud-score">0</span>
       <div class="th-next" id="tuto-hud-next">？</div>
     </div>
@@ -2548,6 +2606,7 @@ body.mobile-ingame #word-panel {
 
   <!-- Bulle fixe centre écran, fond blanc translucide -->
   <div id="tuto-bubble" class="hidden">
+    <span id="tuto-bubble-robot">🤖</span>
     <div id="tuto-bubble-text"></div>
     <div id="tuto-bubble-arrow" class="hidden"></div>
     <button id="tuto-start-btn" class="hidden" onclick="startFromTuto()">C'est parti ! 🚀</button>
@@ -2595,10 +2654,10 @@ body.mobile-ingame #word-panel {
 
 <!-- ═══ MOBILE NAV (in-game) ═══ -->
 <div id="mobile-nav">
-  <span class="mn-kanakun" onclick="document.getElementById('bot-panel').style.display==='flex'?document.getElementById('bot-toggle').click():document.getElementById('bot-toggle').click()">🤖</span>
-  <span class="mn-level" id="mn-level-text">Lv.1 🐬</span>
+  <span class="mn-kanakun" onclick="window._toggleBotPanel()">🤖</span>
   <span class="mn-score" id="mn-score-val">0</span>
-  <span class="mn-next" id="mn-next-kana">？</span>
+   <span class="mn-level" id="mn-level-text"><span class="mn-lv-emoji" id="mn-lv-emoji">🌊</span><span class="mn-lv-num" id="mn-lv-num">Lv. 1</span></span>
+ <span class="mn-next" id="mn-next-kana">？</span>
 </div>
 
 <!-- ═══ JEU ═══ -->
@@ -4363,8 +4422,12 @@ const nextW = LEVEL_WORDS_LOCAL[wordIntroIdx];
       }
     }
     // Sync navbar mobile
-    const _mnLv=document.getElementById('mn-level-text');
-    if(_mnLv) _mnLv.textContent=`Lv.${lvlData.id} ${lvlData.emoji} ${lvlData.theme}`;
+    // Sync navbar mobile — sous-éléments séparés (sans écraser le HTML)
+    const _mnLvEmoji = document.getElementById('mn-lv-emoji');
+    const _mnLvNum   = document.getElementById('mn-lv-num');
+    if(_mnLvEmoji) _mnLvEmoji.textContent = lvlData.emoji;
+    if(_mnLvNum)   _mnLvNum.textContent   = 'Lv. ' + lvlData.id;
+    if(typeof _applyNavTint === 'function') _applyNavTint(lvlData.id);
     if(puzzleMode){
       rebuildPool();
       dom.wordPanelEl.innerHTML='';
@@ -4762,6 +4825,13 @@ function _showTutoBubble(text, arrow){
   }
   // Re-trigger animation
   b.style.animation='none'; void b.offsetWidth; b.style.animation='bubbleIn .35s cubic-bezier(.34,1.56,.64,1) forwards';
+  // Fluent 3D sur la bulle et le HUD
+  if(typeof fluent==='function'){
+    setTimeout(()=>{
+      fluent(document.getElementById('tuto-bubble'));
+      fluent(document.getElementById('tuto-hud'));
+    },30);
+  }
 }
 function _hideTutoBubble(){ document.getElementById('tuto-bubble').classList.add('hidden'); }
 
@@ -5925,6 +5995,9 @@ const BOT={
 };
 
 // ── UI Bot → panneau navigation robot ──
+// Stub anticipé : défini avant le IIFE pour que le onclick HTML puisse l'appeler
+window._toggleBotPanel = function(){ /* sera remplacé par le IIFE ci-dessous */ };
+
 (()=>{
   const ui=document.createElement('div');
   ui.id='bot-ui';
@@ -5945,10 +6018,6 @@ const BOT={
       <button id="bot-nav-wof" style="background:linear-gradient(135deg,#6d28d9,#9333ea);border:none;border-radius:14px;color:#fff;padding:10px 14px;font-size:13px;font-family:'Nunito',sans-serif;font-weight:900;cursor:pointer;width:100%;text-align:left;display:flex;align-items:center;gap:9px;transition:transform .15s,box-shadow .15s;box-shadow:0 3px 12px rgba(109,40,217,.4);">
         <span style="font-size:20px;">🏆</span>
         <div><div style="font-size:13px;">Wall of Fame</div><div style="font-size:10px;opacity:.75;font-weight:700;">Voir le classement Top 25</div></div>
-      </button>
-      <button id="bot-nav-keys" style="background:linear-gradient(135deg,#4c1d95,#7c3aed);border:none;border-radius:14px;color:#fff;padding:10px 14px;font-size:13px;font-family:'Nunito',sans-serif;font-weight:900;cursor:pointer;width:100%;text-align:left;display:flex;align-items:center;gap:9px;transition:transform .15s,box-shadow .15s;box-shadow:0 3px 12px rgba(76,29,149,.4);">
-        <span style="font-size:20px;">⚙️</span>
-        <div><div style="font-size:13px;">Config touches</div><div style="font-size:10px;opacity:.75;font-weight:700;">Personnaliser les contrôles</div></div>
       </button>
       <button id="bot-nav-stats" style="background:linear-gradient(135deg,#2e1065,#4c1d95);border:none;border-radius:14px;color:#fff;padding:10px 14px;font-size:13px;font-family:'Nunito',sans-serif;font-weight:900;cursor:pointer;width:100%;text-align:left;display:flex;align-items:center;gap:9px;transition:transform .15s,box-shadow .15s;box-shadow:0 3px 12px rgba(46,16,101,.4);">
         <span style="font-size:20px;">📊</span>
@@ -5975,7 +6044,7 @@ const BOT={
   });
 
   // Hover effect on nav buttons
-  ['bot-nav-tuto','bot-nav-wof','bot-nav-keys','bot-nav-stats'].forEach(id=>{
+  ['bot-nav-tuto','bot-nav-wof','bot-nav-stats'].forEach(id=>{
     const btn=document.getElementById(id);
     btn.addEventListener('mouseenter',()=>{btn.style.transform='translateX(-3px) scale(1.02)';});
     btn.addEventListener('mouseleave',()=>{btn.style.transform='';});
@@ -5983,8 +6052,28 @@ const BOT={
 
   document.getElementById('bot-nav-tuto').addEventListener('click',()=>{panel.style.display='none';toggle.style.transform='';toggle.style.boxShadow='0 3px 14px rgba(168,85,247,.5)';showTuto();});
   document.getElementById('bot-nav-wof').addEventListener('click',()=>{panel.style.display='none';toggle.style.transform='';toggle.style.boxShadow='0 3px 14px rgba(168,85,247,.5)';showWallOfFame();});
-  document.getElementById('bot-nav-keys').addEventListener('click',()=>{panel.style.display='none';toggle.style.transform='';toggle.style.boxShadow='0 3px 14px rgba(168,85,247,.5)';showKeybinds();});
+
   document.getElementById('bot-nav-stats').addEventListener('click',()=>{panel.style.display='none';toggle.style.transform='';toggle.style.boxShadow='0 3px 14px rgba(168,85,247,.5)';showStats();});
+
+  // Fonction globale pour ouvrir/fermer le panel depuis la nav in-game
+  window._toggleBotPanel = function(){
+    // En mode in-game, bot-ui est caché mais le panel est toujours dans le DOM
+    const open = panel.style.display === 'flex';
+    // Repositionner le panel en haut à gauche si on est en mode nav
+    const nav = document.getElementById('mobile-nav');
+    if(nav && nav.classList.contains('visible')){
+      panel.style.position = 'fixed';
+      panel.style.top = '58px';
+      panel.style.left = '8px';
+      panel.style.right = 'auto';
+      panel.style.bottom = 'auto';
+      panel.style.zIndex = '600';
+    }
+    panel.style.display = open ? 'none' : 'flex';
+    toggle.style.transform = open ? '' : 'rotate(15deg) scale(1.08)';
+    if(!open && typeof fluent==='function') setTimeout(()=>fluent(panel),50);
+  };
+
 })();
 
 
@@ -6501,11 +6590,7 @@ function _quizReveal(choiceIdx){
     soundWord();
     const card=document.getElementById('quiz-kana-card');
     const r=card.getBoundingClientRect();
-    burst(r.left+r.width/2,r.top+r.height/2,_quizStreak>=5?28:16,_quizStreak>=5?'boss':'combo');
-    if(_quizStreak%5===0){
-      setTimeout(()=>{burst(window.innerWidth/2,window.innerHeight*.4,40,'logo');burst(window.innerWidth/2,window.innerHeight*.4,25,'combo');},200);
-      soundLevelUp();
-    }
+    burst(r.left+r.width/2,r.top+r.height/2,16,'combo');
     if(_quizDone.size%10===0) setTimeout(_quizChangeBg,400);
   } else {
     _quizStreak=0;
@@ -6761,7 +6846,11 @@ function _statsRender(){
     cell.innerHTML=`<span class="stats-kana-char" style="${fs}">${kana}</span><span class="stats-kana-pct">${pt}</span>`;
     cell.addEventListener('mouseenter',e=>_statsShowTooltip(e,kana,s));
     cell.addEventListener('mouseleave',()=>document.getElementById('stats-tooltip').classList.add('hidden'));
-    cell.addEventListener('touchstart',e=>{e.preventDefault();_statsShowTooltip(e.touches[0],kana,s);},{passive:false});
+    // Appui long uniquement sur mobile (permet le scroll normal)
+    let _lpTimer=null;
+    cell.addEventListener('touchstart',e=>{_lpTimer=setTimeout(()=>{_statsShowTooltip(e.touches[0],kana,s);},400);},{passive:true});
+    cell.addEventListener('touchend',()=>{clearTimeout(_lpTimer);});
+    cell.addEventListener('touchmove',()=>{clearTimeout(_lpTimer);document.getElementById('stats-tooltip').classList.add('hidden');});
     grid.appendChild(cell);
   });
 }
@@ -6791,7 +6880,11 @@ function _statsRenderVocab(){
     cell.innerHTML=`<span style="font-size:clamp(32px,8.5vw,44px);line-height:1">${w.emoji}</span><span style="font-family:'Noto Sans JP',sans-serif;font-weight:900;font-size:clamp(14px,3.8vw,18px);color:#1a1040;margin-top:3px">${w.kana}</span><span class="stats-kana-pct" style="font-size:clamp(11px,2.8vw,13px)">${pt}</span>`;
     cell.addEventListener('mouseenter',e=>_statsShowTooltip(e,w.kana,s,w));
     cell.addEventListener('mouseleave',()=>document.getElementById('stats-tooltip').classList.add('hidden'));
-    cell.addEventListener('touchstart',e=>{e.preventDefault();_statsShowTooltip(e.touches[0],w.kana,s,w);},{passive:false});
+    // Appui long uniquement sur mobile (permet le scroll normal)
+    let _lpTimer2=null;
+    cell.addEventListener('touchstart',e=>{_lpTimer2=setTimeout(()=>{_statsShowTooltip(e.touches[0],w.kana,s,w);},400);},{passive:true});
+    cell.addEventListener('touchend',()=>{clearTimeout(_lpTimer2);});
+    cell.addEventListener('touchmove',()=>{clearTimeout(_lpTimer2);document.getElementById('stats-tooltip').classList.add('hidden');});
     grid.appendChild(cell);
   });
   // Fluent 3D sur les emojis de la grille vocabulaire
@@ -6894,10 +6987,42 @@ function splashEnter(){
 (function(){
   let _observers = [];
 
+  // Palette de teintes RGB par niveau (correspond aux --lv*-top existantes)
+  const NAV_TINTS = [
+    '180,235,255', // lv1  bleu mer
+    '255,235,195', // lv2  beige chaud
+    '205,255,200', // lv3  vert tendre
+    '255,230,195', // lv4  pêche
+    '240,200,255', // lv5  lavande
+    '195,225,255', // lv6  bleu ciel
+    '255,248,195', // lv7  citron doux
+    '205,255,200', // lv8  vert clair
+    '255,205,225', // lv9  rose
+    '195,255,225', // lv10 turquoise
+    '195,220,255', // lv11 bleu doux
+    '195,255,205', // lv12 vert eau
+    '255,225,200', // lv13 saumon clair
+    '220,195,255', // lv14 violet doux
+    '195,220,255', // lv15 bleu clair
+    '255,200,200', // lv16 rose pâle
+    '220,195,255', // lv17 lilas
+    '255,225,200', // lv18 abricot
+    '195,255,225', // lv19 menthe
+    '255,220,185', // lv20 orange pâle
+    '195,220,255', // lv21 bleu azur
+  ];
+
+  function _applyNavTint(levelId){
+    const idx = Math.max(0, Math.min((levelId||1)-1, NAV_TINTS.length-1));
+    document.documentElement.style.setProperty('--nav-tint-rgb', NAV_TINTS[idx]);
+  }
+  window._applyNavTint = _applyNavTint;
+
   function syncNav(){
     const mnScore = document.getElementById('mn-score-val');
     const mnNext  = document.getElementById('mn-next-kana');
-    const mnLevel = document.getElementById('mn-level-text');
+    const mnLvEmoji = document.getElementById('mn-lv-emoji');
+    const mnLvNum   = document.getElementById('mn-lv-num');
     if(!mnScore) return;
 
     const scoreEl = document.getElementById('score-val');
@@ -6924,14 +7049,21 @@ function splashEnter(){
         mnNext.classList.add('pop');
       }
     }
-    if(badgeEl && mnLevel){
-      // Extraire emoji + numéro de niveau
-      const num = badgeEl.querySelector('.badge-num');
-      const emoji = badgeEl.querySelector('.badge-emoji');
-      if(num && emoji){
-        mnLevel.textContent = num.textContent + ' ' + emoji.textContent;
-      } else {
-        mnLevel.textContent = badgeEl.textContent.replace(/\s+/g,' ').trim();
+    if(badgeEl && mnLvEmoji && mnLvNum){
+      const numEl  = badgeEl.querySelector('.badge-num');
+      const emojiEl = badgeEl.querySelector('.badge-emoji');
+      if(emojiEl) {
+        // Fluent 3D remplace le texte emoji par une <img> — lire l'attribut alt
+        const img = emojiEl.querySelector('img');
+        const emojiChar = img ? img.alt : emojiEl.textContent.trim();
+        if(emojiChar) mnLvEmoji.textContent = emojiChar;
+      }
+      if(numEl) {
+        // Extraire uniquement le numéro → "Lv. X"
+        const numText = numEl.textContent.trim();
+        const match = numText.match(/\d+/);
+        mnLvNum.textContent = match ? 'Lv. ' + match[0] : numText;
+        if(match) _applyNavTint(parseInt(match[0]));
       }
     }
   }
@@ -6940,6 +7072,22 @@ function splashEnter(){
     const nav = document.getElementById('mobile-nav');
     if(nav) nav.classList.add('visible');
     document.body.classList.add('mobile-ingame');
+
+    // Sync immédiat
+    syncNav();
+
+    // Observer le score, le badge de niveau et le next kana
+    const targets = [
+      document.getElementById('score-val'),
+      document.getElementById('level-badge'),
+      document.getElementById('next-kana'),
+    ];
+    targets.forEach(el => {
+      if(!el) return;
+      const obs = new MutationObserver(() => syncNav());
+      obs.observe(el, { childList: true, subtree: true, characterData: true, attributes: true });
+      _observers.push(obs);
+    });
   };
   window._mobileNavHide = function(){
     const nav = document.getElementById('mobile-nav');
@@ -6996,7 +7144,9 @@ function fluent(el) {
                        'stats-grid','quiz-streak-display','quiz-progress-text',
                        'quiz-score-display','tt-kana','tt-good','tt-bad','tt-tests',
                        'tt-streak','tt-date','st-emoji','st-name','st-score',
-                       'score-val','next-kana','level-badge'];
+                       'score-val','next-kana','level-badge',
+                       'mn-score-val','mn-next-kana','mn-lv-emoji','mn-lv-num',
+                       'tuto-hud-next','tuto-hud-score','tuto-hud-lv-emoji','tuto-hud-lv-num'];
       let p = node.parentElement;
       while (p && p !== el) {
         if (skipIds.includes(p.id)) return NodeFilter.FILTER_REJECT;
@@ -7060,6 +7210,7 @@ function applyFluent() {
   fluent(document.getElementById('menu-overlay'));
   fluent(document.getElementById('mobile-nav'));
   fluent(document.getElementById('tuto-overlay'));
+  fluent(document.getElementById('tuto-hud'));
 
   // Zones partiellement dynamiques — on exclut les sous-éléments JS via skipIds dans fluent()
   fluent(document.getElementById('mode-overlay'));
