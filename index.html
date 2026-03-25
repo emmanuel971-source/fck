@@ -1784,6 +1784,14 @@ flex: 0 0 42%;
 
 #board-overlay.hidden { display: none; }
 
+/* Masquer le word-panel et le side-panel quand l'overlay de fin de niveau est actif */
+#shell:has(#board-overlay:not(.hidden)) #word-panel,
+#shell:has(#board-overlay:not(.hidden)) #side-panel {
+  visibility: hidden;
+  pointer-events: none;
+  transition: visibility 0s;
+}
+
 .ov-title {
   font-family: 'Fredoka One', cursive;
   font-size: clamp(28px, 8.5vw, 44px);
