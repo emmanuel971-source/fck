@@ -1239,6 +1239,7 @@ body::before {
   justify-content: space-between;
   padding: 0 16px;
   gap: 12px;
+background: rgba(var(--nav-tint-rgb, 200,240,255), 0.45); /* Comme #mobile-nav */
 }
 /* Robot à gauche */
 #tuto-hud .th-kanakun {
@@ -1319,8 +1320,8 @@ body::before {
 #tuto-score { display: none; }
 
 #tuto-word-panel {
-  background: rgba(255,244,224,.95);
-  border-top: 3px solid rgba(255,160,60,.4);
+  background: var(--surface); /* Comme #word-panel */
+  border-top: 3px solid var(--border);
   flex: 0 0 42%;
   padding: 8px 8px 10px;
   display: flex;
@@ -2459,7 +2460,7 @@ body.mobile-ingame #word-panel {
   <div id="mode-panel-puzzle" class="mode-panel" style="display:none;margin-top:10px;padding:0 16px;">
     <div class="mode-panel-hint">Choisis la difficulté</div>
     <div id="mode-sn-cards" style="display:flex;flex-direction:column;gap:11px;"></div>
-    <button class="mode-back-btn" style="margin-top:10px" onclick="document.getElementById('mode-panel-puzzle').style.display='none'">← Retour</button>
+    <button class="mode-back-btn" style="margin-top:10px" onclick="hidePuzzlePanel()">← Retour</button>
   </div>
   <!-- Panels cachés pour compatibilité JS -->
   <div id="mode-panel-standard" class="mode-panel" style="display:none"></div>
@@ -3437,7 +3438,7 @@ function puzzleGenerate(levelIdx, snDef, customRows){
     const card=document.createElement('div');
     card.className='lvl-card';
     card.style.cssText=`--lc:${lvl.color};border-color:${lvl.color}55;`;
-    const chips=lvl.words.slice(0,4).map(w=>`<span class="lvl-card-word-chip">${w.kana}</span>`).join('');
+    const chips=lvl.words.map(w=>`<span class="lvl-card-word-chip">${w.kana}</span>`).join('');
     card.innerHTML=`
       <div class="lvl-card-left">
         <div class="lvl-card-emoji">${lvl.emoji}</div>
@@ -4860,6 +4861,9 @@ function _tutoWordPanel(kana,romaji,meaning,emoji,replace){
   const row='<div class="word-row" id="tuto-wr-'+kana+'"><div class="wr-emoji">'+emoji+'</div><div class="wr-info"><span class="wr-kana">'+kana+'</span><span class="wr-romaji">'+romaji+'</span><span class="wr-meaning">'+meaning+'</span></div><div class="wr-mult">\xd71</div></div>';
   if(replace) wp.innerHTML=row;
   else wp.innerHTML+=row;
+  
+  // NOUVEAU : On applique Fluent 3D au panel du tuto !
+  if(typeof fluent === 'function') setTimeout(() => fluent(wp), 40);
 }
 function _tutoValidateWord(kana){
   const row=document.getElementById('tuto-wr-'+kana);
@@ -6655,6 +6659,7 @@ function _quizReveal(choiceIdx){
     document.getElementById('quiz-reveal-word-meaning').textContent=item.meaning;
     // Auto-fit : réduire jusqu'à tenir dans la largeur
     requestAnimationFrame(()=>_quizFitWordEl(wordEl));
+    setTimeout(()=>speakWord(item.kana, false), 300);
   } else {
     // MODE HIRAGANA : exploser le kana puis montrer l'emoji du mot exemple
     const kana=item.kana;
@@ -6989,11 +6994,21 @@ if(typeof player1 !== 'undefined') player1.triggerCalcRows();
 
 // ═══ PUZZLE PANEL MOBILE ═══
 function showPuzzlePanel(){
+  // On cache le menu de base
+  document.querySelector('.mode-grid-2x2').style.display = 'none';
+  
   const panelPzl = document.getElementById('mode-panel-puzzle');
   if(panelPzl){
     panelPzl.style.display = 'flex';
     panelPzl.style.flexDirection = 'column';
+    panelPzl.style.margin = '20px auto'; // On le centre bien
   }
+}
+
+// Ajoute cette nouvelle fonction juste en dessous pour le bouton retour :
+function hidePuzzlePanel(){
+  document.getElementById('mode-panel-puzzle').style.display = 'none';
+  document.querySelector('.mode-grid-2x2').style.display = 'grid'; // On réaffiche le menu
 }
 // ═══ MOBILE SPLASH ═══
 function splashEnter(){
@@ -7076,7 +7091,9 @@ function splashEnter(){
         // Fluent 3D remplace le texte emoji par une <img> — lire l'attribut alt
         const img = emojiEl.querySelector('img');
         const emojiChar = img ? img.alt : emojiEl.textContent.trim();
-        if(emojiChar) mnLvEmoji.textContent = emojiChar;
+        if(emojiChar) {
+  mnLvEmoji.innerHTML = `<img src="${_fluentUrl(emojiChar)}" class="femoji" alt="${emojiChar}" onerror="this.replaceWith(document.createTextNode('${emojiChar}'))">`;
+}
       }
       if(numEl) {
         // Extraire uniquement le numéro → "Lv. X"
