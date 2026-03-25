@@ -109,6 +109,7 @@ body::before {
   /* contain:strict bloque le backdrop-filter → on utilise layout+style */
   contain: layout style;
   will-change: contents;
+  will-change: transform;  /* ← stabilise le calque du board entier */
 }
 
 .cell{
@@ -132,9 +133,7 @@ body::before {
   box-shadow: 0 3px 0 rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.7);
   animation: activePulse .65s ease infinite alternate;
   
-  /* --- AJOUTS POUR L'OPTIMISATION --- */
-  will-change: transform, opacity, background-color;
-  transform: translateZ(0); /* Force la création d'un calque GPU dédié */
+
 }
 @keyframes activePulse{from{transform:scale(1);opacity:.92}to{transform:scale(1.06);opacity:1}}
 .cell.ghost{background:rgba(0,0,0,.04);border:1.5px dashed rgba(0,0,0,.15)!important;color:rgba(0,0,0,.2);border-radius:6px;}
