@@ -6915,7 +6915,10 @@ function _statsRenderVocab(){
     let sc='untested',pt='';
     if(s&&s.tests>0){ const r=s.correct/s.tests; sc=r>=0.8?'mastered':r>=0.4?'learning':'struggling'; pt=Math.round(r*100)+'%'; }
     cell.classList.add(sc);
-    cell.innerHTML=`<span style="font-size:clamp(32px,8.5vw,44px);line-height:1">${w.emoji}</span><span style="font-family:'Noto Sans JP',sans-serif;font-weight:900;font-size:clamp(14px,3.8vw,18px);color:#1a1040;margin-top:3px">${w.kana}</span><span class="stats-kana-pct" style="font-size:clamp(11px,2.8vw,13px)">${pt}</span>`;
+    const fUrl=typeof _fluentUrl==='function'?_fluentUrl(w.emoji):'';
+    const eImg=fUrl?`<img src="${fUrl}" alt="${w.emoji}" style="height:clamp(32px,8.5vw,44px);width:auto;display:block" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`:'';
+    const eFb=`<span style="font-size:clamp(32px,8.5vw,44px);line-height:1;display:${fUrl?'none':'block'}">${w.emoji}</span>`;
+    cell.innerHTML=`${eImg}${eFb}<span style="font-family:'Noto Sans JP',sans-serif;font-weight:900;font-size:clamp(14px,3.8vw,18px);color:#1a1040;margin-top:3px">${w.kana}</span><span class="stats-kana-pct" style="font-size:clamp(11px,2.8vw,13px)">${pt}</span>`;
     cell.addEventListener('mouseenter',e=>_statsShowTooltip(e,w.kana,s,w));
     cell.addEventListener('mouseleave',()=>document.getElementById('stats-tooltip').classList.add('hidden'));
     // Appui long uniquement sur mobile (permet le scroll normal)
@@ -6925,8 +6928,7 @@ function _statsRenderVocab(){
     cell.addEventListener('touchmove',()=>{clearTimeout(_lpTimer2);document.getElementById('stats-tooltip').classList.add('hidden');});
     grid.appendChild(cell);
   });
-  // Fluent 3D sur les emojis de la grille vocabulaire
-  if(typeof fluent==='function') setTimeout(()=>fluent(grid),80);
+  // Note : les emojis sont injectés directement via _fluentUrl(), fluent() n'est plus nécessaire ici
 }
 
 function _statsShowTooltip(e, kana, s, word){
@@ -7167,7 +7169,8 @@ const FLUENT_BASE = 'https://uwx.github.io/fluentui-twemoji-3d/export/3D_png/72x
 function _fluentUrl(emoji) { return FLUENT_BASE + _emojiToCP(emoji) + '.png'; }
 
 // Cache des emojis dont l'image est absente → repli sur l'emoji natif
-const _fluentFailed = new Set();
+// Pré-rempli avec les emojis Unicode 15.0+ absents du repo fluentui-twemoji-3d
+const _fluentFailed = new Set(['🫛']); // U+1FADB pea pod — Unicode 15.1, absent du repo
 
 // Détecte si un graphème est un emoji (exclut les ASCII 0-9, #, *)
 const _emojiRe = /\p{Emoji}/u;
