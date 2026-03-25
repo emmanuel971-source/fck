@@ -477,7 +477,8 @@ body::before {
 
 #word-panel{
   background:var(--surface);border-top:3px solid var(--border);
-  flex-shrink:0;padding:8px 8px 10px;
+  flex-shrink:0; 
+  padding: 8px 8px max(15px, env(safe-area-inset-bottom));
   display:flex;flex-direction:column;gap:6px;
   max-height:42dvh;overflow-y:auto;
   padding-top:10px;
@@ -552,7 +553,7 @@ body::before {
 .word-row.boss.pending { border-color: #ff3d6d !important; }
 .word-row.boss.validated { border-color: #52c97a !important; }
 
-.wr-emoji{font-size:clamp(28px,8vw,36px);flex-shrink:0;line-height:1;}
+.wr-emoji{font-size:clamp(20px,1vw,20px);flex-shrink:0;line-height:1;}
 .wr-info{flex:1;min-width:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
 .wr-kana{font-size:clamp(22px,7vw,30px);font-weight:900;color:var(--text-dark);line-height:1;font-family:'Noto Sans JP',sans-serif;}
 .wr-romaji{font-size:clamp(17px,5vw,22px);color:var(--sky);font-weight:900;font-family:'Fredoka One',sans-serif;}
@@ -1322,8 +1323,8 @@ background: rgba(var(--nav-tint-rgb, 200,240,255), 0.45); /* Comme #mobile-nav *
 #tuto-word-panel {
   background: var(--surface); /* Comme #word-panel */
   border-top: 3px solid var(--border);
-  flex: 0 0 42%;
-  padding: 8px 8px 10px;
+flex: 0 0 42%;
+  padding: 8px 8px max(15px, env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -2303,7 +2304,9 @@ body.mobile-ingame #word-panel {
   color: var(--text-dark);
 }
 #mobile-nav .mn-next.pop { animation: nextPop .28s ease forwards; }
-
+body:has(#tuto-overlay:not(.hidden)) #bot-ui {
+    display: none !important;
+}
 </style>
 </head>
 <body>
@@ -2465,7 +2468,7 @@ body.mobile-ingame #word-panel {
   <!-- Panels cachés pour compatibilité JS -->
   <div id="mode-panel-standard" class="mode-panel" style="display:none"></div>
 
-  <button class="mode-back-btn" style="margin-top:14px" onclick="modeBack()">← Retour aux niveaux</button>
+  <button id="btn-retour-niveaux" class="mode-back-btn" style="margin-top:14px" onclick="modeBack()">← Retour aux niveaux</button>
 </div>
 
 <!-- ═══ QUIZ OVERLAY ═══ -->
@@ -2597,13 +2600,13 @@ body.mobile-ingame #word-panel {
   <!-- Shell de jeu intégré dans le tuto (clone visuel) -->
   <div id="tuto-shell">
     <!-- Top-bar HUD (remplace la sidebar desktop) -->
-    <div id="tuto-hud">
+<div id="tuto-hud">
       <span class="th-kanakun">🤖</span>
+      <span class="th-score" id="tuto-hud-score">0</span>
       <span class="th-level" id="tuto-hud-level">
         <span class="th-lv-emoji" id="tuto-hud-lv-emoji">🌊</span>
-        <span class="th-lv-num" id="tuto-hud-lv-num">Niv. 1</span>
+        <span class="th-lv-num" id="tuto-hud-lv-num">Lv. 1</span>
       </span>
-      <span class="th-score" id="tuto-hud-score">0</span>
       <div class="th-next" id="tuto-hud-next">？</div>
     </div>
     <div id="tuto-middle">
@@ -6994,21 +6997,23 @@ if(typeof player1 !== 'undefined') player1.triggerCalcRows();
 
 // ═══ PUZZLE PANEL MOBILE ═══
 function showPuzzlePanel(){
-  // On cache le menu de base
+  // On cache le menu de base et le bouton de retour global
   document.querySelector('.mode-grid-2x2').style.display = 'none';
+  document.getElementById('btn-retour-niveaux').style.display = 'none';
   
   const panelPzl = document.getElementById('mode-panel-puzzle');
   if(panelPzl){
     panelPzl.style.display = 'flex';
     panelPzl.style.flexDirection = 'column';
-    panelPzl.style.margin = '20px auto'; // On le centre bien
+    panelPzl.style.margin = '20px auto'; 
   }
 }
 
-// Ajoute cette nouvelle fonction juste en dessous pour le bouton retour :
 function hidePuzzlePanel(){
   document.getElementById('mode-panel-puzzle').style.display = 'none';
-  document.querySelector('.mode-grid-2x2').style.display = 'grid'; // On réaffiche le menu
+  // On réaffiche le menu et le bouton de retour global
+  document.querySelector('.mode-grid-2x2').style.display = 'grid'; 
+  document.getElementById('btn-retour-niveaux').style.display = 'block'; 
 }
 // ═══ MOBILE SPLASH ═══
 function splashEnter(){
