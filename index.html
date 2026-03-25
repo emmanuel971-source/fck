@@ -106,9 +106,16 @@ body::before {
   border-right: 2px solid rgba(255,255,255,.35);
   border-top: 2px solid rgba(255,255,255,.35);
   overflow: hidden;
-  /* contain:strict bloque le backdrop-filter → on utilise layout+style */
+  
+  /* SUPPRIME OU COMMENTE CES DEUX LIGNES :
   contain: layout style;
-  will-change: contents;
+  will-change: contents; 
+  */
+
+  /* AJOUTE CECI : Force le calque GPU et empêche le "clipping" du flou */
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .cell{
