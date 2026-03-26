@@ -6062,7 +6062,11 @@ window._toggleBotPanel = function(){ /* sera remplacé par le IIFE ci-dessous */
         <span style="font-size:20px;">📊</span>
         <div><div style="font-size:13px;">Mes stats Quiz</div><div style="font-size:10px;opacity:.75;font-weight:700;">Progression kana</div></div>
       </button>
-      <div style="text-align:center;color:#7c6a9a;font-size:10px;padding-top:2px;">🌸 かなDROP · Kana-kun</div>
+      <button id="bot-nav-install" style="background:linear-gradient(135deg,#0ea5e9,#0066ff);border:none;border-radius:14px;color:#fff;padding:10px 14px;font-size:13px;font-family:'Nunito',sans-serif;font-weight:900;cursor:pointer;width:100%;text-align:left;display:none;align-items:center;gap:9px;transition:transform .15s,box-shadow .15s;box-shadow:0 3px 12px rgba(0,102,255,.4);">
+  <span style="font-size:20px;">📲</span>
+  <div><div style="font-size:13px;">Installer l'app</div><div style="font-size:10px;opacity:.75;font-weight:700;">Ajouter à l'écran d'accueil</div></div>
+</button>
+<div style="text-align:center;color:#7c6a9a;font-size:10px;padding-top:2px;">🌸 かなDROP · Kana-kun</div>
     </div>
     <button id="bot-toggle" style="background:linear-gradient(135deg,#a855f7,#4d96ff);border:none;border-radius:50%;width:46px;height:46px;font-size:22px;cursor:pointer;box-shadow:0 3px 14px rgba(168,85,247,.5);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;" title="Menu Kana-kun">🤖</button>
   `;
@@ -6091,9 +6095,32 @@ window._toggleBotPanel = function(){ /* sera remplacé par le IIFE ci-dessous */
 
   document.getElementById('bot-nav-tuto').addEventListener('click',()=>{panel.style.display='none';toggle.style.transform='';toggle.style.boxShadow='0 3px 14px rgba(168,85,247,.5)';showTuto();});
   document.getElementById('bot-nav-wof').addEventListener('click',()=>{panel.style.display='none';toggle.style.transform='';toggle.style.boxShadow='0 3px 14px rgba(168,85,247,.5)';showWallOfFame();});
-
   document.getElementById('bot-nav-stats').addEventListener('click',()=>{panel.style.display='none';toggle.style.transform='';toggle.style.boxShadow='0 3px 14px rgba(168,85,247,.5)';showStats();});
+// PWA Install
+let _deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  _deferredPrompt = e;
+  const btn = document.getElementById('bot-nav-install');
+  if(btn) btn.style.display = 'flex';
+});
 
+document.getElementById('bot-nav-install').addEventListener('click', async () => {
+  if(!_deferredPrompt) return;
+  _deferredPrompt.prompt();
+  const { outcome } = await _deferredPrompt.userChoice;
+  if(outcome === 'accepted') {
+    document.getElementById('bot-nav-install').style.display = 'none';
+  }
+  _deferredPrompt = null;
+  panel.style.display = 'none';
+});
+
+window.addEventListener('appinstalled', () => {
+  const btn = document.getElementById('bot-nav-install');
+  if(btn) btn.style.display = 'none';
+  _deferredPrompt = null;
+});
   // Fonction globale pour ouvrir/fermer le panel depuis la nav in-game
   window._toggleBotPanel = function(){
     // En mode in-game, bot-ui est caché mais le panel est toujours dans le DOM
