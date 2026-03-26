@@ -2,9 +2,8 @@ const CACHE = 'kanadrop-v1';
 const ASSETS = [
   './',
   './index.html',
-  'https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&family=Noto+Sans+JP:wght@400;700;900&family=Black+Han+Sans&display=swap'
+  './manifest.json' // Ajoute le manifeste ici, Android apprécie
 ];
-
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE).then(c => c.addAll(ASSETS))
