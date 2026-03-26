@@ -6106,14 +6106,20 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 
 document.getElementById('bot-nav-install').addEventListener('click', async () => {
-  if(!_deferredPrompt) return;
-  _deferredPrompt.prompt();
-  const { outcome } = await _deferredPrompt.userChoice;
-  if(outcome === 'accepted') {
-    document.getElementById('bot-nav-install').style.display = 'none';
+  if(_deferredPrompt) {
+    _deferredPrompt.prompt();
+    const { outcome } = await _deferredPrompt.userChoice;
+    if(outcome === 'accepted') {
+      document.getElementById('bot-nav-install').style.display = 'none';
+    }
+    _deferredPrompt = null;
+    panel.style.display = 'none';
+  } else {
+    panel.style.display = 'none';
+    setTimeout(() => {
+      alert('Pour installer かなDROP :\n\n📱 Android → menu ⋮ en haut à droite → "Installer l\'application"\n\n🍎 iPhone → bouton Partager ↑ → "Sur l\'écran d\'accueil"');
+    }, 200);
   }
-  _deferredPrompt = null;
-  panel.style.display = 'none';
 });
 
 window.addEventListener('appinstalled', () => {
