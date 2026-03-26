@@ -7358,9 +7358,15 @@ window.addEventListener('load', () => setTimeout(applyFluent, 400));
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js');
+      navigator.serviceWorker.register('./sw.js', { scope: './' })
+        .then(reg => {
+          console.log('Félicitations ! SW enregistré avec succès au scope :', reg.scope);
+        })
+        .catch(err => {
+          console.error('Zut, l’enregistrement du SW a échoué :', err);
+        });
     });
   }
-</script>  
+</script>
 </body>
 </html>
