@@ -2,7 +2,7 @@
   "name": "かなDROP",
   "short_name": "かなDROP",
   "description": "Jeu d'apprentissage des kana japonais",
-  "start_url": "./index.html",
+  "start_url": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#d4f4ff",
