@@ -6,7 +6,19 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js', { scope: './' })
+        .then(reg => {
+          console.log('Félicitations ! SW enregistré avec succès au scope :', reg.scope);
+        })
+        .catch(err => {
+          console.error('Zut, l’enregistrement du SW a échoué :', err);
+        });
+    });
+  }
+</script>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>かなDROP ✨</title>
@@ -7359,18 +7371,6 @@ window.addEventListener('load', () => setTimeout(applyFluent, 400));
 })();
 
 </script>
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js', { scope: './' })
-        .then(reg => {
-          console.log('Félicitations ! SW enregistré avec succès au scope :', reg.scope);
-        })
-        .catch(err => {
-          console.error('Zut, l’enregistrement du SW a échoué :', err);
-        });
-    });
-  }
-</script>
+
 </body>
 </html>
