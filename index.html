@@ -7243,33 +7243,37 @@ function _statsRenderVocab(){
 
 function _statsShowTooltip(e, kana, s, vocabEntry){
   const tt = document.getElementById('stats-tooltip');
+  // Si pas de stats, on cache
   if(!s || (s.tests===0 && !s.correct && !s.wrong)){ tt.classList.add('hidden'); return; }
   
   const ttKana = document.getElementById('tt-kana');
   
   if(vocabEntry) {
-    // Mode Vocabulaire : afficher les deux écritures si elles existent
-    const fUrl = _fluentUrl(vocabEntry.emoji);
-    const imgHtml = `<img src="${fUrl}" class="femoji" alt="${vocabEntry.emoji}" style="width:1em;height:1em;vertical-align:middle" onerror="this.replaceWith(document.createTextNode('${vocabEntry.emoji}'))">`;
+    // Mode Vocabulaire : afficher l'émoji + les deux écritures si elles existent
+    const fUrl = typeof _fluentUrl==='function' ? _fluentUrl(vocabEntry.emoji) : '';
+    const imgHtml = fUrl ? `<img src="${fUrl}" class="femoji" alt="${vocabEntry.emoji}" style="width:1em;height:1em;vertical-align:middle" onerror="this.replaceWith(document.createTextNode('${vocabEntry.emoji}'))">` : vocabEntry.emoji;
     
     let wordsHtml = '';
-    if(vocabEntry.hira) wordsHtml += `<div style="font-size:20px;color:#c77dff;">${vocabEntry.hira}</div>`;
-    if(vocabEntry.kata) wordsHtml += `<div style="font-size:20px;color:#ff8c42;">${vocabEntry.kata}</div>`;
+    // On force la police japonaise pour que ce soit bien lisible
+    if(vocabEntry.hira) wordsHtml += `<div style="font-size:20px;color:#c77dff;font-family:'Noto Sans JP',sans-serif;font-weight:900;">${vocabEntry.hira}</div>`;
+    if(vocabEntry.kata) wordsHtml += `<div style="font-size:20px;color:#ff8c42;font-family:'Noto Sans JP',sans-serif;font-weight:900;">${vocabEntry.kata}</div>`;
     
     ttKana.innerHTML = `${imgHtml} <div style="display:flex;gap:10px;margin-top:4px;">${wordsHtml}</div>`;
     ttKana.style.display = 'flex';
     ttKana.style.flexDirection = 'column';
     ttKana.style.alignItems = 'center';
   } else {
-    // Mode Kana
+    // Mode Kana standard
     ttKana.textContent = kana;
     ttKana.style.display = 'block';
     ttKana.style.color = '#c77dff';
   }
   
-  document.getElementById('tt-good').textContent = s.correct;
-  document.getElementById('tt-bad').textContent = s.wrong;
+  // On ne garde que les bonnes et mauvaises réponses
+  document.getElementById('tt-good').textContent = s.correct || 0;
+  document.getElementById('tt-bad').textContent = s.wrong || 0;
 
+  // Calcul de la date
   let dateTxt = '';
   if(s.lastDate){
     try{
@@ -7283,29 +7287,45 @@ function _statsShowTooltip(e, kana, s, vocabEntry){
   document.getElementById('tt-date').textContent = dateTxt;
 
   tt.classList.remove('hidden');
+  
+  // Positionnement du popup
   const tx = Math.min(e.clientX+12, window.innerWidth-180);
   const ty = Math.min(e.clientY-10, window.innerHeight-160);
   tt.style.left = tx+'px';
   tt.style.top  = ty+'px';
 }
 
-function _statsShowTooltip(e, kana, s, word){
+function _statsShowTooltip(e, kana, s, vocabEntry){
   const tt = document.getElementById('stats-tooltip');
-  if(!s || s.tests===0){ tt.classList.add('hidden'); return; }
-  // Afficher emoji + kana ou juste kana
-const ttKana = document.getElementById('tt-kana');
-if(word) {
-  const fUrl = _fluentUrl(word.emoji);
-  ttKana.innerHTML = `<img src="${fUrl}" class="femoji" alt="${word.emoji}" style="width:1em;height:1em;vertical-align:middle" onerror="this.replaceWith(document.createTextNode('${word.emoji}'))"> ${kana}`;
-} else {
-  ttKana.textContent = kana;
-}
-  document.getElementById('tt-good').textContent = s.correct;
-  document.getElementById('tt-bad').textContent = s.wrong;
-  document.getElementById('tt-tests').textContent = s.tests;
-  document.getElementById('tt-streak').textContent = s.bestStreak||0;
+  if(!tt) return; // Sécurité au cas où le tooltip n'existe pas du tout
 
-  // Date formatée
+  // Si pas de stats, on cache
+  if(!s || (s.tests===0 && !s.correct && !s.wrong)){ 
+    tt.classList.add('hidden'); 
+    return; 
+  }
+  
+  // 1. Construction de l'en-tête (Mode Vocabulaire ou Mode Kana)
+  let headerHtml = '';
+  if(vocabEntry) {
+    const fUrl = typeof _fluentUrl==='function' ? _fluentUrl(vocabEntry.emoji) : '';
+    const imgHtml = fUrl ? `<img src="${fUrl}" class="femoji" alt="${vocabEntry.emoji}" style="width:1.2em;height:1.2em;vertical-align:middle" onerror="this.replaceWith(document.createTextNode('${vocabEntry.emoji}'))">` : vocabEntry.emoji;
+    
+    let wordsHtml = '';
+    if(vocabEntry.hira) wordsHtml += `<div style="font-size:20px;color:#c77dff;font-family:'Noto Sans JP',sans-serif;font-weight:900;">${vocabEntry.hira}</div>`;
+    if(vocabEntry.kata) wordsHtml += `<div style="font-size:20px;color:#ff8c42;font-family:'Noto Sans JP',sans-serif;font-weight:900;">${vocabEntry.kata}</div>`;
+    
+    headerHtml = `
+      <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:8px;border-bottom:1px solid rgba(0,0,0,0.1);padding-bottom:8px;">
+        <div style="font-size:32px;">${imgHtml}</div>
+        <div style="display:flex;gap:12px;margin-top:4px;">${wordsHtml}</div>
+      </div>
+    `;
+  } else {
+    headerHtml = `<div style="font-size:24px;color:#c77dff;text-align:center;margin-bottom:8px;font-family:'Noto Sans JP',sans-serif;font-weight:900;">${kana}</div>`;
+  }
+
+  // 2. Calcul de la date
   let dateTxt = '';
   if(s.lastDate){
     try{
@@ -7314,12 +7334,26 @@ if(word) {
       else if(diff===1) dateTxt='Testé hier';
       else if(diff<7) dateTxt=`Il y a ${diff} jours`;
       else dateTxt=d.toLocaleDateString('fr-FR');
-    }catch(e){ dateTxt=''; }
+    }catch(err){ dateTxt=''; }
   }
-  document.getElementById('tt-date').textContent = dateTxt;
+
+  // 3. Injection directe de tout le HTML (Zéro risque d'erreur "null")
+  tt.innerHTML = `
+    ${headerHtml}
+    <div class="tt-row" style="display:flex;justify-content:space-between;margin-bottom:4px;">
+      <span>✅ Bonnes</span> 
+      <span style="font-weight:bold;color:var(--mint, #2ed8a0);">${s.correct || 0}</span>
+    </div>
+    <div class="tt-row" style="display:flex;justify-content:space-between;margin-bottom:8px;">
+      <span>❌ Ratés</span> 
+      <span style="font-weight:bold;color:var(--coral, #ff4d6d);">${s.wrong || 0}</span>
+    </div>
+    <div class="tt-date" style="font-size:11px;color:#888;text-align:right;">${dateTxt}</div>
+  `;
 
   tt.classList.remove('hidden');
-  // Positionner le tooltip près du curseur sans déborder
+  
+  // 4. Positionnement du popup
   const tx = Math.min(e.clientX+12, window.innerWidth-180);
   const ty = Math.min(e.clientY-10, window.innerHeight-160);
   tt.style.left = tx+'px';
