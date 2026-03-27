@@ -3563,10 +3563,16 @@ function puzzleFillNeutrals(board,bRows,bCols,allWords,fillRatio,excludeCols=new
   }
 }
 function puzzleGenerate(levelIdx, snDef, customRows){
-  const allWords=ACTIVE_LEVELS[levelIdx].words;
-  const eligible=allWords.filter(w=>[...w.kana].length===2);
+const allWords=ACTIVE_LEVELS[levelIdx].words;
   const boardRows = customRows || ROWS;
   const boardCols = COLS;
+  
+  // NOUVEAU FILTRE : On accepte tous les mots qui font au moins 2 caractères 
+  // et qui peuvent rentrer sur la largeur de la grille (boardCols)
+  const eligible = allWords.filter(w => {
+    const len = [...w.kana].length;
+    return len >= 2 && len <= boardCols; 
+  });
   
   // CORRECTIF : Au lieu de filtrer les chaînes, on les garde toutes tant qu'on a au moins 1 mot éligible
   const chainDefs = eligible.length > 0 ? snDef.chains : [];
