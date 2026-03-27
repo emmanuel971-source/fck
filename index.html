@@ -2371,6 +2371,10 @@ body:has(#tuto-overlay:not(.hidden)) #bot-ui {
     <div class="menu-sub"><span class="menu-wave">🌊</span> Apprends les kana en jouant !</div>
   </div>
   <div class="menu-section-lbl">✨ Choisis ton clan</div>
+<div class="mode-tabs" style="margin: 0 auto 12px; width: calc(100% - 32px); max-width: 480px;">
+  <button class="mode-tab active" id="tab-menu-hira" onclick="switchMenuAlphabet('hiragana')">あ Hiragana</button>
+  <button class="mode-tab" id="tab-menu-kata" onclick="switchMenuAlphabet('katakana')">ア Katakana</button>
+</div>
   <div id="lvl-scroll"></div>
   <div class="menu-scroll-hint">↕ Fais défiler pour voir tous les niveaux</div>
 </div>
@@ -2561,9 +2565,10 @@ body:has(#tuto-overlay:not(.hidden)) #bot-ui {
         <div class="stats-sum-lbl">streak max</div>
       </div>
     </div>
-    <div id="stats-tabs">
-      <button class="stats-tab active" id="stats-tab-kana" onclick="statsSetTab('kana')">🎌 Hiragana</button>
-      <button class="stats-tab" id="stats-tab-vocab" onclick="statsSetTab('vocab')">📖 Vocabulaire</button>
+<div id="stats-tabs">
+      <button class="stats-tab active" id="stats-tab-hiragana" onclick="statsSetTab('hiragana')">あ Hiragana</button>
+      <button class="stats-tab" id="stats-tab-katakana" onclick="statsSetTab('katakana')">ア Katakana</button>
+      <button class="stats-tab" id="stats-tab-vocab" onclick="statsSetTab('vocab')">📖 Vocab</button>
     </div>
     <div id="stats-legend">
       <div class="stats-leg"><div class="stats-leg-dot" style="background:#72e8b8"></div>Maîtrisé ≥80%</div>
@@ -2577,12 +2582,10 @@ body:has(#tuto-overlay:not(.hidden)) #bot-ui {
     <button id="stats-back-btn" onclick="hideStats()">← Retour au menu</button>
   </div>
   <!-- Tooltip détail -->
-  <div id="stats-tooltip" class="hidden">
+<div id="stats-tooltip" class="hidden">
     <span class="tt-kana" id="tt-kana">あ</span>
     <div class="tt-row"><span>✅ Bonnes</span><span class="tt-good" id="tt-good">0</span></div>
     <div class="tt-row"><span>❌ Ratés</span><span class="tt-bad" id="tt-bad">0</span></div>
-    <div class="tt-row"><span>📊 Tests</span><span id="tt-tests">0</span></div>
-    <div class="tt-row"><span>🔥 Streak</span><span style="color:var(--neon-gold)" id="tt-streak">0</span></div>
     <div class="tt-date" id="tt-date"></div>
   </div>
 </div>
@@ -2889,7 +2892,111 @@ const ALL_LEVELS=[
     {kana:'かたな',romaji:'katana',meaning:'sabre',emoji:'⚔️',boss:true},
   ]},
 ];
-
+const ALL_LEVELS_KATA = [
+  {id:1, theme:'Animaux 1', clan:'', emoji:'🐱', color:'#ffaa7a', words:[
+    {kana:'ネコ', romaji:'neko', meaning:'chat', emoji:'🐱', boss:false},
+    {kana:'ウマ', romaji:'uma', meaning:'cheval', emoji:'🐴', boss:false},
+    {kana:'ヤギ', romaji:'yagi', meaning:'chèvre', emoji:'🐐', boss:false},
+    {kana:'ブタ', romaji:'buta', meaning:'cochon', emoji:'🐷', boss:false},
+    {kana:'イヌ', romaji:'inu', meaning:'chien', emoji:'🐶', boss:false},
+    {kana:'ヒツジ', romaji:'hitsuji', meaning:'mouton', emoji:'🐑', boss:true},
+  ]},
+  {id:2, theme:'Animaux 2', clan:'', emoji:'🐻', color:'#5cb85c', words:[
+    {kana:'ヌー', romaji:'nū', meaning:'gnou', emoji:'🐃', boss:false},
+    {kana:'クマ', romaji:'kuma', meaning:'ours', emoji:'🐻', boss:false},
+    {kana:'トラ', romaji:'tora', meaning:'tigre', emoji:'🐯', boss:false},
+    {kana:'ヘビ', romaji:'hebi', meaning:'serpent', emoji:'🐍', boss:false},
+    {kana:'ワシ', romaji:'washi', meaning:'aigle', emoji:'🦅', boss:false},
+    {kana:'ハト', romaji:'hato', meaning:'pigeon', emoji:'🕊️', boss:true},
+  ]},
+  {id:3, theme:'Animaux 3', clan:'', emoji:'🦍', color:'#e8833a', words:[
+    {kana:'カバ', romaji:'kaba', meaning:'hippopotame', emoji:'🦛', boss:false},
+    {kana:'ボア', romaji:'boa', meaning:'serpent boa', emoji:'🐍', boss:false},
+    {kana:'サイ', romaji:'sai', meaning:'rhinocéros', emoji:'🦏', boss:false},
+    {kana:'サル', romaji:'saru', meaning:'singe', emoji:'🐒', boss:false},
+    {kana:'ゴリラ', romaji:'gorira', meaning:'gorille', emoji:'🦍', boss:true},
+  ]},
+  {id:4, theme:'Aquatique & Oiseaux', clan:'', emoji:'🐙', color:'#00c8e8', words:[
+    {kana:'エビ', romaji:'ebi', meaning:'crevette', emoji:'🦐', boss:false},
+    {kana:'フグ', romaji:'fugu', meaning:'poisson-globe', emoji:'🐡', boss:false},
+    {kana:'コイ', romaji:'koi', meaning:'carpe', emoji:'🐟', boss:false},
+    {kana:'カメ', romaji:'kame', meaning:'tortue', emoji:'🐢', boss:false},
+    {kana:'カモ', romaji:'kamo', meaning:'canard', emoji:'🦆', boss:false},
+    {kana:'タコ', romaji:'tako', meaning:'pieuvre', emoji:'🐙', boss:true},
+  ]},
+  {id:5, theme:'Corps & Personnes 1', clan:'', emoji:'🙋', color:'#ff85b3', words:[
+    {kana:'アイ', romaji:'ai', meaning:'amour', emoji:'❤️', boss:false},
+    {kana:'バイ', romaji:'bai', meaning:'au revoir', emoji:'👋', boss:false},
+    {kana:'ハイ', romaji:'hai', meaning:'oui', emoji:'👍', boss:false},
+    {kana:'マイ', romaji:'mai', meaning:'mon/ma', emoji:'🙋', boss:false},
+    {kana:'ミミ', romaji:'mimi', meaning:'oreille', emoji:'👂', boss:true},
+  ]},
+  {id:6, theme:'Corps & Personnes 2', clan:'', emoji:'👶', color:'#c4a8ff', words:[
+    {kana:'ベビ', romaji:'bebi', meaning:'bébé', emoji:'👶', boss:false},
+    {kana:'ヨガ', romaji:'yoga', meaning:'yoga', emoji:'🧘', boss:false},
+    {kana:'デモ', romaji:'demo', meaning:'manifestation', emoji:'📣', boss:false},
+    {kana:'オニ', romaji:'oni', meaning:'démon', emoji:'👹', boss:false},
+    {kana:'ゾンビ', romaji:'zonbi', meaning:'zombie', emoji:'🧟', boss:true},
+  ]},
+  {id:7, theme:'Nature & Insectes', clan:'', emoji:'🌸', color:'#72c472', words:[
+    {kana:'アリ', romaji:'ari', meaning:'fourmi', emoji:'🐜', boss:false},
+    {kana:'クモ', romaji:'kumo', meaning:'araignée', emoji:'🕷️', boss:false},
+    {kana:'ムシ', romaji:'mushi', meaning:'insecte', emoji:'🐛', boss:false},
+    {kana:'セミ', romaji:'semi', meaning:'cigale', emoji:'🦗', boss:false},
+    {kana:'ハナ', romaji:'hana', meaning:'fleur', emoji:'🌸', boss:false},
+    {kana:'ホシ', romaji:'hoshi', meaning:'étoile', emoji:'⭐', boss:true},
+  ]},
+  {id:8, theme:'Ciel & Environnement', clan:'', emoji:'🌈', color:'#4db8d4', words:[
+    {kana:'ニジ', romaji:'niji', meaning:'arc-en-ciel', emoji:'🌈', boss:false},
+    {kana:'ニワ', romaji:'niwa', meaning:'jardin', emoji:'🌳', boss:false},
+    {kana:'ライ', romaji:'rai', meaning:'seigle', emoji:'🌾', boss:false},
+    {kana:'ソラ', romaji:'sora', meaning:'ciel', emoji:'🌤️', boss:false},
+    {kana:'ツキ', romaji:'tsuki', meaning:'lune', emoji:'🌙', boss:false},
+    {kana:'ヤシ', romaji:'yashi', meaning:'palmier', emoji:'🌴', boss:false},
+    {kana:'ユキ', romaji:'yuki', meaning:'neige', emoji:'❄️', boss:true},
+  ]},
+  {id:9, theme:'Gourmandises', clan:'', emoji:'🍰', color:'#f9d000', words:[
+    {kana:'ジュ', romaji:'ju', meaning:'jus', emoji:'🧃', boss:false},
+    {kana:'パイ', romaji:'pai', meaning:'tarte', emoji:'🥧', boss:false},
+    {kana:'ケーキ', romaji:'kēki', meaning:'gâteau', emoji:'🎂', boss:false},
+    {kana:'ティー', romaji:'tī', meaning:'thé', emoji:'🍵', boss:false},
+    {kana:'アイス', romaji:'aisu', meaning:'glace', emoji:'🍦', boss:true},
+  ]},
+  {id:10, theme:'Nourriture & Boissons', clan:'', emoji:'🍌', color:'#ffb3d9', words:[
+    {kana:'ビア', romaji:'bia', meaning:'bière', emoji:'🍺', boss:false},
+    {kana:'レア', romaji:'rea', meaning:'viande saignante', emoji:'🥩', boss:false},
+    {kana:'チーズ', romaji:'chīzu', meaning:'fromage', emoji:'🧀', boss:false},
+    {kana:'バナナ', romaji:'banana', meaning:'banane', emoji:'🍌', boss:false},
+    {kana:'チョコ', romaji:'choko', meaning:'chocolat', emoji:'🍫', boss:true},
+  ]},
+  {id:11, theme:'Objets du quotidien', clan:'', emoji:'🚪', color:'#7bcfff', words:[
+    {kana:'ピン', romaji:'pin', meaning:'épingle', emoji:'📍', boss:false},
+    {kana:'ペン', romaji:'pen', meaning:'stylo', emoji:'✏️', boss:false},
+    {kana:'ドア', romaji:'doa', meaning:'porte', emoji:'🚪', boss:false},
+    {kana:'ギア', romaji:'gia', meaning:'engrenage', emoji:'⚙️', boss:false},
+    {kana:'ソファ', romaji:'sofa', meaning:'canapé', emoji:'🛋️', boss:true},
+  ]},
+  {id:12, theme:'Objets & Achats', clan:'', emoji:'🚗', color:'#ff6b6b', words:[
+    {kana:'カー', romaji:'kā', meaning:'voiture', emoji:'🚗', boss:false},
+    {kana:'キー', romaji:'kī', meaning:'clé', emoji:'🔑', boss:false},
+    {kana:'ルビー', romaji:'rubī', meaning:'rubis', emoji:'💎', boss:false},
+    {kana:'セール', romaji:'sēru', meaning:'soldes', emoji:'🏷️', boss:true},
+  ]},
+  {id:13, theme:'Plein air & Maison', clan:'', emoji:'⛺', color:'#e8833a', words:[
+    {kana:'ナイ', romaji:'nai', meaning:'couteau', emoji:'🔪', boss:false},
+    {kana:'シャ', romaji:'sha', meaning:'douche', emoji:'🚿', boss:false},
+    {kana:'テント', romaji:'tento', meaning:'tente', emoji:'⛺', boss:false},
+    {kana:'ヨット', romaji:'yotto', meaning:'voilier', emoji:'⛵', boss:true},
+  ]},
+  {id:14, theme:'Onomatopées', clan:'', emoji:'💥', color:'#c77dff', words:[
+    {kana:'プー', romaji:'pū', meaning:'pfff', emoji:'🎈', boss:false},
+    {kana:'ノー', romaji:'nō', meaning:'non', emoji:'❌', boss:false},
+    {kana:'ゲラ', romaji:'gera', meaning:'gros rire', emoji:'😂', boss:false},
+    {kana:'ザザ', romaji:'zaza', meaning:'bruit de pluie forte', emoji:'🌧️', boss:false},
+    {kana:'ダン', romaji:'dan', meaning:'boum ! / explosion', emoji:'💥', boss:false},
+    {kana:'ポン', romaji:'pon', meaning:'pan', emoji:'👏', boss:true},
+  ]}
+];
 // ═══════════════════════════════════════════════════════════════════
 //  ÉTAT GLOBAL DE SESSION
 // ═══════════════════════════════════════════════════════════════════
@@ -3044,6 +3151,25 @@ const KANA_COLORS = {
   'だ':'#FFD0B0','ぢ':'#A8E8D0','づ':'#B0D0FF','で':'#FFD0C0','ど':'#C8F0B0',
   'ば':'#FFE8A8','び':'#A8F0E8','ぶ':'#B8D8FF','べ':'#FFB8C8','ぼ':'#C8D8FF',
   'ぱ':'#FFD0D8','ぴ':'#D0FFD0','ぷ':'#C8ECFF','ぺ':'#FFD0E8','ぽ':'#D8E8FF',
+
+// --- Ajouts Katakana ---
+  'ア':'#FFD6A5','イ':'#CAFFBF','ウ':'#A0C4FF','エ':'#FFB3C6','オ':'#BDE0FE',
+  'カ':'#FDFFB6','キ':'#B9FBC0','ク':'#A2D2FF','ケ':'#FFAFCC','コ':'#CDB4DB',
+  'サ':'#FFC8DD','シ':'#CBFFA9','ス':'#ADE8F4','セ':'#FFE5A0','ソ':'#C8E6C9',
+  'タ':'#FFD7BA','チ':'#B5EAD7','ツ':'#B8D8FF','テ':'#FFDDD2','ト':'#D4F0C0',
+  'ナ':'#FFC6FF','ニ':'#A0FFD6','ヌ':'#BAD7F2','ネ':'#FFCFD2','ノ':'#E2F0CB',
+  'ハ':'#FFF1A8','ヒ':'#B5F5EC','フ':'#C3DDFD','ヘ':'#FFD6D6','ホ':'#D5EAFF',
+  'マ':'#FFE2B7','ミ':'#C3FAC3','ム':'#BFDBFE','メ':'#FFBBD2','モ':'#D8F3DC',
+  'ヤ':'#FFEAA7','ユ':'#A8F0E8','ヨ':'#C6E2FF',
+  'ラ':'#FFD3B6','リ':'#BAFFD8','ル':'#B6CCFE','レ':'#FFD6E0','ロ':'#D9F3EE',
+  'ワ':'#FFF3CD','ヰ':'#C0F0C0','ヱ':'#C0D8FF','ヲ':'#FFD0D0','ン':'#E8CBFF',
+  'ガ':'#F0FFB0','ギ':'#B0FFC0','グ':'#B0D8FF','ゲ':'#FFB0C8','ゴ':'#C0B0E8',
+  'ザ':'#FFB0D0','ジ':'#C0FFA0','ズ':'#A0E0F4','ゼ':'#FFD8A0','ゾ':'#B0E0C0',
+  'ダ':'#FFD0B0','ヂ':'#A8E8D0','ヅ':'#B0D0FF','デ':'#FFD0C0','ド':'#C8F0B0',
+  'バ':'#FFE8A8','ビ':'#A8F0E8','ブ':'#B8D8FF','ベ':'#FFB8C8','ボ':'#C8D8FF',
+  'パ':'#FFD0D8','ピ':'#D0FFD0','プ':'#C8ECFF','ペ':'#FFD0E8','ポ':'#D8E8FF',
+  'ー':'#F0F0F0',
+  'ッ':'#FFF1A8'
 };
 const DEFAULT_KANA_BG='#F0F0F0';
 function kanaBg(char){return KANA_COLORS[char]||DEFAULT_KANA_BG;}
@@ -3417,7 +3543,7 @@ function puzzleFillNeutrals(board,bRows,bCols,allWords,fillRatio,excludeCols=new
   }
 }
 function puzzleGenerate(levelIdx, snDef, customRows){
-  const allWords=ALL_LEVELS[levelIdx].words;
+  const allWords=ACTIVE_LEVELS[levelIdx].words;
   const eligible=allWords.filter(w=>[...w.kana].length===2);
   const boardRows = customRows || ROWS;
   const boardCols = COLS;
@@ -3453,17 +3579,27 @@ function puzzleGenerate(levelIdx, snDef, customRows){
 //  NAVIGATION — Menu niveaux → Écran mode → Jeu
 // ═══════════════════════════════════════════════════════════════════
 
-// ── Construction des cards de niveau (sans bouton Puzzle) ──
-(()=>{
-  const scroll=document.getElementById('lvl-scroll');
-  ALL_LEVELS.forEach((lvl,i)=>{
-    const best=KS.getSoloBest(lvl.id);
-    const bestHtml=best?`<span style="font-size:11px;color:${lvl.color};font-family:'Fredoka One',cursive;">🏆 ${best.score.toLocaleString()}</span>`:'';
-    const card=document.createElement('div');
-    card.className='lvl-card';
-    card.style.cssText=`--lc:${lvl.color};border-color:${lvl.color}55;`;
-    const chips=lvl.words.map(w=>`<span class="lvl-card-word-chip">${w.kana}</span>`).join('');
-    card.innerHTML=`
+// ── GESTION DE L'ALPHABET ACTIF ──
+let currentAlphabet = 'hiragana';
+let ACTIVE_LEVELS = ALL_LEVELS; // Pointe par défaut sur les hiragana
+
+// ── Construction des cards de niveau ──
+function renderMenuLevels() {
+  const scroll = document.getElementById('lvl-scroll');
+  scroll.innerHTML = ''; // On vide la liste avant de la recréer
+
+  ACTIVE_LEVELS.forEach((lvl, i) => {
+    // Astuce : on différencie les scores du Lv1 Hiragana et Lv1 Katakana
+    const scoreId = currentAlphabet === 'katakana' ? `${lvl.id}_kata` : lvl.id;
+    const best = KS.getSoloBest(scoreId);
+    const bestHtml = best ? `<span style="font-size:11px;color:${lvl.color};font-family:'Fredoka One',cursive;">🏆 ${best.score.toLocaleString()}</span>` : '';
+    
+    const card = document.createElement('div');
+    card.className = 'lvl-card';
+    card.style.cssText = `--lc:${lvl.color};border-color:${lvl.color}55;`;
+    const chips = lvl.words.map(w => `<span class="lvl-card-word-chip">${w.kana}</span>`).join('');
+    
+    card.innerHTML = `
       <div class="lvl-card-left">
         <div class="lvl-card-emoji">${lvl.emoji}</div>
         <div class="lvl-card-num" style="color:${lvl.color}">Lv.${lvl.id}</div>
@@ -3476,15 +3612,43 @@ function puzzleGenerate(levelIdx, snDef, customRows){
           ${bestHtml}
         </div>
       </div>`;
-    card.addEventListener('click',()=>showModeSelect(i));
+      
+    // On garde ton EventListener, mais la fonction qu'il appelle (showModeSelect)
+    // va maintenant piocher dans ACTIVE_LEVELS au lieu de ALL_LEVELS
+    card.addEventListener('click', () => showModeSelect(i));
     scroll.appendChild(card);
   });
-})();
+
+  // Si Fluent 3D est chargé, on l'applique sur les nouveaux éléments
+  if (typeof fluent === 'function') setTimeout(() => fluent(scroll), 40);
+}
+
+// ── Fonction de bascule du menu ──
+function switchMenuAlphabet(alphabet) {
+  if (currentAlphabet === alphabet) return;
+  
+  currentAlphabet = alphabet;
+  ACTIVE_LEVELS = (alphabet === 'katakana') ? ALL_LEVELS_KATA : ALL_LEVELS;
+
+  const tabHira = document.getElementById('tab-menu-hira');
+  const tabKata = document.getElementById('tab-menu-kata');
+  if (tabHira) tabHira.classList.toggle('active', alphabet === 'hiragana');
+  if (tabKata) tabKata.classList.toggle('active', alphabet === 'katakana');
+
+  // --- AJOUTE CETTE LIGNE ICI ---
+  updateQuizLists(); 
+  // ------------------------------
+
+  renderMenuLevels();
+}
+
+// Génération initiale au chargement de l'app
+renderMenuLevels();
 
 // ── Afficher l'écran de choix de mode pour un niveau ──
 function showModeSelect(levelIdx){
   pendingLevelIdx=levelIdx;
-  const lvl=ALL_LEVELS[levelIdx];
+  const lvl = ACTIVE_LEVELS[levelIdx];
   const fUrl = _fluentUrl(lvl.emoji);
   document.getElementById('mode-level-name').innerHTML =
     `<img src="${fUrl}" class="femoji" alt="${lvl.emoji}" style="width:clamp(32px,9vw,44px);height:clamp(32px,9vw,44px);vertical-align:middle;filter:drop-shadow(0 3px 8px rgba(0,0,0,.18))" onerror="this.replaceWith(document.createTextNode('${lvl.emoji}'))"> ${lvl.theme}`;
@@ -3577,13 +3741,13 @@ function _survieSlideToNextLevel(currentScore, slideFn){
   _survieScore += currentScore;
   const nextIdx = _survieLevelIdx + 1;
 
-  if(nextIdx >= ALL_LEVELS.length){
+if(nextIdx >= ACTIVE_LEVELS.length){
     _survieVictory();
     return;
   }
 
   _survieLevelIdx = nextIdx;
-  const nextLv = ALL_LEVELS[nextIdx];
+  const nextLv = ACTIVE_LEVELS[nextIdx];
 
   // Flash rapide du nom du niveau suivant (non bloquant)
   const tr = document.getElementById('survie-transition');
@@ -3616,8 +3780,8 @@ function _survieSlideToNextLevel(currentScore, slideFn){
 function _survieOnGameOver(levelScore){
   _survieScore += levelScore;
   _survieActive = false;
-  if(typeof KS !== 'undefined' && KS.isHighscore(_survieScore)){
-    const lv = ALL_LEVELS[_survieLevelIdx];
+if(typeof KS !== 'undefined' && KS.isHighscore(_survieScore)){
+    const lv = ACTIVE_LEVELS[_survieLevelIdx];
     setTimeout(()=>showWofEntry({
       score: _survieScore,
       levelId: lv.id,
@@ -4264,28 +4428,28 @@ const wordsToScan = gameMode === 'survie' ? _survieAllWords : activeWords;
    * - Les anciens mots restent dans activeWords (scorables mais hors panel)
    * - Accélère la vitesse
    */
-  function _survieDoSlide(nextLevelIdx){
-    currentLevelIdx = nextLevelIdx;
-    const nextWords = ALL_LEVELS[nextLevelIdx].words.map(w=>({...w, mult:1}));
+function _survieDoSlide(nextLevelIdx){
+  currentLevelIdx = nextLevelIdx;
+  const nextWords = ACTIVE_LEVELS[nextLevelIdx].words.map(w=>({...w, mult:1}));
 
-    // Retirer le boss du niveau précédent (mot le plus long = boss)
-    const bossIdx = activeWords.findIndex(w=>w.boss);
-    if(bossIdx !== -1) activeWords.splice(bossIdx, 1);
+  // Retirer le boss du niveau précédent (mot le plus long = boss)
+  const bossIdx = activeWords.findIndex(w=>w.boss);
+  if(bossIdx !== -1) activeWords.splice(bossIdx, 1);
 
-    // Charger les nouveaux mots (ils seront introduits progressivement par introNext)
-    LEVEL_WORDS_LOCAL = nextWords;
-    LEVEL_WORDS = LEVEL_WORDS_LOCAL;
-    wordIntroIdx = 0;
-    isLastCycle = false;
-    foundRound = new Set();
+  // Charger les nouveaux mots (ils seront introduits progressivement par introNext)
+  LEVEL_WORDS_LOCAL = nextWords;
+  LEVEL_WORDS = LEVEL_WORDS_LOCAL;
+  wordIntroIdx = 0;
+  isLastCycle = false;
+  foundRound = new Set();
 
-    // Accélération survie progressive
-    const survieSpeedBonus = Math.min(nextLevelIdx * 30, 400);
-    DROP_SPEED = Math.max(700, DROP_SPEED - survieSpeedBonus);
-    startTimer();
+  // Accélération survie progressive
+  const survieSpeedBonus = Math.min(nextLevelIdx * 30, 400);
+  DROP_SPEED = Math.max(700, DROP_SPEED - survieSpeedBonus);
+  startTimer();
 
-    // Mettre à jour le badge niveau
-    const lvlData = ALL_LEVELS[nextLevelIdx];
+  // Mettre à jour le badge niveau
+  const lvlData = ACTIVE_LEVELS[nextLevelIdx];
     const badge = document.getElementById('level-badge');
     if(badge){
       badge.innerHTML=`<span class="badge-emoji">${lvlData.emoji}</span><span class="badge-num" style="color:${lvlData.color}">Lv.${lvlData.id}</span><span style="font-size:10px;color:#ff0066;display:block;font-family:'Fredoka One',cursive;text-shadow:0 0 8px rgba(255,0,102,.5)">🔥 SURVIE</span>`;
@@ -4359,9 +4523,9 @@ const nextW = LEVEL_WORDS_LOCAL[wordIntroIdx];
       _battleEndGame(id); return;
     }
     // En mode survie : game over définitif
-    if(gameMode==='survie' && typeof _survieOnGameOver==='function'){
-      soundGameOver();
-      const lvlData=ALL_LEVELS[currentLevelIdx];
+if(gameMode==='survie' && typeof _survieOnGameOver==='function'){
+    soundGameOver();
+    const lvlData=ACTIVE_LEVELS[currentLevelIdx];
       _survieOnGameOver(score);
       showOverlay({
         title:'💀 Survie terminée !',
@@ -4371,10 +4535,11 @@ const nextW = LEVEL_WORDS_LOCAL[wordIntroIdx];
       });
       return;
     }
-    soundGameOver();
-    const lvlData=ALL_LEVELS[currentLevelIdx];
-    // Sauvegarder le score même en cas de game over (déclenche WoF si top 25)
-    if(typeof KS!=='undefined') KS.saveSoloBest(ALL_LEVELS[currentLevelIdx].id, score, KS.getPlayerName('p1'));
+   soundGameOver();
+  const lvlData=ACTIVE_LEVELS[currentLevelIdx];
+  // Sauvegarder le score même en cas de game over (déclenche WoF si top 25)
+  const scoreId = currentAlphabet === 'katakana' ? `${ACTIVE_LEVELS[currentLevelIdx].id}_kata` : ACTIVE_LEVELS[currentLevelIdx].id;
+  if(typeof KS!=='undefined') KS.saveSoloBest(scoreId, score, KS.getPlayerName('p1'));
     showOverlay({title:'💔 Partie terminée !',sub:`${lvlData.emoji} ${lvlData.theme}<br>Score : <strong style="color:var(--neon-violet)">${score.toLocaleString()}</strong>`,btn1:'Réessayer 🔄',act1:()=>startGame(currentLevelIdx),btn2:currentLevelIdx>0?'← Niveau précédent':null,act2:currentLevelIdx>0?()=>startGame(currentLevelIdx-1):null});
   }
   function levelDone(){
@@ -4391,12 +4556,13 @@ const nextW = LEVEL_WORDS_LOCAL[wordIntroIdx];
       _survieSlideToNextLevel(score, ()=>{});
       return;
     }
-    soundLevelUp();
-    // Sauvegarder le meilleur score solo
-    if(typeof KS!=='undefined') KS.saveSoloBest(ALL_LEVELS[currentLevelIdx].id, score, KS.getPlayerName('p1'));
-    const lvlData=ALL_LEVELS[currentLevelIdx];
-    const isLast=currentLevelIdx>=ALL_LEVELS.length-1;
-    const nextLvl=ALL_LEVELS[currentLevelIdx+1];
+soundLevelUp();
+  // Sauvegarder le meilleur score solo
+  const scoreId = currentAlphabet === 'katakana' ? `${ACTIVE_LEVELS[currentLevelIdx].id}_kata` : ACTIVE_LEVELS[currentLevelIdx].id;
+  if(typeof KS!=='undefined') KS.saveSoloBest(scoreId, score, KS.getPlayerName('p1'));
+  const lvlData=ACTIVE_LEVELS[currentLevelIdx];
+  const isLast=currentLevelIdx>=ACTIVE_LEVELS.length-1;
+  const nextLvl=ACTIVE_LEVELS[currentLevelIdx+1];
     showOverlay({title:`🎉 クリア！ Niveau ${lvlData.id}`,sub:`<span style="font-size:26px">${lvlData.emoji}</span><br><strong style="color:var(--neon-violet)">${lvlData.theme}</strong> maîtrisé !<br>Score : <strong style="color:var(--neon-violet)">${score.toLocaleString()}</strong>`,words:LEVEL_WORDS_LOCAL,btn1:isLast?'🏆 Rejouer depuis le début':`Niveau ${lvlData.id+1} → ${nextLvl.theme}`,act1:isLast?()=>startGame(0):()=>startGame(currentLevelIdx+1),btn2:'Rejouer ce niveau 🔄',act2:()=>startGame(currentLevelIdx)});
   }
 
@@ -4431,9 +4597,9 @@ const nextW = LEVEL_WORDS_LOCAL[wordIntroIdx];
   // ── startGame ──
   function startGame(levelIdx, isPuzzle=false){
     currentLevelIdx=(levelIdx!==undefined)?levelIdx:0;
-    LEVEL_WORDS_LOCAL=ALL_LEVELS[currentLevelIdx].words.map(w=>({...w}));
+    LEVEL_WORDS_LOCAL=ACTIVE_LEVELS[currentLevelIdx].words.map(w=>({...w}));
     LEVEL_WORDS=LEVEL_WORDS_LOCAL; // compatibilité globale mode solo
-    const lvlData=ALL_LEVELS[currentLevelIdx];
+    const lvlData=ACTIVE_LEVELS[currentLevelIdx];
     // En mode survie : ne pas remettre le score à 0, conserver la vitesse accumulée + bonus accélération
     if(gameMode==='survie' && _survieActive){
       score=0; streak=0;
@@ -5358,17 +5524,18 @@ function _showBattleEndOverlay(winnerId){
   const p2Score = window._p2 ? window._p2.score : 0;
 
   // Sauvegarder le résultat battle
-  if(typeof KS !== 'undefined'){
+if(typeof KS !== 'undefined'){
     KS.saveBattleResult({
       winner: winnerId,
       scores: { p1: p1Score, p2: p2Score },
       mode: gameMode,
-      levelId: ALL_LEVELS[currentLevelIdx].id,
+      levelId: ACTIVE_LEVELS[currentLevelIdx].id,
     });
+    // ..
     // Déclencher la WoF pour le VAINQUEUR uniquement s'il mérite le top 25
     // vsBot → le vainqueur doit être P1 (seul humain)
     // vs2p  → le vainqueur peut être P1 ou P2
-    const lv = ALL_LEVELS[currentLevelIdx];
+    const lv = ACTIVE_LEVELS[currentLevelIdx];
     const winnerScore   = winnerId === 'p1' ? p1Score : p2Score;
     const winnerIsHuman = gameMode === 'vs2p' || (gameMode === 'vsBot' && winnerId === 'p1');
     if(winnerIsHuman && KS.isHighscore(winnerScore)){
@@ -5541,9 +5708,9 @@ function enterBattleMode(levelIdx){
   shell.style.cssText = 'position:relative;z-index:1;display:flex;flex-direction:row;height:100dvh;max-width:100vw;overflow:hidden;background:transparent;';
 
   const p1Label = gameMode === 'botVsBot' ? 'Bot Alpha' : 'Joueur 1';
-  const p2Label = gameMode === 'vsBot' ? 'CPU' : (gameMode === 'botVsBot' ? 'Bot Beta' : 'Joueur 2');
+const p2Label = gameMode === 'vsBot' ? 'CPU' : (gameMode === 'botVsBot' ? 'Bot Beta' : 'Joueur 2');
 
-  const lv = ALL_LEVELS[currentLevelIdx];
+  const lv = ACTIVE_LEVELS[currentLevelIdx];
   const centerCol = `<div id="battle-center">
     <div class="bc-logo-kana">かな</div>
     <div class="bc-logo-drop">DROP!</div>
@@ -6382,42 +6549,40 @@ const KANA_TO_ROMAJI = {
   'ぎゃ':'gya','ぎゅ':'gyu','ぎょ':'gyo',
   'びゃ':'bya','びゅ':'byu','びょ':'byo',
   'ぴゃ':'pya','ぴゅ':'pyu','ぴょ':'pyo',
+// --- Ajouts Katakana et voyelles longues ---
+  'ア':'a','イ':'i','ウ':'u','エ':'e','オ':'o',
+  'カ':'ka','キ':'ki','ク':'ku','ケ':'ke','コ':'ko',
+  'サ':'sa','シ':'shi','ス':'su','セ':'se','ソ':'so',
+  'タ':'ta','チ':'chi','ツ':'tsu','テ':'te','ト':'to',
+  'ナ':'na','ニ':'ni','ヌ':'nu','ネ':'ne','ノ':'no',
+  'ハ':'ha','ヒ':'hi','フ':'fu','ヘ':'he','ホ':'ho',
+  'マ':'ma','ミ':'mi','ム':'mu','メ':'me','モ':'mo',
+  'ヤ':'ya','ユ':'yu','ヨ':'yo',
+  'ラ':'ra','リ':'ri','ル':'ru','レ':'re','ロ':'ro',
+  'ワ':'wa','ヲ':'wo','ン':'n',
+  'ガ':'ga','ギ':'gi','グ':'gu','ゲ':'ge','ゴ':'go',
+  'ザ':'za','ジ':'ji','ズ':'zu','ゼ':'ze','ゾ':'zo',
+  'ダ':'da','ヂ':'di','ヅ':'du','デ':'de','ド':'do',
+  'バ':'ba','ビ':'bi','ブ':'bu','ベ':'be','ボ':'bo',
+  'パ':'pa','ピ':'pi','プ':'pu','ペ':'pe','ポ':'po',
+  'キャ':'kya','キュ':'kyu','キョ':'kyo',
+  'シャ':'sha','シュ':'shu','ショ':'sho',
+  'チャ':'cha','チュ':'chu','チョ':'cho',
+  'ニャ':'nya','ニュ':'nyu','ニョ':'nyo',
+  'ヒャ':'hya','ヒュ':'hyu','ヒョ':'hyo',
+  'ミャ':'mya','ミュ':'myu','ミョ':'myo',
+  'リャ':'rya','リュ':'ryu','リョ':'ryo',
+  'ギャ':'gya','ギュ':'gyu','ギョ':'gyo',
+  'ジャ':'ja','ジュ':'ju','ジョ':'jo',
+  'ビャ':'bya','ビュ':'byu','ビョ':'byo',
+  'ピャ':'pya','ピュ':'pyu','ピョ':'pyo',
+  'ヌー':'nū', 'ケー':'kē', 'チー':'chī', 'セー':'sē',
+  'プー':'pū', 'ノー':'nō', 'ビー':'bī', 'ティ':'ti', 'ルー':'rū'
 };
 
 // Liste pédagogique : kana uniques dans l'ordre des niveaux
 // On exclut les petits kana isolés (ゃゅょっ) qui n'existent pas seuls
-const QUIZ_KANA_LIST = (()=>{
-  const seen = new Set();
-  const list = [];
-  const smallKana = new Set(['ゃ','ゅ','ょ','っ','ぁ','ぃ','ぅ','ぇ','ぉ']);
-  ALL_LEVELS.forEach(lv=>{
-    lv.words.forEach(w=>{
-      // D'abord chercher les digraphes dans le mot (2 kana : grand + petit)
-      const chars = [...w.kana];
-      let i = 0;
-      while(i < chars.length){
-        let token = chars[i];
-        // Si le suivant est un petit kana → c'est un digraphe
-        if(i+1 < chars.length && smallKana.has(chars[i+1])){
-          token = chars[i] + chars[i+1];
-          i += 2;
-        } else {
-          i++;
-        }
-        if(!smallKana.has(token) && !seen.has(token) && KANA_TO_ROMAJI[token]){
-          seen.add(token);
-          // Collecter tous les mots de tous les niveaux contenant ce token
-          const candidates = [];
-          ALL_LEVELS.forEach(lv2=>{
-            lv2.words.forEach(ww=>{ if(ww.kana.includes(token)) candidates.push(ww); });
-          });
-          list.push({ kana: token, exWord: candidates[0]||w, candidates: candidates.length?candidates:[w] });
-        }
-      }
-    });
-  });
-  return list;
-})();
+
 
 let _quizMode = 'hiragana'; // 'hiragana' | 'vocab'
 let _quizQueue = [];
@@ -6433,24 +6598,69 @@ let _quizLastExWord = null; // anti-répétition du mot exemple
 const QUIZ_TIMER_MS = 5000;
 const QUIZ_AUTO_ADVANCE_MS = 1800; // délai avant passage auto à la question suivante
 
-// Liste vocabulaire : tous les mots uniques de tous les niveaux
-const QUIZ_VOCAB_LIST = (()=>{
-  const seen = new Set();
-  const list = [];
-  ALL_LEVELS.forEach(lv=>{
-    lv.words.forEach(w=>{
-      if(!seen.has(w.kana)){
-        seen.add(w.kana);
-        list.push(w);
+// On utilise 'let' pour pouvoir les mettre à jour
+let QUIZ_KANA_LIST = [];
+let QUIZ_VOCAB_LIST = [];
+
+// Cette fonction sera appelée à chaque changement d'onglet Hiragana/Katakana
+function updateQuizLists() {
+  const seenKana = new Set();
+  const kanaList = [];
+  // On ajoute les petits kana Katakana (ャ, ュ, ョ, etc.) à la liste d'exclusion
+  const smallKana = new Set(['ゃ','ゅ','ょ','っ','ぁ','ぃ','ぅ','ぇ','ぉ', 'ャ','ュ','ョ','ッ','ァ','ィ','ゥ','ェ','ォ','ー']);
+  
+  ACTIVE_LEVELS.forEach(lv => {
+    lv.words.forEach(w => {
+      const chars = [...w.kana];
+      let i = 0;
+      while(i < chars.length){
+        let token = chars[i];
+        if(i+1 < chars.length && smallKana.has(chars[i+1])){
+          token = chars[i] + chars[i+1];
+          i += 2;
+        } else { i++; }
+        if(!smallKana.has(token) && !seenKana.has(token) && KANA_TO_ROMAJI[token]){
+          seenKana.add(token);
+          const candidates = [];
+          ACTIVE_LEVELS.forEach(lv2 => {
+            lv2.words.forEach(ww => { if(ww.kana.includes(token)) candidates.push(ww); });
+          });
+          kanaList.push({ kana: token, exWord: candidates[0]||w, candidates: candidates.length?candidates:[w] });
+        }
       }
     });
   });
-  return list;
-})();
+  QUIZ_KANA_LIST = kanaList;
+
+  const seenVocab = new Set();
+  const vocabList = [];
+  ACTIVE_LEVELS.forEach(lv => {
+    lv.words.forEach(w => {
+      if(!seenVocab.has(w.kana)){
+        seenVocab.add(w.kana);
+        vocabList.push(w);
+      }
+    });
+  });
+  QUIZ_VOCAB_LIST = vocabList;
+}
+
+// Initialisation au premier chargement
+updateQuizLists();
 
 function showQuiz(){
   document.getElementById('menu-overlay').classList.add('hidden');
   document.getElementById('quiz-overlay').classList.remove('hidden');
+  
+  // --- Ajout : Met à jour le texte du bouton selon l'alphabet ---
+  const tabHira = document.getElementById('quiz-tab-hiragana');
+  if(currentAlphabet === 'katakana') {
+    tabHira.textContent = '🎌 Katakana';
+  } else {
+    tabHira.textContent = '🎌 Hiragana';
+  }
+  // -------------------------------------------------------------
+
   const cq = document.getElementById('confetti-quiz');
   if(cq && !cq.children.length && typeof fillConfetti==='function') fillConfetti(cq);
   _quizScore = 0; _quizStreak = 0;
@@ -6834,15 +7044,42 @@ const STATS_GOJUUON = [
   'びゃ','びゅ','びょ',
   'ぴゃ','ぴゅ','ぴょ',
 ];
+const STATS_GOJUUON_KATA = [
+  'ア','イ','ウ','エ','オ', 'カ','キ','ク','ケ','コ', 'サ','シ','ス','セ','ソ',
+  'タ','チ','ツ','テ','ト', 'ナ','ニ','ヌ','ネ','ノ', 'ハ','ヒ','フ','ヘ','ホ',
+  'マ','ミ','ム','メ','モ', 'ヤ', null,'ユ', null,'ヨ', 'ラ','リ','ル','レ','ロ',
+  'ワ', null, null,'ヲ','ン',
+  'ガ','ギ','グ','ゲ','ゴ', 'ザ','ジ','ズ','ゼ','ゾ', 'ダ','ヂ','ヅ','デ','ド',
+  'バ','ビ','ブ','ベ','ボ', 'パ','ピ','プ','ペ','ポ',
+  'キャ','キュ','キョ', 'シャ','シュ','ショ', 'チャ','チュ','チョ',
+  'ニャ','ニュ','ニョ', 'ヒャ','ヒュ','ヒョ', 'ミャ','ミュ','ミョ',
+  'リャ','リュ','リョ', 'ギャ','ギュ','ギョ', 'ジャ','ジュ','ジョ',
+  'ビャ','ビュ','ビョ', 'ピャ','ピュ','ピョ',
+];
 
+// Set global pour savoir quels Kana sont vraiment testables dans tous tes niveaux combinés
+const ALL_TESTABLE_KANA = new Set();
+[...ALL_LEVELS, ...ALL_LEVELS_KATA].forEach(lv => {
+  lv.words.forEach(w => {
+     const chars = [...w.kana];
+     const smallKana = new Set(['ゃ','ゅ','ょ','っ','ぁ','ぃ','ぅ','ぇ','ぉ', 'ャ','ュ','ョ','ッ','ァ','ィ','ゥ','ェ','ォ','ー']);
+     let i = 0;
+     while(i < chars.length){
+        let token = chars[i];
+        if(i+1 < chars.length && smallKana.has(chars[i+1])){ token += chars[i+1]; i+=2; } else { i++; }
+        if(!smallKana.has(token)) ALL_TESTABLE_KANA.add(token);
+     }
+  });
+});
 // Kana effectivement présents dans le Quiz
 const _QUIZ_KANA_SET = new Set(QUIZ_KANA_LIST.map(it=>it.kana));
 
-let _statsTab = 'kana'; // 'kana' | 'vocab'
+let _statsTab = 'hiragana'; // 'hiragana' | 'katakana' | 'vocab'
 
 function statsSetTab(tab){
   _statsTab = tab;
-  document.getElementById('stats-tab-kana').classList.toggle('active', tab==='kana');
+  document.getElementById('stats-tab-hiragana').classList.toggle('active', tab==='hiragana');
+  document.getElementById('stats-tab-katakana').classList.toggle('active', tab==='katakana');
   document.getElementById('stats-tab-vocab').classList.toggle('active', tab==='vocab');
   _statsRender();
 }
@@ -6864,25 +7101,32 @@ function hideStats(){
 
 function _statsRender(){
   if(_statsTab==='vocab'){ _statsRenderVocab(); return; }
+  
   const stats=KS.getQuizStats();
   let totalTests=0,totalCorrect=0,mastered=0,bestStreak=0;
-  STATS_GOJUUON.forEach(k=>{
+  const activeGojuuon = _statsTab === 'katakana' ? STATS_GOJUUON_KATA : STATS_GOJUUON;
+
+  activeGojuuon.forEach(k=>{
     if(!k) return;
     const s=stats[k];
     if(s&&s.tests>0){ totalTests+=s.tests; totalCorrect+=s.correct; bestStreak=Math.max(bestStreak,s.bestStreak||0); if((s.correct/s.tests)>=0.8)mastered++; }
   });
+  
   const pct=totalTests>0?Math.round(totalCorrect/totalTests*100):null;
-  const tested=STATS_GOJUUON.filter(k=>k&&stats[k]&&stats[k].tests>0).length;
+  const tested=activeGojuuon.filter(k=>k&&stats[k]&&stats[k].tests>0).length;
+  
   document.getElementById('stats-sum-tested').textContent=tested;
   document.getElementById('stats-sum-pct').textContent=pct!==null?pct+'%':'—';
   document.getElementById('stats-sum-mastered').textContent=mastered;
   document.getElementById('stats-sum-streak').textContent=bestStreak;
+  
   const grid=document.getElementById('stats-grid');
   grid.style.gridTemplateColumns='repeat(5,1fr)';
   grid.innerHTML='';
   let section='base';
-  STATS_GOJUUON.forEach((kana)=>{
-    if(kana==='きゃ'&&section==='base'){
+  
+  activeGojuuon.forEach((kana)=>{
+    if((kana==='きゃ' || kana==='キャ') && section==='base'){
       section='yoon';
       const sep=document.createElement('div');
       sep.style.cssText='grid-column:1/-1;font-family:"Fredoka One",cursive;font-size:12px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;padding:6px 0 2px;text-align:center;';
@@ -6895,9 +7139,12 @@ function _statsRender(){
       empty.style.cssText='background:rgba(0,0,0,.03);border-color:transparent;box-shadow:none;cursor:default;';
       grid.appendChild(empty); return;
     }
-    const s=stats[kana]; const inQuiz=_QUIZ_KANA_SET.has(kana);
+    const s=stats[kana]; 
+    const inQuiz = ALL_TESTABLE_KANA.has(kana);
+
     const cell=document.createElement('div'); cell.className='stats-kana-cell';
     if(!inQuiz){ cell.style.cssText='background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.08);cursor:default;opacity:.4;'; cell.innerHTML=`<span class="stats-kana-char" style="font-size:clamp(13px,3.5vw,18px)">${kana}</span>`; grid.appendChild(cell); return; }
+    
     let sc='untested',pt='';
     if(s&&s.tests>0){ const r=s.correct/s.tests; sc=r>=0.8?'mastered':r>=0.4?'learning':'struggling'; pt=Math.round(r*100)+'%'; }
     cell.classList.add(sc);
@@ -6905,7 +7152,7 @@ function _statsRender(){
     cell.innerHTML=`<span class="stats-kana-char" style="${fs}">${kana}</span><span class="stats-kana-pct">${pt}</span>`;
     cell.addEventListener('mouseenter',e=>_statsShowTooltip(e,kana,s));
     cell.addEventListener('mouseleave',()=>document.getElementById('stats-tooltip').classList.add('hidden'));
-    // Appui long uniquement sur mobile (permet le scroll normal)
+    
     let _lpTimer=null;
     cell.addEventListener('touchstart',e=>{_lpTimer=setTimeout(()=>{_statsShowTooltip(e.touches[0],kana,s);},400);},{passive:true});
     cell.addEventListener('touchend',()=>{clearTimeout(_lpTimer);});
@@ -6916,40 +7163,130 @@ function _statsRender(){
 
 function _statsRenderVocab(){
   const stats=KS.getVocabStats();
-  let totalTests=0,totalCorrect=0,mastered=0,bestStreak=0;
-  QUIZ_VOCAB_LIST.forEach(w=>{
-    const s=stats[w.kana];
-    if(s&&s.tests>0){ totalTests+=s.tests; totalCorrect+=s.correct; bestStreak=Math.max(bestStreak,s.bestStreak||0); if((s.correct/s.tests)>=0.8)mastered++; }
+  
+  // Grouper les mots par emoji pour combiner Hira et Kata
+  const vocabMap = new Map();
+  [...ALL_LEVELS, ...ALL_LEVELS_KATA].forEach(lv => {
+    lv.words.forEach(w => {
+      if(!vocabMap.has(w.emoji)) {
+        vocabMap.set(w.emoji, { emoji: w.emoji, meanings: new Set(), hira: null, kata: null });
+      }
+      const entry = vocabMap.get(w.emoji);
+      entry.meanings.add(w.meaning);
+      if (w.kana.match(/[ア-ン]/)) entry.kata = w.kana;
+      else entry.hira = w.kana;
+    });
   });
+
+  const uniqueVocab = Array.from(vocabMap.values());
+  let totalTests=0,totalCorrect=0,mastered=0,bestStreak=0;
+  
+  uniqueVocab.forEach(v => {
+    const sh = v.hira ? stats[v.hira] : null;
+    const sk = v.kata ? stats[v.kata] : null;
+    const t = (sh?.tests||0) + (sk?.tests||0);
+    const c = (sh?.correct||0) + (sk?.correct||0);
+    const bs = Math.max(sh?.bestStreak||0, sk?.bestStreak||0);
+    if(t > 0) {
+      totalTests += t;
+      totalCorrect += c;
+      bestStreak = Math.max(bestStreak, bs);
+      if((c/t) >= 0.8) mastered++;
+    }
+  });
+
   const pct=totalTests>0?Math.round(totalCorrect/totalTests*100):null;
-  const tested=QUIZ_VOCAB_LIST.filter(w=>stats[w.kana]&&stats[w.kana].tests>0).length;
+  const tested=uniqueVocab.filter(v => ((v.hira && stats[v.hira]?.tests>0) || (v.kata && stats[v.kata]?.tests>0))).length;
+  
   document.getElementById('stats-sum-tested').textContent=tested;
   document.getElementById('stats-sum-pct').textContent=pct!==null?pct+'%':'—';
   document.getElementById('stats-sum-mastered').textContent=mastered;
   document.getElementById('stats-sum-streak').textContent=bestStreak;
+  
   const grid=document.getElementById('stats-grid');
   grid.style.gridTemplateColumns='repeat(4,1fr)';
   grid.innerHTML='';
-  QUIZ_VOCAB_LIST.forEach(w=>{
-    const s=stats[w.kana];
+  
+  uniqueVocab.forEach(v => {
+    const sh = v.hira ? stats[v.hira] : null;
+    const sk = v.kata ? stats[v.kata] : null;
+    const t = (sh?.tests||0) + (sk?.tests||0);
+    const c = (sh?.correct||0) + (sk?.correct||0);
+    const w = (sh?.wrong||0) + (sk?.wrong||0);
+    
+    // Objet de stats combinées pour le tooltip
+    const combinedStats = { tests: t, correct: c, wrong: w, lastDate: (sh?.lastDate || sk?.lastDate) };
+
     const cell=document.createElement('div'); cell.className='stats-kana-cell';
     let sc='untested',pt='';
-    if(s&&s.tests>0){ const r=s.correct/s.tests; sc=r>=0.8?'mastered':r>=0.4?'learning':'struggling'; pt=Math.round(r*100)+'%'; }
+    if(t>0){ const r=c/t; sc=r>=0.8?'mastered':r>=0.4?'learning':'struggling'; pt=Math.round(r*100)+'%'; }
     cell.classList.add(sc);
-    const fUrl=typeof _fluentUrl==='function'?_fluentUrl(w.emoji):'';
-    const eImg=fUrl?`<img src="${fUrl}" alt="${w.emoji}" style="height:clamp(32px,8.5vw,44px);width:auto;display:block" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`:'';
-    const eFb=`<span style="font-size:clamp(32px,8.5vw,44px);line-height:1;display:${fUrl?'none':'block'}">${w.emoji}</span>`;
-    cell.innerHTML=`${eImg}${eFb}<span style="font-family:'Noto Sans JP',sans-serif;font-weight:900;font-size:clamp(14px,3.8vw,18px);color:#1a1040;margin-top:3px">${w.kana}</span><span class="stats-kana-pct" style="font-size:clamp(11px,2.8vw,13px)">${pt}</span>`;
-    cell.addEventListener('mouseenter',e=>_statsShowTooltip(e,w.kana,s,w));
+    
+    const fUrl=typeof _fluentUrl==='function'?_fluentUrl(v.emoji):'';
+    // Taille de l'émoji augmentée
+    const eImg=fUrl?`<img src="${fUrl}" alt="${v.emoji}" style="height:clamp(44px,11vw,56px);width:auto;display:block" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`:'';
+    const eFb=`<span style="font-size:clamp(44px,11vw,56px);line-height:1;display:${fUrl?'none':'block'}">${v.emoji}</span>`;
+    
+    // Seulement emoji et pourcentage
+    cell.innerHTML=`${eImg}${eFb}<span class="stats-kana-pct" style="font-size:clamp(12px,3.2vw,14px);margin-top:6px;font-weight:bold;">${pt}</span>`;
+    
+    cell.addEventListener('mouseenter',e=>_statsShowTooltip(e, null, combinedStats, v));
     cell.addEventListener('mouseleave',()=>document.getElementById('stats-tooltip').classList.add('hidden'));
-    // Appui long uniquement sur mobile (permet le scroll normal)
+    
     let _lpTimer2=null;
-    cell.addEventListener('touchstart',e=>{_lpTimer2=setTimeout(()=>{_statsShowTooltip(e.touches[0],w.kana,s,w);},400);},{passive:true});
+    cell.addEventListener('touchstart',e=>{_lpTimer2=setTimeout(()=>{_statsShowTooltip(e.touches[0], null, combinedStats, v);},400);},{passive:true});
     cell.addEventListener('touchend',()=>{clearTimeout(_lpTimer2);});
     cell.addEventListener('touchmove',()=>{clearTimeout(_lpTimer2);document.getElementById('stats-tooltip').classList.add('hidden');});
     grid.appendChild(cell);
   });
-  // Note : les emojis sont injectés directement via _fluentUrl(), fluent() n'est plus nécessaire ici
+}
+
+function _statsShowTooltip(e, kana, s, vocabEntry){
+  const tt = document.getElementById('stats-tooltip');
+  if(!s || (s.tests===0 && !s.correct && !s.wrong)){ tt.classList.add('hidden'); return; }
+  
+  const ttKana = document.getElementById('tt-kana');
+  
+  if(vocabEntry) {
+    // Mode Vocabulaire : afficher les deux écritures si elles existent
+    const fUrl = _fluentUrl(vocabEntry.emoji);
+    const imgHtml = `<img src="${fUrl}" class="femoji" alt="${vocabEntry.emoji}" style="width:1em;height:1em;vertical-align:middle" onerror="this.replaceWith(document.createTextNode('${vocabEntry.emoji}'))">`;
+    
+    let wordsHtml = '';
+    if(vocabEntry.hira) wordsHtml += `<div style="font-size:20px;color:#c77dff;">${vocabEntry.hira}</div>`;
+    if(vocabEntry.kata) wordsHtml += `<div style="font-size:20px;color:#ff8c42;">${vocabEntry.kata}</div>`;
+    
+    ttKana.innerHTML = `${imgHtml} <div style="display:flex;gap:10px;margin-top:4px;">${wordsHtml}</div>`;
+    ttKana.style.display = 'flex';
+    ttKana.style.flexDirection = 'column';
+    ttKana.style.alignItems = 'center';
+  } else {
+    // Mode Kana
+    ttKana.textContent = kana;
+    ttKana.style.display = 'block';
+    ttKana.style.color = '#c77dff';
+  }
+  
+  document.getElementById('tt-good').textContent = s.correct;
+  document.getElementById('tt-bad').textContent = s.wrong;
+
+  let dateTxt = '';
+  if(s.lastDate){
+    try{
+      const d=new Date(s.lastDate), now=new Date(), diff=Math.floor((now-d)/864e5);
+      if(diff===0) dateTxt="Testé aujourd'hui";
+      else if(diff===1) dateTxt='Testé hier';
+      else if(diff<7) dateTxt=`Il y a ${diff} jours`;
+      else dateTxt=d.toLocaleDateString('fr-FR');
+    }catch(err){ dateTxt=''; }
+  }
+  document.getElementById('tt-date').textContent = dateTxt;
+
+  tt.classList.remove('hidden');
+  const tx = Math.min(e.clientX+12, window.innerWidth-180);
+  const ty = Math.min(e.clientY-10, window.innerHeight-160);
+  tt.style.left = tx+'px';
+  tt.style.top  = ty+'px';
 }
 
 function _statsShowTooltip(e, kana, s, word){
