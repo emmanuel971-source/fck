@@ -3172,7 +3172,27 @@ const KANA_COLORS = {
   'ッ':'#FFF1A8'
 };
 const DEFAULT_KANA_BG='#F0F0F0';
-function kanaBg(char){return KANA_COLORS[char]||DEFAULT_KANA_BG;}
+function kanaBg(char){
+  // 1. Si le caractère existe dans la palette, on le prend
+  if(KANA_COLORS[char]) return KANA_COLORS[char];
+  
+  // 2. Si c'est un "petit" caractère, on lui donne la couleur de sa grande version
+  const smallToBig = {
+    'ャ':'ヤ', 'ュ':'ユ', 'ョ':'ヨ', 'ァ':'ア', 'ィ':'イ', 'ゥ':'ウ', 'ェ':'エ', 'ォ':'オ', 'ッ':'ツ',
+    'ゃ':'や', 'ゅ':'ゆ', 'ょ':'よ', 'ぁ':'あ', 'ぃ':'い', 'ぅ':'う', 'ぇ':'え', 'ぉ':'お', 'っ':'つ'
+  };
+  if(smallToBig[char] && KANA_COLORS[smallToBig[char]]) {
+    return KANA_COLORS[smallToBig[char]];
+  }
+  
+  // 3. Traitement spécial pour la barre d'allongement (Choonpu)
+  if(char === 'ー') return '#BDE0FE'; // Un beau bleu ciel
+  
+  // 4. Filet de sécurité anti-gris : couleur pastel dynamique basée sur le caractère
+  const hash = char.charCodeAt(0) % 5;
+  const fallbacks = ['#FFD6A5', '#CAFFBF', '#A0C4FF', '#FFB3C6', '#BDE0FE'];
+  return fallbacks[hash];
+}
 function shuffle(a){return [...a].sort(()=>Math.random()-.5);}
 
 const COLS=8;
@@ -3547,12 +3567,23 @@ function puzzleGenerate(levelIdx, snDef, customRows){
   const eligible=allWords.filter(w=>[...w.kana].length===2);
   const boardRows = customRows || ROWS;
   const boardCols = COLS;
-  const chainDefs=snDef.chains.filter(({chainLen})=>eligible.length>=chainLen);
+  
+  // CORRECTIF : Au lieu de filtrer les chaînes, on les garde toutes tant qu'on a au moins 1 mot éligible
+  const chainDefs = eligible.length > 0 ? snDef.chains : [];
+  
   const board=Array.from({length:boardRows},()=>Array.from({length:boardCols},()=>({filled:false,char:''})));
   const reservedCells=new Set();const chains=[];
+  
   for(let ci=0;ci<chainDefs.length;ci++){
     const{chainLen,triggerRow}=chainDefs[ci];
-    const avail=shuffle(eligible);let res=null;
+    
+    // CORRECTIF : On boucle sur les mots éligibles pour être SÛR d'en avoir assez pour la chaîne
+    let avail=shuffle(eligible);
+    while(avail.length < chainLen && avail.length > 0) {
+        avail = avail.concat(shuffle(eligible));
+    }
+    
+    let res=null;
     for(let attempt=0;attempt<30;attempt++){
       const bTry=board.map(r=>r.map(c=>({...c})));
       const resTry=puzzlePlaceChain(bTry,boardRows,boardCols,allWords,avail,chainLen,triggerRow,new Set(reservedCells));
@@ -3574,7 +3605,6 @@ function puzzleGenerate(levelIdx, snDef, customRows){
   const triggerCells=new Set(chains.map(ch=>`${ch.triggerRowIdx}-${ch.triggerCol}`));
   return{board,chains,triggerCells};
 }
-
 // ═══════════════════════════════════════════════════════════════════
 //  NAVIGATION — Menu niveaux → Écran mode → Jeu
 // ═══════════════════════════════════════════════════════════════════
@@ -3646,12 +3676,14 @@ function switchMenuAlphabet(alphabet) {
 renderMenuLevels();
 
 // ── Afficher l'écran de choix de mode pour un niveau ──
+// ── Afficher l'écran de choix de mode pour un niveau ──
 function showModeSelect(levelIdx){
   pendingLevelIdx=levelIdx;
   const lvl = ACTIVE_LEVELS[levelIdx];
   const fUrl = _fluentUrl(lvl.emoji);
   document.getElementById('mode-level-name').innerHTML =
     `<img src="${fUrl}" class="femoji" alt="${lvl.emoji}" style="width:clamp(32px,9vw,44px);height:clamp(32px,9vw,44px);vertical-align:middle;filter:drop-shadow(0 3px 8px rgba(0,0,0,.18))" onerror="this.replaceWith(document.createTextNode('${lvl.emoji}'))"> ${lvl.theme}`;
+  
   // Remplir les cards SN puzzle
   const snContainer=document.getElementById('mode-sn-cards');
   snContainer.innerHTML='';
@@ -3671,6 +3703,10 @@ function showModeSelect(levelIdx){
     });
     snContainer.appendChild(card);
   });
+
+  // CORRECTIF ICI : On force la réapparition des boutons classiques 
+  hidePuzzlePanel();
+
   // Afficher tab Standard par défaut
   modeTabSwitch('standard');
   document.getElementById('menu-overlay').classList.add('hidden');
