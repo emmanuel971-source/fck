@@ -7217,18 +7217,22 @@ function _statsRenderVocab(){
     // Objet de stats combinées pour le tooltip
     const combinedStats = { tests: t, correct: c, wrong: w, lastDate: (sh?.lastDate || sk?.lastDate) };
 
-    const cell=document.createElement('div'); cell.className='stats-kana-cell';
+const cell=document.createElement('div'); 
+    cell.className='stats-kana-cell';
+    cell.style.minWidth = '0'; // <-- Empêche la cellule de déborder
+    
     let sc='untested',pt='';
     if(t>0){ const r=c/t; sc=r>=0.8?'mastered':r>=0.4?'learning':'struggling'; pt=Math.round(r*100)+'%'; }
     cell.classList.add(sc);
     
     const fUrl=typeof _fluentUrl==='function'?_fluentUrl(v.emoji):'';
-    // Taille de l'émoji augmentée
-    const eImg=fUrl?`<img src="${fUrl}" alt="${v.emoji}" style="height:clamp(44px,11vw,56px);width:auto;display:block" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`:'';
-    const eFb=`<span style="font-size:clamp(44px,11vw,56px);line-height:1;display:${fUrl?'none':'block'}">${v.emoji}</span>`;
     
-    // Seulement emoji et pourcentage
-    cell.innerHTML=`${eImg}${eFb}<span class="stats-kana-pct" style="font-size:clamp(12px,3.2vw,14px);margin-top:6px;font-weight:bold;">${pt}</span>`;
+    // <-- Hauteur ET largeur fixées, image centrée -->
+    const eImg=fUrl?`<img src="${fUrl}" alt="${v.emoji}" style="width:clamp(44px,11vw,56px);height:clamp(44px,11vw,56px);object-fit:contain;display:block;margin:0 auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`:'';
+    const eFb=`<span style="font-size:clamp(44px,11vw,56px);line-height:1;display:${fUrl?'none':'block'};text-align:center;">${v.emoji}</span>`;
+    
+    // <-- Pourcentage centré -->
+    cell.innerHTML=`${eImg}${eFb}<span class="stats-kana-pct" style="font-size:clamp(12px,3.2vw,14px);margin-top:6px;font-weight:bold;display:block;text-align:center;">${pt}</span>`;
     
     cell.addEventListener('mouseenter',e=>_statsShowTooltip(e, null, combinedStats, v));
     cell.addEventListener('mouseleave',()=>document.getElementById('stats-tooltip').classList.add('hidden'));
