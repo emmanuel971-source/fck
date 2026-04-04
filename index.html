@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<link rel="manifest" href="/fck/manifest.json">
 <meta name="theme-color" content="#00aaee">
   <title>かなDROP ✨</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -156,6 +155,9 @@ body::before {
 .cell.malus{background:linear-gradient(135deg,#fdf3ea,#f7e8d5)!important;color:#1a1040!important;border:1px solid rgba(100,200,220,.12)!important;border-radius:8px;box-shadow:0 3px 0 rgba(139,69,19,.12),inset 0 1px 0 rgba(255,255,255,.7)!important;font-size:clamp(20px,7vw,32px)!important;line-height:1!important;padding-top:2px!important;}
 .cell.malus-incoming{animation:malusWobble .5s ease infinite alternate;}
 .cell.skull{background:#1a1a28!important;border:none!important;border-radius:6px!important;box-shadow:0 3px 0 rgba(0,0,0,.5)!important;font-size:clamp(20px,7vw,32px)!important;line-height:1!important;padding-top:1px!important;}
+.cell.puzzle-trigger{background:#F5C842!important;border:2px solid #BA7517!important;border-radius:6px!important;box-shadow:0 3px 0 rgba(186,117,23,.35),inset 0 1px 0 rgba(255,255,255,.6)!important;animation:triggerPulse 1.2s ease-in-out infinite alternate;}
+@keyframes triggerPulse{from{box-shadow:0 3px 0 rgba(186,117,23,.35),inset 0 1px 0 rgba(255,255,255,.6)}to{box-shadow:0 3px 12px rgba(245,200,66,.7),inset 0 1px 0 rgba(255,255,255,.6)}}
+.escape-badge{font-size:clamp(16px,4.5vw,22px);line-height:1;filter:drop-shadow(0 1px 4px rgba(0,0,0,.2));animation:floatPulse 2.8s ease-in-out infinite;}
 @keyframes skullShake{0%,100%{transform:translateX(0)}15%{transform:translateX(-5px)}30%{transform:translateX(5px)}45%{transform:translateX(-4px)}60%{transform:translateX(4px)}75%{transform:translateX(-2px)}90%{transform:translateX(2px)}}
 .skull-row-flash{animation:skullShake .5s ease forwards;}
 @keyframes malusWobble{from{transform:scale(1) rotate(-3deg)}to{transform:scale(1.08) rotate(3deg)}}
@@ -2691,25 +2693,6 @@ body:has(#tuto-overlay:not(.hidden)) #bot-ui {
 
 <!-- ═══ JEU ═══ -->
 <div id="shell">
-  <button id="pwa-install-btn" style="
-  display:none;
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  z-index:9999;
-  background:linear-gradient(135deg,#ff5fa0,#00aaee);
-  color:white;
-  border:none;
-  border-radius:24px;
-  padding:12px 20px;
-  font-family:'Nunito',sans-serif;
-  font-weight:900;
-  font-size:15px;
-  box-shadow:0 4px 15px rgba(0,0,0,.3);
-  cursor:pointer;
-  align-items:center;
-  gap:8px;
-">📲 Installer l'app</button>
   <div id="middle">
     <div id="board-col">
       <div id="board"></div>
@@ -2755,14 +2738,15 @@ const ALL_LEVELS=[
     {kana:'いぬ',romaji:'inu',meaning:'chien',emoji:'🐶',boss:false},
     {kana:'うし',romaji:'ushi',meaning:'vache',emoji:'🐄',boss:false},
     {kana:'うま',romaji:'uma',meaning:'cheval',emoji:'🐴',boss:false},
-    {kana:'きつね',romaji:'kitsune',meaning:'renard',emoji:'🦊',boss:true},
+    {kana:'うさぎ',romaji:'usagi',meaning:'lapin',emoji:'🐰',boss:true},
   ]},
   {id:3,theme:'La Forêt',clan:'',emoji:'🌿',color:'#5cb85c',words:[
     {kana:'くま',romaji:'kuma',meaning:'ours',emoji:'🐻',boss:false},
     {kana:'しか',romaji:'shika',meaning:'cerf',emoji:'🦌',boss:false},
     {kana:'さる',romaji:'saru',meaning:'singe',emoji:'🐒',boss:false},
     {kana:'りす',romaji:'risu',meaning:'écureuil',emoji:'🐿️',boss:false},
-    {kana:'うさぎ',romaji:'usagi',meaning:'lapin',emoji:'🐰',boss:true},
+    {kana:'きつね',romaji:'kitsune',meaning:'renard',emoji:'🦊',boss:true},
+    
   ]},
   {id:4,theme:'La Savane',clan:'',emoji:'🌍',color:'#e8833a',words:[
     {kana:'とら',romaji:'tora',meaning:'tigre',emoji:'🐯',boss:false},
@@ -3328,8 +3312,39 @@ function _romajiFor(kana){
   return null;
 }
 
+// ── TTS via plugin Capacitor (APK Android/iOS) ──
+async function _speakCapacitor(text, rate, pitch){
+  try {
+    await window._capacitorTTS.speak({
+      text: text,
+      lang: 'ja-JP',
+      rate: rate || 0.85,
+      pitch: pitch || 1.05,
+      volume: 0.9,
+      category: 'ambient'
+    });
+  } catch(e){
+    console.warn('[TTS Capacitor] erreur :', e);
+  }
+}
+
 function speakWord(kana, isCombo){
-  if(muted || !window.speechSynthesis) return;
+  if(muted) return;
+
+  // ── Mode Capacitor (APK Android / iOS) ──
+  if(window._capacitorTTS){
+    window._capacitorTTS.stop().catch(()=>{});
+    _speakCapacitor(kana, 0.85, isCombo ? 1.25 : 1.05);
+    if(isCombo){
+      const enc = COMBO_ENCS[Math.floor(Math.random()*COMBO_ENCS.length)];
+      // Petit délai pour enchaîner les deux utterances
+      setTimeout(() => _speakCapacitor(enc.jp, 1.05, 1.35), 700);
+    }
+    return;
+  }
+
+  // ── Mode navigateur (web / PWA) — code original inchangé ──
+  if(!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
 
   const voices = _ttsVoices.length ? _ttsVoices : window.speechSynthesis.getVoices();
@@ -3418,7 +3433,7 @@ class SimState{
   clone(){return new SimState(this.board,this.rows,this.cols,this.words);}
   drop(kana,col){let landRow=-1;for(let r=this.rows-1;r>=0;r--){if(!this.board[r][col].filled){landRow=r;break;}}if(landRow===-1)return false;this.board[landRow][col]={filled:true,char:kana};return landRow;}
   applyGravity(){for(let c=0;c<this.cols;c++){const chars=[];for(let r=this.rows-1;r>=0;r--)if(this.board[r][c].filled)chars.push(this.board[r][c].char);for(let r=this.rows-1;r>=0;r--)this.board[r][c]=chars.length?{filled:true,char:chars.shift()}:{filled:false,char:''};}}
-  _scanLine(cells,found){const line=cells.map(({r,c})=>this.board[r][c].filled?this.board[r][c].char:'\x00').join('');this.words.forEach(w=>{let i=line.indexOf(w.kana);while(i!==-1){const key=cells.slice(i,i+w.kana.length).map(cc=>`${cc.r},${cc.c}`).join('|');if(!found.some(f=>f.key===key))found.push({word:w,cells:cells.slice(i,i+w.kana.length),key});i=line.indexOf(w.kana,i+1);}});}
+  _scanLine(cells,found){const line=cells.map(({r,c})=>this.board[r][c].filled&&this.board[r][c].char!=='☠️'&&this.board[r][c].char!=='§'?this.board[r][c].char:'\x00').join('');this.words.forEach(w=>{let i=line.indexOf(w.kana);while(i!==-1){const key=cells.slice(i,i+w.kana.length).map(cc=>`${cc.r},${cc.c}`).join('|');if(!found.some(f=>f.key===key))found.push({word:w,cells:cells.slice(i,i+w.kana.length),key});i=line.indexOf(w.kana,i+1);}});}
   scanAll(){const found=[];for(let r=0;r<this.rows;r++)this._scanLine(Array.from({length:this.cols},(_,c)=>({r,c})),found);for(let c=0;c<this.cols;c++)this._scanLine(Array.from({length:this.rows},(_,r)=>({r,c})),found);return found;}
   explode(found){const cellSet=new Set();found.forEach(f=>f.cells.forEach(cell=>cellSet.add(`${cell.r},${cell.c}`)));cellSet.forEach(key=>{const[r,c]=key.split(',').map(Number);this.board[r][c]={filled:false,char:''};});return cellSet.size;}
   freeCols(){const free=[];for(let c=0;c<this.cols;c++)if(!this.board[0][c].filled)free.push(c);return free;}
@@ -3479,6 +3494,2632 @@ const PUZZLE_SN_DEFS=[
 ];
 
 function puzzleLevelKanas(levelWords){return [...new Set(levelWords.flatMap(w=>[...w.kana]))];}
+
+// ═══════════════════════════════════════════════════════════════════
+//  ESCAPE PUZZLE — Structures de données & moteur
+// ═══════════════════════════════════════════════════════════════════
+
+const ESCAPE_BLUEPRINTS = {
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  CONFIG : 4x2k_1x3k  (4 mots 2 kanas + 1 mot 3 kanas)
+  //  wordIdx 0-3 = mots 2k, wordIdx 4 = mot 3k (pos 0,1,2)
+  // ═══════════════════════════════════════════════════════════════════
+
+  // ── D1 : trigger en surface, 1 skull, accès immédiat ──
+  'escape_d1_4x2k_1x3k': {
+    id: 'escape_d1_4x2k_1x3k',
+    cols: 8,
+    cells: [
+      // L2
+      { row:2, col:4, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:2, col:5, type:'skull' },
+      { row:2, col:6, type:'skull' },
+      { row:2, col:7, type:'skull' },
+      // L1
+      { row:1, col:3, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:1, col:4, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:1, col:5, type:'wN_p',    wordIdx:4, pos:0 },
+      { row:1, col:6, type:'filler' },
+      { row:1, col:7, type:'filler' },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:4, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:4, pos:2 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:2 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' },
+               { type:'wN_p', wordIdx:3, pos:0 } ] }
+    ],
+    forbiddenPairs:[ { a:{ row:1, col:4 }, b:{ row:1, col:5 } } ]
+  },
+  'escape_d1_4x2k_1x3k_bis': {
+    id: 'escape_d1_4x2k_1x3k_bis',
+    cols: 8,
+    cells: [
+      // L2
+      { row:2, col:0, type:'skull' },
+      { row:2, col:1, type:'skull' },
+      { row:2, col:2, type:'skull' },
+      // L1
+      { row:1, col:0, type:'filler' },
+      { row:1, col:1, type:'filler' },
+      { row:1, col:2, type:'wN_p', wordIdx:4, pos:2 },
+      // L0
+      { row:0, col:0, type:'wN_p', wordIdx:4, pos:0 },
+      { row:0, col:1, type:'wN_p', wordIdx:4, pos:1 },
+      { row:0, col:2, type:'wN_p', wordIdx:3, pos:0 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2], pos:'any' },
+        ]
+      },
+      {
+        phase: 2,
+        condition: { wordFound: 2 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2], pos:'any' },
+          { type:'wN_p', wordIdx:3, pos:1 },
+        ]
+      }
+    ],
+  },
+
+  // ── D2 : trigger sous 1 kana + 1 skull latéral ──
+  'escape_d2_4x2k_1x3k': {
+    id: 'escape_d2_4x2k_1x3k',
+    cols: 8,
+    cells: [
+      // L2
+      { row:2, col:3, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:2, col:5, type:'skull' },
+      { row:2, col:6, type:'skull' },
+      // L1
+      { row:1, col:2, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:1, col:3, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:1, col:4, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:1, col:5, type:'wN_p', wordIdx:4, pos:0 },
+      { row:1, col:6, type:'filler' },
+      // L0
+      { row:0, col:2, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:0, col:3, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:4, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:4, pos:2 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:2 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' },
+               { type:'wN_p', wordIdx:3, pos:0 } ] }
+    ],
+    forbiddenPairs:[ { a:{ row:1, col:4 }, b:{ row:1, col:5 } } ]
+  },
+  'escape_d2_4x2k_1x3k_bis': {
+    id: 'escape_d2_4x2k_1x3k_bis',
+    cols: 8,
+    cells: [
+      // L2
+      { row:2, col:1, type:'skull' },
+      { row:2, col:2, type:'skull' },
+      { row:2, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      // L1
+      { row:1, col:1, type:'filler' },
+      { row:1, col:2, type:'wN_p', wordIdx:4, pos:2 },
+      { row:1, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      // L0
+      { row:0, col:0, type:'wN_p', wordIdx:4, pos:0 },
+      { row:0, col:1, type:'wN_p', wordIdx:4, pos:1 },
+      { row:0, col:2, type:'wN_p', wordIdx:3, pos:0 },
+      { row:0, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2], pos:'any' },
+        ]
+      },
+      {
+        phase: 2,
+        condition: { wordFound: 2 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2], pos:'any' },
+          { type:'wN_p', wordIdx:3, pos:1 },
+        ]
+      }
+    ],
+    forbiddenPairs: [
+      { a:{ row:0, col:2 }, b:{ row:0, col:3 } }
+    ]
+  },
+  // ── D3 : trigger sous 2 kanas, skulls en L2 ──
+  'escape_d3_4x2k_1x3k': {
+    id: 'escape_d3_4x2k_1x3k',
+    cols: 8,
+    cells: [
+      // L3
+      { row:3, col:3, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:3, col:5, type:'skull' },
+      { row:3, col:6, type:'skull' },
+      // L2
+      { row:2, col:2, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:2, col:3, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:2, col:4, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:2, col:5, type:'skull' },
+      { row:2, col:6, type:'filler' },
+      // L1
+      { row:1, col:2, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:1, col:3, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:1, col:4, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:1, col:5, type:'wN_p',    wordIdx:4, pos:0 },
+      { row:1, col:6, type:'wN_p',    wordIdx:3, pos:1 },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:4, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:4, pos:2 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:2 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' },
+               { type:'wN_p', wordIdx:3, pos:0 },
+               { type:'wN_p', wordIdx:4, pos:0 } ] }
+    ]
+  },
+  'escape_d3_4x2k_1x3k_bis': {
+    id: 'escape_d3_4x2k_1x3k_bis',
+    cols: 8,
+    cells: [
+      // L3
+      { row:3, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:3, col:5, type:'skull' },
+      { row:3, col:6, type:'skull' },
+      // L2
+      { row:2, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:5, type:'skull' },
+      { row:2, col:6, type:'filler' },
+      // L1
+      { row:1, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:5, type:'wN_p', wordIdx:4, pos:0 },
+      { row:1, col:6, type:'filler' },
+      // L0
+      { row:0, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:4, type:'wN_p', wordIdx:3, pos:1 },
+      { row:0, col:5, type:'wN_p', wordIdx:0, pos:1 },
+      { row:0, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      { row:0, col:7, type:'wN_p', wordIdx:4, pos:2 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2], pos:'any' },
+        ]
+      },
+      {
+        phase: 2,
+        condition: { wordFound: 2 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2], pos:'any' },
+          { type:'wN_p', wordIdx:3, pos:0 },
+          { type:'wN_p', wordIdx:4, pos:0 },
+        ]
+      }
+    ],
+    forbiddenPairs: [
+      { a:{ row:1, col:4 }, b:{ row:1, col:5 } }
+    ]
+  },
+  'escape_d3_4x2k_1x3k_ter': {
+    id: 'escape_d3_4x2k_1x3k_ter',
+    cols: 8,
+    cells: [
+      // L3
+      { row:3, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:3, col:5, type:'skull' },
+      { row:3, col:6, type:'skull' },
+      // L2
+      { row:2, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:5, type:'skull' },
+      // L1
+      { row:1, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:5, type:'wN_p', wordIdx:4, pos:0 },
+      // L0
+      { row:0, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:4, type:'wN_p', wordIdx:3, pos:1 },
+      { row:0, col:5, type:'wN_p', wordIdx:1, pos:1 },
+      { row:0, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      { row:0, col:7, type:'wN_p', wordIdx:4, pos:2 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2], pos:'any' },
+        ]
+      },
+      {
+        phase: 2,
+        condition: { wordFound: 2 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2], pos:'any' },
+          { type:'wN_p', wordIdx:3, pos:0 },
+          { type:'wN_p', wordIdx:4, pos:0 },
+        ]
+      }
+    ],
+    forbiddenPairs: [
+      { a:{ row:1, col:4 }, b:{ row:1, col:5 } }
+    ]
+  },
+  // ── D4 : trigger sous 3 kanas, colonne de skulls ──
+  'escape_d4_4x2k_1x3k': {
+    id: 'escape_d4_4x2k_1x3k',
+    cols: 8,
+    cells: [
+      // L4
+      { row:4, col:3, type:'skull' },
+      { row:4, col:4, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      // L3
+      { row:3, col:2, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:3, col:3, type:'skull' },
+      { row:3, col:4, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:3, col:5, type:'skull' },
+      // L2
+      { row:2, col:2, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:2, col:3, type:'skull' },
+      { row:2, col:4, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:2, col:5, type:'wN_p', wordIdx:4, pos:0 },
+      { row:2, col:6, type:'skull' },
+      // L1
+      { row:1, col:2, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:1, col:3, type:'filler' },
+      { row:1, col:4, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:1, col:5, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:1, col:6, type:'wN_p',    wordIdx:4, pos:1 },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:4, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:4, pos:2 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:1 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' },
+               { type:'wN_p', wordIdx:3, pos:0 } ] },
+      { phase:3, condition:{ wordFound:3 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' },
+               { type:'wN_p', wordIdx:3, pos:0 },
+               { type:'wN_p', wordIdx:4, pos:0 } ] }
+    ]
+  },
+  'escape_d4_4x2k_1x3k_bis': {
+    id: 'escape_d4_4x2k_1x3k_bis',
+    cols: 8,
+    cells: [
+      // L4
+      { row:4, col:3, type:'skull' },
+      { row:4, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      // L3
+      { row:3, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:3, col:3, type:'skull' },
+      { row:3, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:3, col:5, type:'skull' },
+      // L2
+      { row:2, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:3, type:'skull' },
+      { row:2, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:5, type:'wN_p', wordIdx:4, pos:0 },
+      { row:2, col:6, type:'skull' },
+      // L1
+      { row:1, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:5, type:'wN_p', wordIdx:0, pos:1 },
+      { row:1, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      // L0
+      { row:0, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:5, type:'wN_p', wordIdx:1, pos:1 },
+      { row:0, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      { row:0, col:7, type:'wN_p', wordIdx:4, pos:2 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3], pos:'any' },
+        ]
+      }
+    ],
+    forbiddenPairs: [
+      { a:{ row:2, col:4 }, b:{ row:2, col:5 } },
+      { a:{ row:1, col:4 }, b:{ row:1, col:5 } },
+      { a:{ row:0, col:4 }, b:{ row:0, col:5 } }
+    ]
+  },
+  // ── D5 : trigger profond, skulls en échiquier, 3 phases ──
+  'escape_d5_4x2k_1x3k': {
+    id: 'escape_d5_4x2k_1x3k',
+    cols: 8,
+    cells: [
+      // L5
+      { row:5, col:3, type:'skull' },
+      { row:5, col:5, type:'skull' },
+      // L4
+      { row:4, col:2, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:4, col:3, type:'skull' },
+      { row:4, col:4, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:4, col:5, type:'skull' },
+      { row:4, col:6, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      // L3
+      { row:3, col:2, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:3, col:3, type:'skull' },
+      { row:3, col:4, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:3, col:5, type:'wN_p', wordIdx:4, pos:0 },
+      { row:3, col:6, type:'skull' },
+      // L2
+      { row:2, col:2, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:2, col:3, type:'filler' },
+      { row:2, col:4, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:2, col:5, type:'wN_p', wordIdx:3, pos:1 },
+      { row:2, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      // L1
+      { row:1, col:3, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:1, col:4, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:1, col:5, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:1, col:6, type:'wN_p',    wordIdx:4, pos:1 },
+      { row:1, col:7, type:'wN_p',    wordIdx:4, pos:2 },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:4, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:4, pos:2 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:1 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' },
+               { type:'wN_p', wordIdx:3, pos:0 } ] },
+      { phase:3, condition:{ wordFound:3 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' },
+               { type:'wN_p', wordIdx:3, pos:0 },
+               { type:'wN_p', wordIdx:4, pos:0 } ] }
+    ]
+  },
+  'escape_d5_4x2k_1x3k_bis': {
+    id: 'escape_d5_4x2k_1x3k_bis',
+    cols: 8,
+    cells: [
+      // L5
+      { row:5, col:3, type:'skull' },
+      { row:5, col:5, type:'skull' },
+      // L4
+      { row:4, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:4, col:3, type:'skull' },
+      { row:4, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:4, col:5, type:'skull' },
+      { row:4, col:6, type:'wx', wordGroup:[0,1,2], pos:1 },
+      // L3
+      { row:3, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:3, col:3, type:'skull' },
+      { row:3, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:3, col:5, type:'wN_p', wordIdx:4, pos:0 },
+      { row:3, col:6, type:'skull' },
+      // L2
+      { row:2, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:5, type:'wN_p', wordIdx:0, pos:1 },
+      { row:2, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      // L1
+      { row:1, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:5, type:'wN_p', wordIdx:0, pos:1 },
+      { row:1, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      { row:1, col:7, type:'wN_p', wordIdx:4, pos:2 },
+      // L0
+      { row:0, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:5, type:'wN_p', wordIdx:0, pos:1 },
+      { row:0, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      { row:0, col:7, type:'wN_p', wordIdx:4, pos:2 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3], pos:'any' },
+        ]
+      }
+    ],
+  },
+  'escape_d5_4x2k_1x3k_ter': {
+    id: 'escape_d5_4x2k_1x3k_ter',
+    cols: 8,
+    cells: [
+      // L5
+      { row:5, col:3, type:'skull' },
+      { row:5, col:5, type:'skull' },
+      // L4
+      { row:4, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:4, col:3, type:'skull' },
+      { row:4, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:4, col:5, type:'skull' },
+      { row:4, col:6, type:'wx', wordGroup:[0,1,2], pos:1 },
+      // L3
+      { row:3, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:3, col:3, type:'skull' },
+      { row:3, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:3, col:5, type:'wN_p', wordIdx:4, pos:0 },
+      { row:3, col:6, type:'skull' },
+      // L2
+      { row:2, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:5, type:'wN_p', wordIdx:1, pos:1 },
+      { row:2, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      // L1
+      { row:1, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:5, type:'wN_p', wordIdx:1, pos:1 },
+      { row:1, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      { row:1, col:7, type:'wN_p', wordIdx:4, pos:2 },
+      // L0
+      { row:0, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:5, type:'wN_p', wordIdx:1, pos:1 },
+      { row:0, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      { row:0, col:7, type:'wN_p', wordIdx:4, pos:2 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3], pos:'any' },
+        ]
+      }
+    ],
+  },
+  // ═══════════════════════════════════════════════════════════════════
+  //  CONFIG : 4x2k_2x3k  (4 mots 2 kanas + 2 mots 3 kanas)
+  //  wordIdx 0-3 = mots 2k, wordIdx 4 = 3k escape, wordIdx 5 = 3k bonus
+  // ═══════════════════════════════════════════════════════════════════
+
+  // ── D1 : trigger exposé, skulls discrets ──
+  'escape_d1_4x2k_2x3k': {
+    id: 'escape_d1_4x2k_2x3k',
+    cols: 8,
+    cells: [
+      // L2
+      { row:2, col:3, type:'skull' },
+      { row:2, col:4, type:'skull' },
+      { row:2, col:5, type:'skull' },
+      { row:2, col:6, type:'skull' },
+      { row:2, col:7, type:'skull' },
+      // L1
+      { row:1, col:3, type:'wN_p', wordIdx:5, pos:0 },
+      { row:1, col:4, type:'filler' },
+      { row:1, col:5, type:'wN_p', wordIdx:4, pos:0 },
+      { row:1, col:6, type:'filler' },
+      { row:1, col:7, type:'filler' },
+      // L0
+      { row:0, col:2, type:'trigger', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:3, type:'wN_p', wordIdx:3, pos:1 },
+      { row:0, col:4, type:'wN_p', wordIdx:5, pos:1 },
+      { row:0, col:5, type:'wN_p', wordIdx:5, pos:2 },
+      { row:0, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      { row:0, col:7, type:'wN_p', wordIdx:4, pos:2 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2], pos:'any' },
+        ]
+      },
+      {
+        phase: 2,
+        condition: { wordFound: 2 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2], pos:'any' },
+          { type:'wN_p', wordIdx:3, pos:0 },
+        ]
+      }
+    ],
+  },
+
+  // ── D2 : trigger sous 1 kana, skulls en arc ──
+   'escape_d2_4x2k_2x3k': {
+    id: 'escape_d2_4x2k_2x3k',
+    cols: 8,
+    cells: [
+      // L2
+      { row:2, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:3, type:'skull' },
+      { row:2, col:4, type:'skull' },
+      { row:2, col:5, type:'skull' },
+      { row:2, col:6, type:'skull' },
+      // L1
+      { row:1, col:1, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:3, type:'wN_p', wordIdx:5, pos:0 },
+      { row:1, col:4, type:'filler' },
+      { row:1, col:5, type:'wN_p', wordIdx:4, pos:0 },
+      { row:1, col:6, type:'filler' },
+      // L0
+      { row:0, col:1, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:2, type:'trigger', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:3, type:'wN_p', wordIdx:3, pos:1 },
+      { row:0, col:4, type:'wN_p', wordIdx:5, pos:1 },
+      { row:0, col:5, type:'wN_p', wordIdx:5, pos:2 },
+      { row:0, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      { row:0, col:7, type:'wN_p', wordIdx:4, pos:2 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2], pos:'any' },
+        ]
+      },
+      {
+        phase: 2,
+        condition: { wordFound: 2 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2], pos:'any' },
+          { type:'wN_p', wordIdx:3, pos:0 },
+        ]
+      }
+    ],
+  },
+
+  // ── D3 : trigger sous 2 kanas, double colonne de skulls ──
+    'escape_d3_4x2k_2x3k': {
+    id: 'escape_d3_4x2k_2x3k',
+    cols: 8,
+    cells: [
+      // L5
+      { row:5, col:1, type:'skull' },
+      { row:5, col:4, type:'skull' },
+      // L4
+      { row:4, col:1, type:'skull' },
+      { row:4, col:4, type:'skull' },
+      // L3
+      { row:3, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:3, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:3, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:3, col:5, type:'wx', wordGroup:[0,1,2], pos:1 },
+      // L2
+      { row:2, col:1, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:3, type:'skull' },
+      { row:2, col:4, type:'skull' },
+      { row:2, col:5, type:'skull' },
+      { row:2, col:6, type:'skull' },
+      // L1
+      { row:1, col:1, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:3, type:'wN_p', wordIdx:5, pos:0 },
+      { row:1, col:4, type:'filler' },
+      { row:1, col:5, type:'wN_p', wordIdx:4, pos:0 },
+      { row:1, col:6, type:'filler' },
+      // L0
+      { row:0, col:1, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:2, type:'trigger', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:3, type:'wN_p', wordIdx:3, pos:1 },
+      { row:0, col:4, type:'wN_p', wordIdx:5, pos:1 },
+      { row:0, col:5, type:'wN_p', wordIdx:5, pos:2 },
+      { row:0, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      { row:0, col:7, type:'wN_p', wordIdx:4, pos:2 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2], pos:'any' },
+        ]
+      },
+      {
+        phase: 2,
+        condition: { wordFound: 2 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2], pos:'any' },
+          { type:'wN_p', wordIdx:3, pos:0 },
+        ]
+      }
+    ],
+  },
+
+  // ── D4 : trigger profond, skulls en L, 2 mots 3k en embuscade ──
+  'escape_d4_4x2k_2x3k': {
+    id: 'escape_d4_4x2k_2x3k',
+    cols: 8,
+    cells: [
+      // L5
+      { row:5, col:3, type:'skull' },
+      { row:5, col:5, type:'skull' },
+      // L4
+      { row:4, col:3, type:'skull' },
+      { row:4, col:5, type:'skull' },
+      // L3
+      { row:3, col:2, type:'skull' },
+      { row:3, col:3, type:'skull' },
+      { row:3, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:3, col:5, type:'skull' },
+      { row:3, col:6, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:3, col:7, type:'wx', wordGroup:[0,1,2], pos:1 },
+      // L2
+      { row:2, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:5, type:'wN_p', wordIdx:4, pos:0 },
+      { row:2, col:6, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:7, type:'skull' },
+      // L1
+      { row:1, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:5, type:'wN_p', wordIdx:5, pos:0 },
+      { row:1, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      { row:1, col:7, type:'wN_p', wordIdx:4, pos:2 },
+      // L0
+      { row:0, col:1, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:5, type:'wN_p', wordIdx:3, pos:1 },
+      { row:0, col:6, type:'wN_p', wordIdx:5, pos:1 },
+      { row:0, col:7, type:'wN_p', wordIdx:5, pos:2 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2], pos:'any' },
+        ]
+      },
+      {
+        phase: 2,
+        condition: { wordFound: 2 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2], pos:'any' },
+          { type:'wN_p', wordIdx:3, pos:0 },
+        ]
+      }
+    ],
+  },
+
+  // ── D5 : forteresse de skulls, trigger très enfoui ──
+   'escape_d5_4x2k_2x3k': {
+    id: 'escape_d5_4x2k_2x3k',
+    cols: 8,
+    cells: [
+      // L6
+      { row:6, col:3, type:'skull' },
+      { row:6, col:5, type:'skull' },
+      { row:6, col:7, type:'skull' },
+      // L5
+      { row:5, col:3, type:'skull' },
+      { row:5, col:5, type:'skull' },
+      // L4
+      { row:4, col:3, type:'skull' },
+      { row:4, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:4, col:5, type:'skull' },
+      { row:4, col:6, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:4, col:7, type:'wx', wordGroup:[0,1,2], pos:1 },
+      // L3
+      { row:3, col:1, type:'skull' },
+      { row:3, col:2, type:'skull' },
+      { row:3, col:3, type:'skull' },
+      { row:3, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:3, col:5, type:'skull' },
+      { row:3, col:6, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:3, col:7, type:'wx', wordGroup:[0,1,2], pos:1 },
+      // L2
+      { row:2, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:5, type:'wN_p', wordIdx:4, pos:0 },
+      { row:2, col:6, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:7, type:'skull' },
+      // L1
+      { row:1, col:1, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:5, type:'wN_p', wordIdx:5, pos:0 },
+      { row:1, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      { row:1, col:7, type:'wN_p', wordIdx:4, pos:2 },
+      // L0
+      { row:0, col:0, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:1, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:5, type:'wN_p', wordIdx:3, pos:1 },
+      { row:0, col:6, type:'wN_p', wordIdx:5, pos:1 },
+      { row:0, col:7, type:'wN_p', wordIdx:5, pos:2 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2], pos:'any' },
+        ]
+      },
+      {
+        phase: 2,
+        condition: { wordFound: 2 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2], pos:'any' },
+          { type:'wN_p', wordIdx:3, pos:0 },
+        ]
+      }
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  CONFIG : 6x2k  (6 mots de 2 kanas)
+  //  wordIdx 0-5 = mots 2k, trigger = mot parmi 0-4, w5 = escape
+  // ═══════════════════════════════════════════════════════════════════
+
+  // ── D1 : trigger quasi exposé, 3 skulls fixes ──
+  'escape_d1_6x2k': {
+    id: 'escape_d1_6x2k',
+    cols: 8,
+    cells: [
+      // L2
+      { row:2, col:4, type:'skull' },
+      { row:2, col:6, type:'skull' },
+      { row:2, col:7, type:'skull' },
+      // L1
+      { row:1, col:4, type:'skull' },
+      { row:1, col:6, type:'wN_p', wordIdx:5, pos:0 },
+      { row:1, col:7, type:'filler' },
+      // L0
+      { row:0, col:4, type:'skull' },
+      { row:0, col:5, type:'trigger', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:0, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      { row:0, col:7, type:'wN_p', wordIdx:5, pos:1 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1,2,3], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:3 },
+        pool:[ { type:'wx', wordGroup:[0,1,2,3], pos:'any' },
+               { type:'wN_p', wordIdx:4, pos:0 } ] }
+    ]
+  },
+
+  // ── D2 : trigger sous 1 kana, skulls en L ──
+  'escape_d2_6x2k': {
+    id: 'escape_d2_6x2k',
+    cols: 8,
+    cells: [
+      // L2
+      { row:2, col:3, type:'skull' },
+      { row:2, col:5, type:'skull' },
+      { row:2, col:6, type:'skull' },
+      // L1
+      { row:1, col:3, type:'skull' },
+      { row:1, col:4, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:1, col:5, type:'filler' },
+      { row:1, col:6, type:'wN_p', wordIdx:5, pos:0 },
+      // L0
+      { row:0, col:2, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:0, col:3, type:'skull' },
+      { row:0, col:4, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:0, col:5, type:'trigger', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:0, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      { row:0, col:7, type:'wN_p', wordIdx:5, pos:1 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3,4], pos:'any' },
+        ]
+      }
+    ],
+  },
+
+  // ── D3 : trigger sous 2 kanas, skulls en croix ──
+  'escape_d3_6x2k': {
+    id: 'escape_d3_6x2k',
+    cols: 8,
+    cells: [
+      // L4
+      { row:4, col:4, type:'skull' },
+      { row:4, col:6, type:'skull' },
+      // L3
+      { row:3, col:4, type:'skull' },
+      { row:3, col:6, type:'skull' },
+      // L2
+      { row:2, col:3, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:2, col:4, type:'skull' },
+      { row:2, col:5, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:2, col:6, type:'skull' },
+      { row:2, col:7, type:'skull' },
+      // L1
+      { row:1, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:3, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:1, col:4, type:'skull' },
+      { row:1, col:5, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:1, col:6, type:'wN_p', wordIdx:5, pos:0 },
+      // L0
+      { row:0, col:1, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:3, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:0, col:4, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:0, col:5, type:'trigger', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:0, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      { row:0, col:7, type:'wN_p', wordIdx:5, pos:1 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3,4], pos:'any' },
+        ]
+      }
+    ],
+  },
+
+  // ── D4 : trigger sous 3 kanas, skulls en tunnel ──
+  'escape_d4_6x2k': {
+    id: 'escape_d4_6x2k',
+    cols: 8,
+    cells: [
+      // L6
+      { row:6, col:6, type:'skull' },
+      { row:6, col:7, type:'skull' },
+      // L5
+      { row:5, col:4, type:'skull' },
+      { row:5, col:6, type:'skull' },
+      { row:5, col:7, type:'wN_p', wordIdx:5, pos:0 },
+      // L4
+      { row:4, col:4, type:'skull' },
+      { row:4, col:6, type:'skull' },
+      { row:4, col:7, type:'wx', wordGroup:[0,1,2], pos:1 },
+      // L3
+      { row:3, col:3, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:3, col:4, type:'skull' },
+      { row:3, col:5, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:3, col:6, type:'skull' },
+      { row:3, col:7, type:'wx', wordGroup:[0,1,2], pos:1 },
+      // L2
+      { row:2, col:3, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:2, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:5, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:2, col:6, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:7, type:'wx', wordGroup:[0,1,2], pos:1 },
+      // L1
+      { row:1, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:3, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:1, col:4, type:'skull' },
+      { row:1, col:5, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:1, col:6, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:7, type:'wx', wordGroup:[0,1,2], pos:1 },
+      // L0
+      { row:0, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:3, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:0, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:5, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:6, type:'skull' },
+      { row:0, col:7, type:'wN_p', wordIdx:5, pos:1 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3,4], pos:'any' },
+        ]
+      }
+    ],
+  },
+
+  // ── D5 : labyrinthe de skulls, trigger très enfoui ──
+   'escape_d5_6x2k': {
+    id: 'escape_d5_6x2k',
+    cols: 8,
+    cells: [
+      // L6
+      { row:6, col:6, type:'skull' },
+      { row:6, col:7, type:'skull' },
+      // L5
+      { row:5, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:5, col:4, type:'skull' },
+      { row:5, col:6, type:'skull' },
+      { row:5, col:7, type:'wN_p', wordIdx:5, pos:0 },
+      // L4
+      { row:4, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:4, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:4, col:4, type:'skull' },
+      { row:4, col:6, type:'skull' },
+      { row:4, col:7, type:'wx', wordGroup:[0,1,2], pos:1 },
+      // L3
+      { row:3, col:1, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:3, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:3, col:3, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:3, col:4, type:'skull' },
+      { row:3, col:5, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:3, col:6, type:'skull' },
+      { row:3, col:7, type:'wx', wordGroup:[0,1,2], pos:1 },
+      // L2
+      { row:2, col:1, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:3, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:2, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:5, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:2, col:6, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:7, type:'wx', wordGroup:[0,1,2], pos:1 },
+      // L1
+      { row:1, col:0, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:1, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:3, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:1, col:4, type:'skull' },
+      { row:1, col:5, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:1, col:6, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:7, type:'wx', wordGroup:[0,1,2], pos:1 },
+      // L0
+      { row:0, col:0, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:1, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:3, type:'wx', wordGroup:[0,1,2,3,4], pos:1 },
+      { row:0, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:5, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:6, type:'skull' },
+      { row:0, col:7, type:'wN_p', wordIdx:5, pos:1 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3,4], pos:'any' },
+        ]
+      }
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  CONFIG : 5x2k  (5 mots de 2 kanas)
+  //  wordIdx 0-4 = mots 2k, trigger = mot parmi 0-3, w4 = escape
+  // ═══════════════════════════════════════════════════════════════════
+
+  'escape_d1_5x2k': {
+    id: 'escape_d1_5x2k',
+    cols: 8,
+    cells: [
+      // L1
+      { row:1, col:4, type:'skull' },
+      { row:1, col:6, type:'wN_p', wordIdx:4, pos:0 },
+      { row:1, col:7, type:'filler' },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:4, type:'skull' },
+      { row:0, col:5, type:'trigger', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:4, pos:1 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1,2,3], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:2 },
+        pool:[ { type:'wx', wordGroup:[0,1,2,3], pos:'any' },
+               { type:'wN_p', wordIdx:3, pos:0 } ] }
+    ]
+  },
+
+  'escape_d2_5x2k': {
+    id: 'escape_d2_5x2k',
+    cols: 8,
+    cells: [
+      // L2
+      { row:2, col:3, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:4, type:'skull' },
+      { row:2, col:5, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:6, type:'skull' },
+      // L1
+      { row:1, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:4, type:'skull' },
+      { row:1, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:6, type:'wN_p', wordIdx:4, pos:0 },
+      // L0
+      { row:0, col:1, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:4, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:5, type:'trigger', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:6, type:'wN_p', wordIdx:3, pos:1 },
+      { row:0, col:7, type:'wN_p', wordIdx:4, pos:1 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3], pos:'any' },
+        ]
+      },
+      {
+        phase: 2,
+        condition: { wordFound: 2 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3], pos:'any' },
+          { type:'wN_p', wordIdx:3, pos:0 },
+        ]
+      }
+    ],
+  },
+
+  'escape_d3_5x2k': {
+    id: 'escape_d3_5x2k',
+    cols: 8,
+    cells: [
+      // L8
+      { row:8, col:0, type:'skull' },
+      { row:8, col:1, type:'skull' },
+      { row:8, col:6, type:'skull' },
+      { row:8, col:7, type:'skull' },
+      // L7
+      { row:7, col:0, type:'wN_p', wordIdx:3, pos:0 },
+      { row:7, col:1, type:'skull' },
+      { row:7, col:6, type:'skull' },
+      { row:7, col:7, type:'wN_p', wordIdx:4, pos:0 },
+      // L6
+      { row:6, col:0, type:'wN_p', wordIdx:0, pos:0 },
+      { row:6, col:1, type:'skull' },
+      { row:6, col:6, type:'skull' },
+      { row:6, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L5
+      { row:5, col:0, type:'wN_p', wordIdx:1, pos:0 },
+      { row:5, col:1, type:'skull' },
+      { row:5, col:6, type:'skull' },
+      { row:5, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L4
+      { row:4, col:0, type:'wN_p', wordIdx:2, pos:0 },
+      { row:4, col:1, type:'skull' },
+      { row:4, col:6, type:'skull' },
+      { row:4, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L3
+      { row:3, col:0, type:'wN_p', wordIdx:3, pos:0 },
+      { row:3, col:1, type:'skull' },
+      { row:3, col:6, type:'skull' },
+      { row:3, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L2
+      { row:2, col:0, type:'wN_p', wordIdx:3, pos:0 },
+      { row:2, col:1, type:'skull' },
+      { row:2, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L1
+      { row:1, col:0, type:'wN_p', wordIdx:1, pos:0 },
+      { row:1, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L0
+      { row:0, col:0, type:'wN_p', wordIdx:2, pos:0 },
+      { row:0, col:7, type:'wN_p', wordIdx:4, pos:1 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[1,2,3], pos:'any' },
+        ]
+      }
+    ],
+  },
+
+  'escape_d4_5x2k': {
+    id: 'escape_d4_5x2k',
+    cols: 8,
+    cells: [
+      // L8
+      { row:8, col:0, type:'skull' },
+      { row:8, col:1, type:'skull' },
+      { row:8, col:6, type:'skull' },
+      { row:8, col:7, type:'skull' },
+      // L7
+      { row:7, col:0, type:'wN_p', wordIdx:3, pos:0 },
+      { row:7, col:1, type:'skull' },
+      { row:7, col:6, type:'skull' },
+      { row:7, col:7, type:'wN_p', wordIdx:4, pos:0 },
+      // L6
+      { row:6, col:0, type:'wN_p', wordIdx:0, pos:0 },
+      { row:6, col:1, type:'skull' },
+      { row:6, col:6, type:'skull' },
+      { row:6, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L5
+      { row:5, col:0, type:'wN_p', wordIdx:1, pos:0 },
+      { row:5, col:1, type:'skull' },
+      { row:5, col:6, type:'skull' },
+      { row:5, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L4
+      { row:4, col:0, type:'wN_p', wordIdx:2, pos:0 },
+      { row:4, col:1, type:'skull' },
+      { row:4, col:3, type:'skull' },
+      { row:4, col:4, type:'skull' },
+      { row:4, col:6, type:'skull' },
+      { row:4, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L3
+      { row:3, col:0, type:'wN_p', wordIdx:3, pos:0 },
+      { row:3, col:1, type:'skull' },
+      { row:3, col:3, type:'skull' },
+      { row:3, col:4, type:'skull' },
+      { row:3, col:6, type:'skull' },
+      { row:3, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L2
+      { row:2, col:0, type:'wN_p', wordIdx:3, pos:0 },
+      { row:2, col:1, type:'skull' },
+      { row:2, col:3, type:'skull' },
+      { row:2, col:4, type:'skull' },
+      { row:2, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L1
+      { row:1, col:0, type:'wN_p', wordIdx:1, pos:0 },
+      { row:1, col:3, type:'skull' },
+      { row:1, col:4, type:'skull' },
+      { row:1, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L0
+      { row:0, col:0, type:'wN_p', wordIdx:2, pos:0 },
+      { row:0, col:3, type:'skull' },
+      { row:0, col:4, type:'skull' },
+      { row:0, col:7, type:'wN_p', wordIdx:4, pos:1 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[1,2,3], pos:'any' },
+        ]
+      }
+    ],
+  },
+
+   'escape_d5_5x2k': {
+    id: 'escape_d5_5x2k',
+    cols: 8,
+    cells: [
+      // L8
+      { row:8, col:0, type:'skull' },
+      { row:8, col:1, type:'skull' },
+      { row:8, col:3, type:'skull' },
+      { row:8, col:4, type:'skull' },
+      { row:8, col:6, type:'skull' },
+      { row:8, col:7, type:'skull' },
+      // L7
+      { row:7, col:0, type:'wN_p', wordIdx:3, pos:0 },
+      { row:7, col:1, type:'skull' },
+      { row:7, col:3, type:'skull' },
+      { row:7, col:4, type:'skull' },
+      { row:7, col:6, type:'skull' },
+      { row:7, col:7, type:'wN_p', wordIdx:4, pos:0 },
+      // L6
+      { row:6, col:0, type:'wN_p', wordIdx:0, pos:0 },
+      { row:6, col:1, type:'skull' },
+      { row:6, col:3, type:'skull' },
+      { row:6, col:4, type:'skull' },
+      { row:6, col:6, type:'skull' },
+      { row:6, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L5
+      { row:5, col:0, type:'wN_p', wordIdx:1, pos:0 },
+      { row:5, col:1, type:'skull' },
+      { row:5, col:3, type:'skull' },
+      { row:5, col:4, type:'skull' },
+      { row:5, col:6, type:'skull' },
+      { row:5, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L4
+      { row:4, col:0, type:'wN_p', wordIdx:2, pos:0 },
+      { row:4, col:1, type:'skull' },
+      { row:4, col:3, type:'skull' },
+      { row:4, col:4, type:'skull' },
+      { row:4, col:6, type:'skull' },
+      { row:4, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L3
+      { row:3, col:0, type:'wN_p', wordIdx:3, pos:0 },
+      { row:3, col:1, type:'skull' },
+      { row:3, col:3, type:'skull' },
+      { row:3, col:4, type:'skull' },
+      { row:3, col:6, type:'skull' },
+      { row:3, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L2
+      { row:2, col:0, type:'wN_p', wordIdx:3, pos:0 },
+      { row:2, col:1, type:'skull' },
+      { row:2, col:3, type:'skull' },
+      { row:2, col:4, type:'skull' },
+      { row:2, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L1
+      { row:1, col:0, type:'wN_p', wordIdx:1, pos:0 },
+      { row:1, col:3, type:'skull' },
+      { row:1, col:4, type:'skull' },
+      { row:1, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L0
+      { row:0, col:0, type:'wN_p', wordIdx:2, pos:0 },
+      { row:0, col:3, type:'skull' },
+      { row:0, col:4, type:'skull' },
+      { row:0, col:7, type:'wN_p', wordIdx:4, pos:1 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[1,2,3], pos:'any' },
+        ]
+      }
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  CONFIG : 7x2k  (7 mots de 2 kanas)
+  //  wordIdx 0-6 = mots 2k, trigger parmi 0-5, w6 = escape
+  // ═══════════════════════════════════════════════════════════════════
+
+  'escape_d1_7x2k': {
+    id: 'escape_d1_7x2k',
+    cols: 8,
+    cells: [
+      // L2
+      { row:2, col:4, type:'skull' },
+      { row:2, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:2, col:6, type:'skull' },
+      { row:2, col:7, type:'skull' },
+      // L1
+      { row:1, col:4, type:'skull' },
+      { row:1, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:6, type:'wN_p', wordIdx:6, pos:0 },
+      // L0
+      { row:0, col:4, type:'skull' },
+      { row:0, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:6, type:'wN_p', wordIdx:5, pos:1 },
+      { row:0, col:7, type:'wN_p', wordIdx:6, pos:1 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3,4], pos:'any' },
+        ]
+      },
+      {
+        phase: 2,
+        condition: { wordFound: 4 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3,4], pos:'any' },
+          { type:'wN_p', wordIdx:5, pos:0 },
+        ]
+      }
+    ],
+  },
+
+    'escape_d2_7x2k': {
+    id: 'escape_d2_7x2k',
+    cols: 8,
+    cells: [
+      // L3
+      { row:3, col:4, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:3, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:3, col:6, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:3, col:7, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      // L2
+      { row:2, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:2, col:4, type:'skull' },
+      { row:2, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:2, col:6, type:'skull' },
+      { row:2, col:7, type:'skull' },
+      // L1
+      { row:1, col:2, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:4, type:'skull' },
+      { row:1, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:6, type:'wN_p', wordIdx:6, pos:0 },
+      // L0
+      { row:0, col:1, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:2, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:6, type:'wN_p', wordIdx:5, pos:1 },
+      { row:0, col:7, type:'wN_p', wordIdx:6, pos:1 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3,4], pos:'any' },
+        ]
+      },
+      {
+        phase: 2,
+        condition: { wordFound: 4 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3,4], pos:'any' },
+          { type:'wN_p', wordIdx:5, pos:0 },
+        ]
+      }
+    ],
+  },
+
+  'escape_d3_7x2k': {
+    id: 'escape_d3_7x2k',
+    cols: 8,
+    cells: [
+      // L5
+      { row:5, col:3, type:'skull' },
+      { row:5, col:6, type:'skull' },
+      // L4
+      { row:4, col:2, type:'skull' },
+      { row:4, col:3, type:'skull' },
+      { row:4, col:6, type:'skull' },
+      // L3
+      { row:3, col:4, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:3, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:3, col:7, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      // L2
+      { row:2, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:2, col:4, type:'skull' },
+      { row:2, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:2, col:6, type:'skull' },
+      { row:2, col:7, type:'skull' },
+      // L1
+      { row:1, col:2, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:4, type:'skull' },
+      { row:1, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:6, type:'wN_p', wordIdx:6, pos:0 },
+      // L0
+      { row:0, col:1, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:2, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:6, type:'wN_p', wordIdx:5, pos:1 },
+      { row:0, col:7, type:'wN_p', wordIdx:6, pos:1 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3,4], pos:'any' },
+        ]
+      },
+      {
+        phase: 2,
+        condition: { wordFound: 4 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3,4], pos:'any' },
+          { type:'wN_p', wordIdx:5, pos:0 },
+        ]
+      }
+    ],
+  },
+
+   'escape_d4_7x2k': {
+    id: 'escape_d4_7x2k',
+    cols: 8,
+    cells: [
+      // L6
+      { row:6, col:3, type:'skull' },
+      { row:6, col:6, type:'skull' },
+      // L5
+      { row:5, col:2, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:5, col:3, type:'skull' },
+      { row:5, col:6, type:'skull' },
+      // L4
+      { row:4, col:2, type:'skull' },
+      { row:4, col:3, type:'skull' },
+      // L3
+      { row:3, col:2, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:3, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:3, col:4, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:3, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:3, col:7, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      // L2
+      { row:2, col:1, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:2, col:2, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:2, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:2, col:4, type:'skull' },
+      { row:2, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:2, col:6, type:'skull' },
+      { row:2, col:7, type:'skull' },
+      // L1
+      { row:1, col:1, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:2, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:4, type:'skull' },
+      { row:1, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:6, type:'wN_p', wordIdx:6, pos:0 },
+      // L0
+      { row:0, col:0, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:1, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:2, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:6, type:'wN_p', wordIdx:5, pos:1 },
+      { row:0, col:7, type:'wN_p', wordIdx:6, pos:1 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3,4], pos:'any' },
+        ]
+      },
+      {
+        phase: 2,
+        condition: { wordFound: 4 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3,4], pos:'any' },
+          { type:'wN_p', wordIdx:5, pos:0 },
+        ]
+      }
+    ],
+  },
+    'escape_d5_7x2k': {
+    id: 'escape_d5_7x2k',
+    cols: 8,
+    cells: [
+      // L6
+      { row:6, col:2, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:6, col:3, type:'skull' },
+      { row:6, col:6, type:'skull' },
+      // L5
+      { row:5, col:1, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:5, col:2, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:5, col:3, type:'skull' },
+      { row:5, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:5, col:6, type:'skull' },
+      // L4
+      { row:4, col:1, type:'skull' },
+      { row:4, col:2, type:'skull' },
+      { row:4, col:3, type:'skull' },
+      { row:4, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:4, col:7, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      // L3
+      { row:3, col:2, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:3, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:3, col:4, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:3, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:3, col:7, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      // L2
+      { row:2, col:1, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:2, col:2, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:2, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:2, col:4, type:'skull' },
+      { row:2, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:2, col:6, type:'skull' },
+      { row:2, col:7, type:'skull' },
+      // L1
+      { row:1, col:1, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:2, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:4, type:'skull' },
+      { row:1, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:6, type:'wN_p', wordIdx:6, pos:0 },
+      // L0
+      { row:0, col:0, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:1, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:2, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:5, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:6, type:'wN_p', wordIdx:5, pos:1 },
+      { row:0, col:7, type:'wN_p', wordIdx:6, pos:1 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3,4], pos:'any' },
+        ]
+      },
+      {
+        phase: 2,
+        condition: { wordFound: 4 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3,4], pos:'any' },
+          { type:'wN_p', wordIdx:5, pos:0 },
+        ]
+      }
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  CONFIG : 5x2k_1x3k  (5 mots 2k + 1 mot 3k)
+  //  wordIdx 0-4 = mots 2k, wordIdx 5 = mot 3k escape (pos 0,1,2)
+  // ═══════════════════════════════════════════════════════════════════
+
+  'escape_d1_5x2k_1x3k': {
+    id: 'escape_d1_5x2k_1x3k',
+    cols: 8,
+    cells: [
+      // L2
+      { row:2, col:5, type:'skull' },
+      { row:2, col:6, type:'skull' },
+      // L1
+      { row:1, col:4, type:'wx',   wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:5, type:'wN_p', wordIdx:5, pos:0 },
+      { row:1, col:6, type:'filler' },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:4, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:5, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:5, pos:2 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1,2,3], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:3 },
+        pool:[ { type:'wx', wordGroup:[0,1,2,3], pos:'any' },
+               { type:'wN_p', wordIdx:4, pos:0 },
+               { type:'wN_p', wordIdx:5, pos:0 } ] }
+    ]
+  },
+
+  'escape_d2_5x2k_1x3k': {
+    id: 'escape_d2_5x2k_1x3k',
+    cols: 8,
+    cells: [
+      // L2
+      { row:2, col:4, type:'wx',   wordGroup:[0,1,2,3], pos:1 },
+      { row:2, col:5, type:'skull' },
+      { row:2, col:6, type:'skull' },
+      // L1
+      { row:1, col:3, type:'wx',   wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:4, type:'wx',   wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:5, type:'wN_p', wordIdx:5, pos:0 },
+      { row:1, col:6, type:'filler' },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:4, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:5, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:5, pos:2 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1,2,3], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:3 },
+        pool:[ { type:'wx', wordGroup:[0,1,2,3], pos:'any' },
+               { type:'wN_p', wordIdx:4, pos:0 },
+               { type:'wN_p', wordIdx:5, pos:0 } ] }
+    ],
+    forbiddenPairs:[ { a:{ row:1, col:4 }, b:{ row:1, col:5 } } ]
+  },
+
+  'escape_d3_5x2k_1x3k': {
+    id: 'escape_d3_5x2k_1x3k',
+    cols: 8,
+    cells: [
+      // L3
+      { row:3, col:4, type:'skull' },
+      { row:3, col:5, type:'skull' },
+      // L2
+      { row:2, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:2, col:4, type:'skull' },
+      { row:2, col:5, type:'wN_p', wordIdx:5, pos:0 },
+      { row:2, col:6, type:'skull' },
+      // L1
+      { row:1, col:2, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:5, type:'wN_p', wordIdx:4, pos:1 },
+      { row:1, col:6, type:'wN_p', wordIdx:5, pos:1 },
+      { row:1, col:7, type:'wN_p', wordIdx:5, pos:2 },
+      // L0
+      { row:0, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:5, type:'wN_p', wordIdx:4, pos:1 },
+      { row:0, col:6, type:'wN_p', wordIdx:5, pos:1 },
+      { row:0, col:7, type:'wN_p', wordIdx:5, pos:2 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3], pos:'any' },
+        ]
+      },
+      {
+        phase: 2,
+        condition: { wordFound: 2 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3], pos:'any' },
+          { type:'wN_p', wordIdx:4, pos:0 },
+          { type:'wN_p', wordIdx:5, pos:0 },
+        ]
+      }
+    ],
+  },
+
+   'escape_d4_5x2k_1x3k': {
+    id: 'escape_d4_5x2k_1x3k',
+    cols: 8,
+    cells: [
+      // L4
+      { row:4, col:4, type:'skull' },
+      { row:4, col:6, type:'skull' },
+      // L3
+      { row:3, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:3, col:4, type:'skull' },
+      { row:3, col:5, type:'wN_p', wordIdx:5, pos:0 },
+      { row:3, col:6, type:'skull' },
+      // L2
+      { row:2, col:2, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:2, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:2, col:5, type:'wN_p', wordIdx:4, pos:1 },
+      { row:2, col:6, type:'wN_p', wordIdx:5, pos:1 },
+      { row:2, col:7, type:'skull' },
+      // L1
+      { row:1, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:4, type:'skull' },
+      { row:1, col:5, type:'wN_p', wordIdx:4, pos:1 },
+      { row:1, col:6, type:'wN_p', wordIdx:5, pos:1 },
+      { row:1, col:7, type:'wN_p', wordIdx:5, pos:2 },
+      // L0
+      { row:0, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:5, type:'wN_p', wordIdx:4, pos:1 },
+      { row:0, col:6, type:'wN_p', wordIdx:5, pos:1 },
+      { row:0, col:7, type:'wN_p', wordIdx:5, pos:2 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3], pos:'any' },
+        ]
+      },
+      {
+        phase: 2,
+        condition: { wordFound: 2 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3], pos:'any' },
+          { type:'wN_p', wordIdx:4, pos:0 },
+          { type:'wN_p', wordIdx:5, pos:0 },
+        ]
+      }
+    ],
+  },
+
+  'escape_d5_5x2k_1x3k': {
+    id: 'escape_d5_5x2k_1x3k',
+    cols: 8,
+    cells: [
+      // L6
+      { row:6, col:4, type:'skull' },
+      { row:6, col:6, type:'skull' },
+      // L5
+      { row:5, col:4, type:'skull' },
+      { row:5, col:6, type:'skull' },
+      // L4
+      { row:4, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:4, col:4, type:'skull' },
+      { row:4, col:5, type:'wN_p', wordIdx:5, pos:0 },
+      { row:4, col:6, type:'skull' },
+      // L3
+      { row:3, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:3, col:5, type:'wN_p', wordIdx:4, pos:1 },
+      { row:3, col:6, type:'wN_p', wordIdx:5, pos:1 },
+      { row:3, col:7, type:'skull' },
+      // L2
+      { row:2, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:2, col:3, type:'skull' },
+      { row:2, col:4, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:2, col:5, type:'wN_p', wordIdx:4, pos:1 },
+      { row:2, col:6, type:'wN_p', wordIdx:5, pos:1 },
+      { row:2, col:7, type:'wN_p', wordIdx:5, pos:2 },
+      // L1
+      { row:1, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:1, col:4, type:'skull' },
+      { row:1, col:5, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:6, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:1, col:7, type:'wN_p', wordIdx:5, pos:2 },
+      // L0
+      { row:0, col:1, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:2, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:3, type:'wx', wordGroup:[0,1,2,3], pos:1 },
+      { row:0, col:5, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:6, type:'wx', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:7, type:'wx', wordGroup:[0,1,2], pos:1 },
+    ],
+    spawnPhases: [
+      {
+        phase: 1,
+        condition: { wordsFound: 0 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3], pos:'any' },
+        ]
+      },
+      {
+        phase: 2,
+        condition: { wordFound: 2 },
+        pool: [
+          { type:'wx', wordGroup:[0,1,2,3], pos:'any' },
+          { type:'wN_p', wordIdx:4, pos:0 },
+        ]
+      }
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  CONFIG : 3x2k_2x3k  (3 mots 2k + 2 mots 3k)
+  //  wordIdx 0-2 = mots 2k, wordIdx 3-4 = mots 3k (pos 0,1,2)
+  // ═══════════════════════════════════════════════════════════════════
+
+  'escape_d1_3x2k_2x3k': {
+    id: 'escape_d1_3x2k_2x3k',
+    cols: 8,
+    cells: [
+      // L1
+      { row:1, col:5, type:'skull' },
+      { row:1, col:7, type:'wN_p', wordIdx:4, pos:0 },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:4, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:3, pos:2 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:1 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' },
+               { type:'wN_p', wordIdx:3, pos:0 },
+               { type:'wN_p', wordIdx:4, pos:0 } ] }
+    ]
+  },
+
+  'escape_d2_3x2k_2x3k': {
+    id: 'escape_d2_3x2k_2x3k',
+    cols: 8,
+    cells: [
+      // L2
+      { row:2, col:5, type:'skull' },
+      { row:2, col:6, type:'skull' },
+      // L1
+      { row:1, col:4, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:1, col:5, type:'wN_p', wordIdx:3, pos:0 },
+      { row:1, col:6, type:'filler' },
+      { row:1, col:7, type:'wN_p', wordIdx:4, pos:0 },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:4, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:3, pos:2 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:1 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' },
+               { type:'wN_p', wordIdx:3, pos:0 },
+               { type:'wN_p', wordIdx:4, pos:0 } ] }
+    ]
+  },
+
+  'escape_d3_3x2k_2x3k': {
+    id: 'escape_d3_3x2k_2x3k',
+    cols: 8,
+    cells: [
+      // L3
+      { row:3, col:4, type:'skull' },
+      { row:3, col:6, type:'skull' },
+      // L2
+      { row:2, col:3, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:2, col:4, type:'skull' },
+      { row:2, col:5, type:'wN_p', wordIdx:3, pos:0 },
+      { row:2, col:6, type:'skull' },
+      { row:2, col:7, type:'wN_p', wordIdx:4, pos:0 },
+      // L1
+      { row:1, col:3, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:1, col:4, type:'filler' },
+      { row:1, col:5, type:'wN_p', wordIdx:3, pos:1 },
+      { row:1, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      { row:1, col:7, type:'wN_p', wordIdx:3, pos:2 },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:4, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:4, pos:2 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:1 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' },
+               { type:'wN_p', wordIdx:3, pos:0 },
+               { type:'wN_p', wordIdx:4, pos:0 } ] }
+    ]
+  },
+
+  'escape_d4_3x2k_2x3k': {
+    id: 'escape_d4_3x2k_2x3k',
+    cols: 8,
+    cells: [
+      // L4
+      { row:4, col:4, type:'skull' },
+      { row:4, col:6, type:'skull' },
+      // L3
+      { row:3, col:3, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:3, col:4, type:'skull' },
+      { row:3, col:5, type:'wN_p', wordIdx:3, pos:0 },
+      { row:3, col:6, type:'skull' },
+      { row:3, col:7, type:'wN_p', wordIdx:4, pos:0 },
+      // L2
+      { row:2, col:2, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:2, col:3, type:'skull' },
+      { row:2, col:4, type:'filler' },
+      { row:2, col:5, type:'wN_p', wordIdx:3, pos:1 },
+      { row:2, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      { row:2, col:7, type:'skull' },
+      // L1
+      { row:1, col:3, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:1, col:4, type:'filler' },
+      { row:1, col:5, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:1, col:6, type:'wN_p',    wordIdx:4, pos:1 },
+      { row:1, col:7, type:'wN_p',    wordIdx:4, pos:2 },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:4, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:4, pos:2 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:1 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' },
+               { type:'wN_p', wordIdx:3, pos:0 },
+               { type:'wN_p', wordIdx:4, pos:0 } ] }
+    ]
+  },
+
+  'escape_d5_3x2k_2x3k': {
+    id: 'escape_d5_3x2k_2x3k',
+    cols: 8,
+    cells: [
+      // L5
+      { row:5, col:4, type:'skull' },
+      { row:5, col:6, type:'skull' },
+      // L4
+      { row:4, col:3, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:4, col:4, type:'skull' },
+      { row:4, col:5, type:'wN_p', wordIdx:3, pos:0 },
+      { row:4, col:6, type:'skull' },
+      { row:4, col:7, type:'wN_p', wordIdx:4, pos:0 },
+      // L3
+      { row:3, col:2, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:3, col:3, type:'skull' },
+      { row:3, col:4, type:'filler' },
+      { row:3, col:5, type:'wN_p', wordIdx:3, pos:1 },
+      { row:3, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      { row:3, col:7, type:'skull' },
+      // L2
+      { row:2, col:2, type:'wx',   wordGroup:[0,1,2], pos:1 },
+      { row:2, col:3, type:'skull' },
+      { row:2, col:4, type:'skull' },
+      { row:2, col:5, type:'wN_p', wordIdx:3, pos:1 },
+      { row:2, col:6, type:'wN_p', wordIdx:4, pos:1 },
+      { row:2, col:7, type:'wN_p', wordIdx:4, pos:2 },
+      // L1
+      { row:1, col:3, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:1, col:4, type:'filler' },
+      { row:1, col:5, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:1, col:6, type:'wN_p',    wordIdx:4, pos:1 },
+      { row:1, col:7, type:'wN_p',    wordIdx:4, pos:2 },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1,2], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1,2], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:4, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:4, pos:2 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:1 },
+        pool:[ { type:'wx', wordGroup:[0,1,2], pos:'any' },
+               { type:'wN_p', wordIdx:3, pos:0 },
+               { type:'wN_p', wordIdx:4, pos:0 } ] }
+    ]
+  },
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  CONFIG : 2x2k_3x3k  (2 mots 2k + 3 mots 3k)
+  //  wordIdx 0-1 = mots 2k, wordIdx 2-4 = mots 3k (pos 0,1,2)
+  // ═══════════════════════════════════════════════════════════════════
+
+  'escape_d1_2x2k_3x3k': {
+    id: 'escape_d1_2x2k_3x3k',
+    cols: 8,
+    cells: [
+      // L1
+      { row:1, col:5, type:'skull' },
+      { row:1, col:7, type:'wN_p', wordIdx:4, pos:0 },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:2, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:4, pos:1 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1], pos:'any' },
+               { type:'wN_p', wordIdx:2, pos:0 },
+               { type:'wN_p', wordIdx:3, pos:0 },
+               { type:'wN_p', wordIdx:4, pos:0 } ] }
+    ]
+  },
+
+  'escape_d2_2x2k_3x3k': {
+    id: 'escape_d2_2x2k_3x3k',
+    cols: 8,
+    cells: [
+      // L2
+      { row:2, col:5, type:'skull' },
+      { row:2, col:7, type:'skull' },
+      // L1
+      { row:1, col:4, type:'wx',   wordGroup:[0,1], pos:1 },
+      { row:1, col:5, type:'wN_p', wordIdx:2, pos:0 },
+      { row:1, col:6, type:'wN_p', wordIdx:3, pos:0 },
+      { row:1, col:7, type:'wN_p', wordIdx:4, pos:0 },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:2, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:4, pos:1 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1], pos:'any' },
+               { type:'wN_p', wordIdx:2, pos:0 },
+               { type:'wN_p', wordIdx:3, pos:0 },
+               { type:'wN_p', wordIdx:4, pos:0 } ] }
+    ]
+  },
+
+  'escape_d3_2x2k_3x3k': {
+    id: 'escape_d3_2x2k_3x3k',
+    cols: 8,
+    cells: [
+      // L3
+      { row:3, col:5, type:'skull' },
+      { row:3, col:7, type:'skull' },
+      // L2
+      { row:2, col:4, type:'wx',   wordGroup:[0,1], pos:1 },
+      { row:2, col:5, type:'skull' },
+      { row:2, col:6, type:'wN_p', wordIdx:2, pos:0 },
+      { row:2, col:7, type:'wN_p', wordIdx:3, pos:0 },
+      // L1
+      { row:1, col:3, type:'wx',   wordGroup:[0,1], pos:1 },
+      { row:1, col:4, type:'skull' },
+      { row:1, col:5, type:'wN_p', wordIdx:2, pos:1 },
+      { row:1, col:6, type:'wN_p', wordIdx:3, pos:1 },
+      { row:1, col:7, type:'wN_p', wordIdx:4, pos:0 },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:2, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:4, pos:1 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1], pos:'any' },
+               { type:'wN_p', wordIdx:2, pos:0 },
+               { type:'wN_p', wordIdx:3, pos:0 },
+               { type:'wN_p', wordIdx:4, pos:0 } ] }
+    ]
+  },
+
+  'escape_d4_2x2k_3x3k': {
+    id: 'escape_d4_2x2k_3x3k',
+    cols: 8,
+    cells: [
+      // L4
+      { row:4, col:5, type:'skull' },
+      { row:4, col:7, type:'skull' },
+      // L3
+      { row:3, col:4, type:'wx',   wordGroup:[0,1], pos:1 },
+      { row:3, col:5, type:'skull' },
+      { row:3, col:6, type:'wN_p', wordIdx:2, pos:0 },
+      { row:3, col:7, type:'wN_p', wordIdx:3, pos:0 },
+      // L2
+      { row:2, col:3, type:'wx',   wordGroup:[0,1], pos:1 },
+      { row:2, col:4, type:'skull' },
+      { row:2, col:5, type:'wN_p', wordIdx:2, pos:1 },
+      { row:2, col:6, type:'wN_p', wordIdx:3, pos:1 },
+      { row:2, col:7, type:'wN_p', wordIdx:4, pos:0 },
+      // L1
+      { row:1, col:3, type:'wx',      wordGroup:[0,1], pos:1 },
+      { row:1, col:4, type:'skull' },
+      { row:1, col:5, type:'wN_p',    wordIdx:2, pos:1 },
+      { row:1, col:6, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:1, col:7, type:'wN_p',    wordIdx:4, pos:1 },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:2, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:4, pos:1 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1], pos:'any' },
+               { type:'wN_p', wordIdx:2, pos:0 },
+               { type:'wN_p', wordIdx:3, pos:0 },
+               { type:'wN_p', wordIdx:4, pos:0 } ] }
+    ]
+  },
+
+  'escape_d5_2x2k_3x3k': {
+    id: 'escape_d5_2x2k_3x3k',
+    cols: 8,
+    cells: [
+      // L5
+      { row:5, col:5, type:'skull' },
+      { row:5, col:7, type:'skull' },
+      // L4
+      { row:4, col:4, type:'wx',   wordGroup:[0,1], pos:1 },
+      { row:4, col:5, type:'skull' },
+      { row:4, col:6, type:'wN_p', wordIdx:2, pos:0 },
+      { row:4, col:7, type:'wN_p', wordIdx:3, pos:0 },
+      // L3
+      { row:3, col:3, type:'wx',   wordGroup:[0,1], pos:1 },
+      { row:3, col:4, type:'skull' },
+      { row:3, col:5, type:'skull' },
+      { row:3, col:6, type:'wN_p', wordIdx:2, pos:1 },
+      { row:3, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L2
+      { row:2, col:3, type:'wx',   wordGroup:[0,1], pos:1 },
+      { row:2, col:4, type:'skull' },
+      { row:2, col:5, type:'wN_p', wordIdx:4, pos:0 },
+      { row:2, col:6, type:'wN_p', wordIdx:2, pos:1 },
+      { row:2, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L1
+      { row:1, col:3, type:'wx',      wordGroup:[0,1], pos:1 },
+      { row:1, col:4, type:'filler' },
+      { row:1, col:5, type:'wN_p',    wordIdx:4, pos:1 },
+      { row:1, col:6, type:'wN_p',    wordIdx:2, pos:1 },
+      { row:1, col:7, type:'wN_p',    wordIdx:3, pos:1 },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:4, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:2, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:3, pos:1 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1], pos:'any' },
+               { type:'wN_p', wordIdx:2, pos:0 },
+               { type:'wN_p', wordIdx:3, pos:0 },
+               { type:'wN_p', wordIdx:4, pos:0 } ] }
+    ]
+  },
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  CONFIG : 2x2k_2x3k  (2 mots 2k + 2 mots 3k)
+  //  wordIdx 0-1 = mots 2k, wordIdx 2-3 = mots 3k (pos 0,1,2)
+  // ═══════════════════════════════════════════════════════════════════
+
+  'escape_d1_2x2k_2x3k': {
+    id: 'escape_d1_2x2k_2x3k',
+    cols: 8,
+    cells: [
+      // L1
+      { row:1, col:5, type:'skull' },
+      { row:1, col:7, type:'wN_p', wordIdx:3, pos:0 },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:2, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:2, pos:2 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1], pos:'any' },
+               { type:'wN_p', wordIdx:2, pos:0 },
+               { type:'wN_p', wordIdx:3, pos:0 } ] }
+    ]
+  },
+
+  'escape_d2_2x2k_2x3k': {
+    id: 'escape_d2_2x2k_2x3k',
+    cols: 8,
+    cells: [
+      // L2
+      { row:2, col:5, type:'skull' },
+      { row:2, col:6, type:'skull' },
+      // L1
+      { row:1, col:4, type:'wx',   wordGroup:[0,1], pos:1 },
+      { row:1, col:5, type:'wN_p', wordIdx:2, pos:0 },
+      { row:1, col:6, type:'filler' },
+      { row:1, col:7, type:'wN_p', wordIdx:3, pos:0 },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:2, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:2, pos:2 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1], pos:'any' },
+               { type:'wN_p', wordIdx:2, pos:0 },
+               { type:'wN_p', wordIdx:3, pos:0 } ] }
+    ]
+  },
+
+  'escape_d3_2x2k_2x3k': {
+    id: 'escape_d3_2x2k_2x3k',
+    cols: 8,
+    cells: [
+      // L3
+      { row:3, col:5, type:'skull' },
+      { row:3, col:6, type:'skull' },
+      // L2
+      { row:2, col:4, type:'wx',   wordGroup:[0,1], pos:1 },
+      { row:2, col:5, type:'skull' },
+      { row:2, col:6, type:'wN_p', wordIdx:2, pos:0 },
+      { row:2, col:7, type:'wN_p', wordIdx:3, pos:0 },
+      // L1
+      { row:1, col:3, type:'wx',   wordGroup:[0,1], pos:1 },
+      { row:1, col:4, type:'skull' },
+      { row:1, col:5, type:'wN_p', wordIdx:2, pos:1 },
+      { row:1, col:6, type:'wN_p', wordIdx:3, pos:1 },
+      { row:1, col:7, type:'wN_p', wordIdx:2, pos:2 },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:2, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:3, pos:2 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1], pos:'any' },
+               { type:'wN_p', wordIdx:2, pos:0 },
+               { type:'wN_p', wordIdx:3, pos:0 } ] }
+    ]
+  },
+
+  'escape_d4_2x2k_2x3k': {
+    id: 'escape_d4_2x2k_2x3k',
+    cols: 8,
+    cells: [
+      // L4
+      { row:4, col:5, type:'skull' },
+      { row:4, col:6, type:'skull' },
+      // L3
+      { row:3, col:4, type:'wx',   wordGroup:[0,1], pos:1 },
+      { row:3, col:5, type:'skull' },
+      { row:3, col:6, type:'wN_p', wordIdx:2, pos:0 },
+      { row:3, col:7, type:'wN_p', wordIdx:3, pos:0 },
+      // L2
+      { row:2, col:3, type:'wx',   wordGroup:[0,1], pos:1 },
+      { row:2, col:4, type:'skull' },
+      { row:2, col:5, type:'skull' },
+      { row:2, col:6, type:'wN_p', wordIdx:2, pos:1 },
+      { row:2, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L1
+      { row:1, col:3, type:'wx',      wordGroup:[0,1], pos:1 },
+      { row:1, col:4, type:'filler' },
+      { row:1, col:5, type:'wN_p',    wordIdx:2, pos:1 },
+      { row:1, col:6, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:1, col:7, type:'wN_p',    wordIdx:2, pos:2 },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:2, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:3, pos:2 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1], pos:'any' },
+               { type:'wN_p', wordIdx:2, pos:0 },
+               { type:'wN_p', wordIdx:3, pos:0 } ] }
+    ]
+  },
+
+  'escape_d5_2x2k_2x3k': {
+    id: 'escape_d5_2x2k_2x3k',
+    cols: 8,
+    cells: [
+      // L5
+      { row:5, col:5, type:'skull' },
+      { row:5, col:6, type:'skull' },
+      // L4
+      { row:4, col:4, type:'wx',   wordGroup:[0,1], pos:1 },
+      { row:4, col:5, type:'skull' },
+      { row:4, col:6, type:'wN_p', wordIdx:2, pos:0 },
+      { row:4, col:7, type:'wN_p', wordIdx:3, pos:0 },
+      // L3
+      { row:3, col:3, type:'wx',   wordGroup:[0,1], pos:1 },
+      { row:3, col:4, type:'skull' },
+      { row:3, col:5, type:'skull' },
+      { row:3, col:6, type:'wN_p', wordIdx:2, pos:1 },
+      { row:3, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L2
+      { row:2, col:3, type:'wx',   wordGroup:[0,1], pos:1 },
+      { row:2, col:4, type:'skull' },
+      { row:2, col:5, type:'filler' },
+      { row:2, col:6, type:'wN_p', wordIdx:2, pos:1 },
+      { row:2, col:7, type:'wN_p', wordIdx:3, pos:1 },
+      // L1
+      { row:1, col:3, type:'wx',      wordGroup:[0,1], pos:1 },
+      { row:1, col:4, type:'filler' },
+      { row:1, col:5, type:'wN_p',    wordIdx:2, pos:1 },
+      { row:1, col:6, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:1, col:7, type:'wN_p',    wordIdx:3, pos:2 },
+      // L0
+      { row:0, col:3, type:'wx',      wordGroup:[0,1], pos:1 },
+      { row:0, col:4, type:'trigger', wordGroup:[0,1], pos:1 },
+      { row:0, col:5, type:'wN_p',    wordIdx:2, pos:1 },
+      { row:0, col:6, type:'wN_p',    wordIdx:3, pos:1 },
+      { row:0, col:7, type:'wN_p',    wordIdx:3, pos:2 },
+    ],
+    spawnPhases: [
+      { phase:1, condition:{ wordsFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1], pos:'any' } ] },
+      { phase:2, condition:{ wordFound:0 },
+        pool:[ { type:'wx', wordGroup:[0,1], pos:'any' },
+               { type:'wN_p', wordIdx:2, pos:0 },
+               { type:'wN_p', wordIdx:3, pos:0 } ] }
+    ]
+  }
+
+};
+
+// ── Variables globales escape ──
+let _escapeLevel = null;
+let _escapePool  = [];
+
+// ── Résolution d'une case symbolique ──
+function _resolveCell(cell, words) {
+  switch(cell.type) {
+    case 'skull':
+      return { ...cell, char:'☠️' };
+    case 'filler':
+      return { ...cell, char:'§' };
+    case 'wx':
+    case 'trigger': {
+      const w = words[cell.wordGroup[Math.floor(Math.random()*cell.wordGroup.length)]];
+      return { ...cell, char:[...w.kana][cell.pos] };
+    }
+    case 'wN_p': {
+      return { ...cell, char:[...words[cell.wordIdx].kana][cell.pos] };
+    }
+    default:
+      return { ...cell, char:'?' };
+  }
+}
+
+// ── Validation de la grille résolue ──
+function _validateEscapeResolved(resolvedCells, bp, levelWords) {
+  const VROWS = 15, VCOLS = 8;
+  const tmp = Array.from({length:VROWS}, ()=>Array.from({length:VCOLS}, ()=>({filled:false,char:''})));
+  for(const cell of resolvedCells){
+    const br = (VROWS-1) - cell.row;
+    tmp[br][cell.col] = { filled:true, char: cell.type==='skull' ? '☠️' : cell.char };
+  }
+  // Vérifier les paires interdites
+  for(const pair of (bp.forbiddenPairs||[])){
+    const rA = resolvedCells.find(c=>c.row===pair.a.row&&c.col===pair.a.col);
+    const rB = resolvedCells.find(c=>c.row===pair.b.row&&c.col===pair.b.col);
+    if(!rA||!rB) continue;
+    const c1=rA.char+rB.char, c2=rB.char+rA.char;
+    if(levelWords.some(w=>w.kana===c1||w.kana===c2)) return false;
+  }
+  // Vérifier qu'aucun mot n'est déjà formé
+  const sim = new SimState(tmp, VROWS, VCOLS, levelWords);
+  return sim.scanAll().length === 0;
+}
+
+// ── Résolution complète avec retry ──
+function _resolveAllCells(bp, words, levelWords) {
+  const MAX = 100;
+  for(let i=0; i<MAX; i++){
+    const resolved = bp.cells.map(c => _resolveCell(c, words));
+    if(_validateEscapeResolved(resolved, bp, levelWords)) return resolved;
+  }
+  return null;
+}
+
+// ── Construction de l'escape level ──
+function buildEscapeLevel(blueprintId, levelWords) {
+  const bp = ESCAPE_BLUEPRINTS[blueprintId];
+  if(!bp) return null;
+  const resolved = _resolveAllCells(bp, levelWords, levelWords);
+  if(!resolved){ console.warn('[EscapePuzzle] Échec résolution blueprint', blueprintId); return null; }
+  return { blueprint:bp, words:levelWords, resolvedCells:resolved, currentPhase:1, triggersCleared:new Set(), wordsFoundCount:0 };
+}
+
+// ── Reconstruction de la pool selon la phase ──
+function escapeRebuildPool(escapeLevel) {
+  _escapeLevel = escapeLevel;
+  const { blueprint:bp, words, currentPhase } = escapeLevel;
+  const activePhase = bp.spawnPhases.filter(p=>p.phase<=currentPhase).at(-1);
+  if(!activePhase){ _escapePool=[]; return; }
+  const pool=[];
+  for(const src of activePhase.pool){
+    if(src.type==='wx'){
+      for(const wIdx of src.wordGroup){
+        const kanas=[...words[wIdx].kana];
+        const positions = src.pos==='any' ? kanas : [kanas[src.pos]].filter(Boolean);
+        pool.push(...positions);
+      }
+    } else if(src.type==='wN_p'){
+      const k=[...words[src.wordIdx].kana][src.pos];
+      if(k) pool.push(k);
+    }
+  }
+  _escapePool=[...new Set(pool)];
+  console.log(`[EscapePuzzle] Pool phase ${currentPhase}:`, _escapePool);
+}
+
+// ── Callback mot validé ──
+function escapeOnWordFound(wordKana) {
+  if(!_escapeLevel) return;
+  _escapeLevel.wordsFoundCount++;
+  // Passage de phase ?
+  const nextPhase = _escapeLevel.blueprint.spawnPhases.find(
+    p => p.condition.wordFound !== undefined &&
+         p.condition.wordFound === _escapeLevel.words.findIndex(w=>w.kana===wordKana)
+  );
+  if(nextPhase && nextPhase.phase > _escapeLevel.currentPhase){
+    _escapeLevel.currentPhase = nextPhase.phase;
+    escapeRebuildPool(_escapeLevel);
+    _showEscapePhaseToast(nextPhase.phase);
+  }
+  escapeCheckTriggers();
+}
+
+// ── Vérification des triggers ──
+function escapeCheckTriggers() {
+  // Sécurité : on vérifie que le niveau existe et que le joueur est accessible
+  if (!_escapeLevel || !player1) return;
+
+  // On récupère les données internes du joueur via les getters
+  const triggerCells = player1.puzzleTriggerCells;
+  const currentBoard = player1.board; 
+
+  if (!triggerCells || !currentBoard) return;
+
+  triggerCells.forEach(key => {
+    const [r, c] = key.split('-').map(Number);
+    const above = r - 1;
+
+    // Si on est tout en haut de la grille, rien à vérifier au-dessus
+    if (above < 0) return;
+
+    // Logique : si la cellule au-dessus est vide ET que le trigger n'a pas encore été validé
+    if (!currentBoard[above][c].filled && !_escapeLevel.triggersCleared.has(key)) {
+      _escapeLevel.triggersCleared.add(key);
+      
+      console.log('[EscapePuzzle] Trigger déclenché :', key);
+      
+      // Ton feedback visuel
+      _showEscapeTriggerToast();
+      
+      // Optionnel : Tu pourrais aussi déclencher ici une vérification de victoire 
+      // si tous les triggers sont à true.
+    }
+  });
+}
+
+// ── Toasts escape ──
+function _showEscapePhaseToast(phase){
+  const t=document.getElementById('enc-toast');if(!t)return;
+  t.querySelector('.enc-jp').textContent='🔓 アンロック！';
+  t.querySelector('.enc-fr').textContent=`Phase ${phase} — nouvelle pièce disponible !`;
+  t.className='';void t.offsetWidth;t.className='show';
+  setTimeout(()=>t.className='',2500);
+}
+function _showEscapeTriggerToast(){
+  const t=document.getElementById('enc-toast');if(!t)return;
+  t.querySelector('.enc-jp').textContent='⚡ トリガー！';
+  t.querySelector('.enc-fr').textContent='Trigger activé — la chaîne peut commencer !';
+  t.className='';void t.offsetWidth;t.className='show';
+  setTimeout(()=>t.className='',2500);
+}
+
+// ── Point d'entrée principal ──
+// Fonction pour déduire la topologie du niveau
+function getLevelTopology(levelWords) {
+    const lengthCounts = {};
+    levelWords.forEach(w => {
+        const len = [...w.kana].length;
+        lengthCounts[len] = (lengthCounts[len] || 0) + 1;
+    });
+    
+    const parts = Object.keys(lengthCounts)
+        .sort((a, b) => a - b)
+        .map(len => `${lengthCounts[len]}x${len}k`);
+        
+    return parts.join('_'); 
+}
+
+
+function startPuzzleEscape(levelIdx, difficulty = 1) {
+  const _idx = levelIdx !== undefined ? levelIdx : 0;
+  const wordsForLevel = ACTIVE_LEVELS[_idx].words.map(w=>({...w}));
+
+  // 1. Calcul dynamique de l'ID du blueprint
+  const topology = getLevelTopology(wordsForLevel);
+  
+  // 2. Construction de l'ID attendu
+const targetBlueprintId = `escape_d${difficulty}_${topology}`;
+
+  console.log(`[Escape] Tentative de chargement du blueprint : ${targetBlueprintId}`);
+
+  let escapeLevel = buildEscapeLevel(targetBlueprintId, wordsForLevel);
+  
+  // 1er Repli : Tentative avec le blueprint "bis"
+  if(!escapeLevel) {
+    const bisBlueprintId = `${targetBlueprintId}_bis`;
+    console.warn(`[EscapePuzzle] Collision ou échec sur ${targetBlueprintId}. Tentative avec ${bisBlueprintId}...`);
+    escapeLevel = buildEscapeLevel(bisBlueprintId, wordsForLevel);
+  }
+
+  // 2ème Repli (Optionnel) : Tentative avec un blueprint "ter" si tu veux être très prudent
+  if(!escapeLevel) {
+    const terBlueprintId = `${targetBlueprintId}_ter`;
+    console.warn(`[EscapePuzzle] Échec sur le bis. Tentative finale avec ${terBlueprintId}...`);
+    escapeLevel = buildEscapeLevel(terBlueprintId, wordsForLevel);
+  }
+
+  // Si tout échoue, on annule et on affiche une erreur propre au lieu de l'ancien mode
+  if(!escapeLevel){
+    console.error(`[EscapePuzzle] Génération impossible, même avec les fallbacks pour : ${targetBlueprintId}`);
+    player1.showOverlay({
+      title: '⚠️ Oups !',
+      sub: 'Les kana se sont emmêlés lors de la génération de ce niveau.<br><br>Réessaie ou choisis une difficulté inférieure !',
+      words: [],
+      btn1: '← Retour au menu',
+      act1: () => showMenu()
+    });
+    return;
+  }
+  // Activer le layout mobile AVANT startGame
+  document.body.classList.add('mobile-ingame');
+  const nav = document.getElementById('mobile-nav');
+  if (nav) nav.classList.add('visible');
+
+  // Stocker AVANT startGame
+  _escapeLevel = escapeLevel;
+  _escapePool  = [];
+
+  player1.prepEscapeMode();
+  player1.startGame(_idx, true);
+  player1.initPuzzleEscape(escapeLevel);
+
+  // Override word panel pour ajouter les badges 🔒/🗝️
+  const wp = document.getElementById('word-panel');
+  if(wp){
+    wp.innerHTML='';
+    escapeLevel.words.forEach((w,i)=>{
+      const isEscape = i===escapeLevel.words.length-1;
+      const isKey    = i===escapeLevel.words.length-2;
+      const badge = isEscape?'<span class="escape-badge">🔒</span>'
+                  : isKey   ?'<span class="escape-badge">🗝️</span>':'';
+      const row=document.createElement('div');
+      row.className='word-row'+(w.boss?' boss':'');
+      row.id='wr-'+w.kana;
+      row.innerHTML=`<div class="wr-emoji">${w.emoji}</div><div class="wr-info"><span class="wr-kana">${w.kana}</span><span class="wr-romaji">${w.romaji}</span><span class="wr-meaning">${w.meaning}</span></div><div class="wr-mult" id="wm-${w.kana}">${badge}</div>`;
+      wp.appendChild(row);
+    });
+    if(typeof fluent==='function') setTimeout(()=>fluent(wp),60);
+  }
+
+  const lvlData = ACTIVE_LEVELS[_idx];
+  const badge = document.getElementById('level-badge');
+  if(badge) badge.innerHTML=`<span class="badge-emoji">${lvlData.emoji}</span><span class="badge-num" style="color:${lvlData.color}">Lv.${lvlData.id}</span><span style="font-size:10px;color:var(--neon-gold);display:block">🔓 ESCAPE D${difficulty}</span>`;
+
+  console.log('[EscapePuzzle] Démarré — niveau', lvlData.id, '·', lvlData.theme);
+}
+
+
+
+function puzzleVictoryEscape(){
+  if(!_escapeLevel){ if(typeof _puzzleVictoryOrig !== 'undefined' && _puzzleVictoryOrig) _puzzleVictoryOrig(); return; }
+  const lvlData=ACTIVE_LEVELS[currentLevelIdx];
+  
+  // CORRECTION 1 : On récupère le dernier mot via _escapeLevel.words
+  const escapeWord=_escapeLevel.words.at(-1); 
+  
+  const _el=_escapeLevel; // capturer avant reset
+  _escapeLevel=null; _escapePool=[];
+  
+  player1.showOverlay({
+    title:'🔓 Évasion réussie !',
+    // CORRECTION 2 : On utilise player1.score au lieu de score tout court
+    sub:`<span style="font-size:26px">${lvlData.emoji}</span><br><strong style="color:var(--neon-violet)">${lvlData.theme}</strong><br>La chaîne a libéré <strong style="color:var(--neon-gold)">${escapeWord.kana}</strong> !<br>Score : <strong style="color:var(--neon-violet)">${player1.score.toLocaleString()}</strong>`,
+    words:[],
+    btn1:'🔓 Rejouer ce puzzle',act1:()=>startPuzzleEscape(currentLevelIdx,_el.blueprint.id),
+    btn2:'📋 Menu principal',act2:()=>showMenu(),
+  });
+}
 function puzzleFillColumnBelow(board,bRows,bCols,allWords,col,fromRowIdx,reservedCells){
   const allKanas=puzzleLevelKanas(allWords);
   const maxRowIdx=Math.floor(bRows/2);
@@ -3682,7 +6323,6 @@ function switchMenuAlphabet(alphabet) {
 renderMenuLevels();
 
 // ── Afficher l'écran de choix de mode pour un niveau ──
-// ── Afficher l'écran de choix de mode pour un niveau ──
 function showModeSelect(levelIdx){
   pendingLevelIdx=levelIdx;
   const lvl = ACTIVE_LEVELS[levelIdx];
@@ -3690,28 +6330,33 @@ function showModeSelect(levelIdx){
   document.getElementById('mode-level-name').innerHTML =
     `<img src="${fUrl}" class="femoji" alt="${lvl.emoji}" style="width:clamp(32px,9vw,44px);height:clamp(32px,9vw,44px);vertical-align:middle;filter:drop-shadow(0 3px 8px rgba(0,0,0,.18))" onerror="this.replaceWith(document.createTextNode('${lvl.emoji}'))"> ${lvl.theme}`;
   
-  // Remplir les cards SN puzzle
+  // Remplir les cards SN puzzle avec le lancement de l'Escape
   const snContainer=document.getElementById('mode-sn-cards');
   snContainer.innerHTML='';
   snContainer.style.cssText='display:flex;flex-direction:column;gap:10px;';
-  PUZZLE_SN_DEFS.forEach((sn,si)=>{
+  
+  PUZZLE_SN_DEFS.forEach((sn)=>{
     const card=document.createElement('button');
     card.className='mode-sn-card';
     card.innerHTML=`<span class="mode-sn-stars">${sn.stars}</span><div class="mode-btn-inner"><div class="mode-btn-label">${sn.label}</div></div>`;
+    
     card.addEventListener('click',()=>{
       document.getElementById('mode-overlay').classList.add('hidden');
       document.getElementById('menu-overlay').classList.add('hidden');
       document.body.classList.add('mobile-ingame');
       const nav = document.getElementById('mobile-nav');
       if(nav) nav.classList.add('visible');
-      player1.startPuzzle(levelIdx,si);
+      
+      // 🌟 NOUVEAU : On lance le mode Escape avec la difficulté (sn.num va de 1 à 5)
+      startPuzzleEscape(levelIdx, sn.num); 
+      
       if(typeof _mobileNavShow==='function') setTimeout(_mobileNavShow, 50);
     });
     snContainer.appendChild(card);
   });
 
-  // CORRECTIF ICI : On force la réapparition des boutons classiques 
-  hidePuzzlePanel();
+  // ⚠️ SUPPRIME TOTALEMENT la section "// ── Bouton Escape puzzle ──"
+  // car l'Escape est maintenant intégré dans les 5 boutons normaux.
 
   // Afficher tab Standard par défaut
   modeTabSwitch('standard');
@@ -4086,10 +6731,16 @@ function _fitBattleBoard(){
       }else if(board[r][c].filled){
         const isMalus=board[r][c].char==='💩';
         const isSkull=board[r][c].char==='☠️';
-        el.className=isMalus?'cell filled malus':isSkull?'cell filled skull':'cell filled';
-        el.textContent=board[r][c].char;
-        el.style.background=(isMalus||isSkull)?'':kanaBg(board[r][c].char);
-        if(isTrig)el.classList.add('puzzle-trigger');
+        const isFiller=board[r][c].char==='§';
+        if(isFiller){
+          // Filler : case solide mais invisible
+          el.className='cell empty';el.textContent='';el.style.background='';
+        } else {
+          el.className=isMalus?'cell filled malus':isSkull?'cell filled skull':'cell filled';
+          el.textContent=board[r][c].char;
+          el.style.background=(isMalus||isSkull)?'':kanaBg(board[r][c].char);
+          if(isTrig)el.classList.add('puzzle-trigger');
+        }
       }else{
         el.className='cell empty';el.textContent='';el.style.background='';
         if(isTrig)el.classList.add('puzzle-trigger');
@@ -4135,6 +6786,8 @@ function _fitBattleBoard(){
     activeWords.forEach(w=>{
       const el=dom.wordPanelEl.querySelector('#wm-'+w.kana);
       if(!el)return;
+      // Mode escape : ne pas écraser les badges 🔒/🗝️
+      if(typeof _escapeLevel!=='undefined'&&_escapeLevel&&el.querySelector('.escape-badge'))return;
       el.textContent='×'+w.mult;el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump');
     });
   }
@@ -4148,6 +6801,8 @@ function _fitBattleBoard(){
   }
 
 function renderPanel(){
+    // Mode escape : le word panel est géré par startPuzzleEscape, ne pas reconstruire
+    if(typeof _escapeLevel!=='undefined'&&_escapeLevel)return;
     dom.wordPanelEl.innerHTML='';
     activeWords.forEach(w=>{
       const row=document.createElement('div');
@@ -4263,10 +6918,22 @@ function renderPanel(){
     spawn();
   }
 
+  function _pickNextKana(){
+    if(puzzleMode&&typeof _escapeLevel!=='undefined'&&_escapeLevel&&typeof _escapePool!=='undefined'&&_escapePool.length>0)
+      return _escapePool[Math.floor(Math.random()*_escapePool.length)];
+    return rndKana();
+  }
   function spawn(){
-    active={char:nextChar||rndKana(),x:Math.floor(COLS/2),y:0};
+    // Choisir la colonne de spawn — éviter les colonnes bloquées dès la ligne 0
+    let spawnX = Math.floor(COLS/2);
+    if(board[0][spawnX].filled){
+      // Chercher la première colonne libre en partant du centre
+      const order=[4,3,5,2,6,1,7,0];
+      spawnX = order.find(c=>!board[0][c].filled) ?? Math.floor(COLS/2);
+    }
+    active={char:nextChar||_pickNextKana(),x:spawnX,y:0};
     playKanaSound(active.char);
-    nextChar=rndKana();
+    nextChar=_pickNextKana();
     dom.nextKanaEl.textContent=nextChar;
     dom.nextKanaEl.style.fontSize=''; // reset après un éventuel 💩 surdimensionné
     // Préserver la classe de base (next-kana en solo, next-kana-box en battle)
@@ -4311,9 +6978,13 @@ function renderPanel(){
 
   // ── Scan / cascade ──
   function scanLine(cells,found){
-    // Le 💩 et le ☠️ sont traités comme des cases vides pour la détection de mots (jamais matchables)
-    const line=cells.map(({r,c})=>(board[r][c].filled&&board[r][c].char!=='💩'&&board[r][c].char!=='☠️')?board[r][c].char:'\x00').join('');
-const wordsToScan = gameMode === 'survie' ? _survieAllWords : activeWords;
+    // Le 💩, ☠️ et § (filler) sont traités comme des cases vides (jamais matchables)
+    const line=cells.map(({r,c})=>(board[r][c].filled&&board[r][c].char!=='💩'&&board[r][c].char!=='☠️'&&board[r][c].char!=='§')?board[r][c].char:'\x00').join('');
+    // En mode escape : scanner tous les mots du niveau (LEVEL_WORDS_LOCAL est toujours complet)
+    // En survie : tous les mots croisés, sinon activeWords
+    const wordsToScan = gameMode==='survie' ? _survieAllWords
+                      : (puzzleMode && typeof _escapeLevel!=='undefined' && _escapeLevel) ? LEVEL_WORDS_LOCAL
+                      : activeWords;
     
     wordsToScan.forEach(w=>{
       let i=line.indexOf(w.kana);
@@ -4326,10 +6997,40 @@ const wordsToScan = gameMode === 'survie' ? _survieAllWords : activeWords;
   }
   function scanRowCol(r,c){const found=[];scanLine(Array.from({length:COLS},(_,cc)=>({r,c:cc})),found);scanLine(Array.from({length:ROWS},(_,rr)=>({r:rr,c})),found);return found;}
   function scanFullBoard(){const found=[];for(let r=0;r<ROWS;r++)scanLine(Array.from({length:COLS},(_,c)=>({r,c})),found);for(let c=0;c<COLS;c++)scanLine(Array.from({length:ROWS},(_,r)=>({r,c})),found);return found;}
-  function checkWords(pr,pc){const found=scanRowCol(pr,pc);if(!found.length){safeSpawn();return;}processCascade(found,false);}
+  function checkWords(pr,pc){
+    // Mode escape : scanner toute la grille (la gravité peut avoir créé des mots ailleurs)
+    const found = (puzzleMode && typeof _escapeLevel!=='undefined' && _escapeLevel)
+      ? scanFullBoard()
+      : scanRowCol(pr,pc);
+    if(!found.length){safeSpawn();return;}
+    processCascade(found,false);
+  }
 
-  function gravity(){for(let c=0;c<COLS;c++){const ch=[];for(let r=ROWS-1;r>=0;r--)if(board[r][c].filled)ch.push(board[r][c].char);for(let r=ROWS-1;r>=0;r--)board[r][c]=ch.length?{filled:true,char:ch.shift()}:{filled:false,char:''};}}
-
+function gravity(){
+    for(let c=0; c<COLS; c++){
+      // On parcourt la colonne de bas en haut
+      for(let r=ROWS-1; r>=0; r--){
+        
+        // Si c'est un kana normal (qui peut tomber, donc ni vide, ni skull, ni filler)
+        if(board[r][c].filled && board[r][c].char !== '☠️' && board[r][c].char !== '§'){
+          
+          let charToMove = board[r][c].char;
+          let currentRow = r;
+          
+          // Le kana descend tant que la case juste en dessous de lui est vide
+          while(currentRow + 1 < ROWS && !board[currentRow + 1][c].filled){
+            currentRow++;
+          }
+          
+          // Si le kana a effectivement chuté vers une case plus basse
+          if(currentRow !== r){
+            board[currentRow][c] = { filled: true, char: charToMove };
+            board[r][c] = { filled: false, char: '' };
+          }
+        }
+      }
+    }
+  }
   function processCascade(found,isCascade){
     const isCombo=found.length>=2;
     const cellSet=new Set();found.forEach(f=>f.cells.forEach(cell=>cellSet.add(`${cell.r},${cell.c}`)));
@@ -4345,6 +7046,8 @@ const wordsToScan = gameMode === 'survie' ? _survieAllWords : activeWords;
     }
     let pts=0;
     found.forEach(f=>{pts+=f.word.kana.length*100*(f.word.mult||1);f.word.mult=(f.word.mult||1)+1;foundRound.add(f.word.kana);});
+    // ── Escape puzzle : notifier pour chaque mot validé ──
+    if(puzzleMode&&typeof _escapeLevel!=='undefined'&&_escapeLevel)found.forEach(f=>escapeOnWordFound(f.word.kana));
     const now=Date.now();if(now-lastWordTime<4000)streak++;else streak=1;lastWordTime=now;
     if(streak>1)pts=Math.round(pts*(1+streak*.08));
     score+=pts;increaseSpeed();
@@ -4390,7 +7093,12 @@ const wordsToScan = gameMode === 'survie' ? _survieAllWords : activeWords;
         : activeWords;
       const allDone = currentActiveWords.every(w=>foundRound.has(w.kana));
       if(allDone){
-        if(puzzleMode)return;
+        if(puzzleMode){
+          // La victoire est gérée par puzzleCheckChains() avec son propre setTimeout
+          // On spawne quand même pour ne pas bloquer si victoire pas encore atteinte
+          if(!LEVEL_WORDS_LOCAL.every(w=>puzzleWordsFound.has(w.kana))) safeSpawn();
+          return;
+        }
         if(wordIntroIdx>=LEVEL_WORDS_LOCAL.length){
           setTimeout(levelDone,400);
         } else {
@@ -4616,7 +7324,14 @@ soundLevelUp();
   function puzzleCheckChains(){
     activeWords.forEach(w=>{if(foundRound.has(w.kana))puzzleWordsFound.add(w.kana);});
     const allDone=LEVEL_WORDS_LOCAL.every(w=>puzzleWordsFound.has(w.kana));
-    if(allDone)setTimeout(()=>puzzleVictory(),600);
+    if(allDone){
+      // Victoire — on laisse le setTimeout de processCascade finir d'abord
+      setTimeout(()=>{
+        if(typeof _escapeLevel!=='undefined'&&_escapeLevel) puzzleVictoryEscape();
+        else puzzleVictory();
+      },900);
+    }
+    // Pas de safeSpawn ici — c'est le setTimeout de processCascade qui s'en charge
   }
   function showPuzzleChainToast(ci,len){
     const t=dom.encToastEl;
@@ -4652,7 +7367,7 @@ soundLevelUp();
       score=0;streak=0;DROP_SPEED=1400;
     }
     dom.streakEl.style.display='none';updateScore();
-    if(!isPuzzle)puzzleMode=false;
+    puzzleMode = isPuzzle;
     if(puzzleMode){
       activeWords=LEVEL_WORDS_LOCAL.map(w=>({...w,mult:1}));
       wordIntroIdx=LEVEL_WORDS_LOCAL.length;foundRound=new Set();isLastCycle=true;
@@ -4703,20 +7418,27 @@ soundLevelUp();
       if(typeof fluent==='function') setTimeout(()=>fluent(dom.wordPanelEl),60);
       updateWordRowColors();
       calcRows();buildDOM();
-      const gen=puzzleGenerate(currentLevelIdx, puzzleSNDef, ROWS);
-      puzzleBoard=gen.board;puzzleChains=gen.chains;puzzleTriggerCells=gen.triggerCells;
-      if(puzzleBoard){
-        const pbRows=puzzleBoard.length;
+      // ── Mode Escape : on ne génère pas de grille ici, initPuzzleEscape s'en charge après ──
+      if(typeof _escapeLevel!=='undefined'&&_escapeLevel){
         board=Array.from({length:ROWS},()=>Array.from({length:COLS},()=>({filled:false,char:''})));
-        const offset=ROWS-pbRows;
-        for(let r=0;r<pbRows;r++)for(let c=0;c<COLS;c++)if(r+offset>=0)board[r+offset][c]={...puzzleBoard[r][c]};
-        for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
-          if(board[r][c].filled){const el=gc(r,c);if(el){el.className='cell filled';el.textContent=board[r][c].char;el.style.background=kanaBg(board[r][c].char);}}
+        nextChar=_pickNextKana();dom.nextKanaEl.textContent=nextChar;
+        // safeSpawn sera appelé par startPuzzleEscape après initPuzzleEscape
+      } else {
+        const gen=puzzleGenerate(currentLevelIdx, puzzleSNDef, ROWS);
+        puzzleBoard=gen.board;puzzleChains=gen.chains;puzzleTriggerCells=gen.triggerCells;
+        if(puzzleBoard){
+          const pbRows=puzzleBoard.length;
+          board=Array.from({length:ROWS},()=>Array.from({length:COLS},()=>({filled:false,char:''})));
+          const offset=ROWS-pbRows;
+          for(let r=0;r<pbRows;r++)for(let c=0;c<COLS;c++)if(r+offset>=0)board[r+offset][c]={...puzzleBoard[r][c]};
+          for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+            if(board[r][c].filled){const el=gc(r,c);if(el){el.className='cell filled';el.textContent=board[r][c].char;el.style.background=kanaBg(board[r][c].char);}}
+          }
+          puzzleMarkTriggers();
         }
-        puzzleMarkTriggers();
+        nextChar=rndKana();dom.nextKanaEl.textContent=nextChar;
+        setTimeout(()=>safeSpawn(),350);
       }
-      nextChar=rndKana();dom.nextKanaEl.textContent=nextChar;
-      setTimeout(()=>safeSpawn(),350);
     }else{
       const w=LEVEL_WORDS_LOCAL[wordIntroIdx++];w.mult=1;activeWords.push(w);
 if(gameMode === 'survie') {
@@ -4725,6 +7447,53 @@ if(gameMode === 'survie') {
       rebuildPool();renderPanel();nextChar=rndKana();dom.nextKanaEl.textContent=nextChar;
     }
   }
+
+  // ── Initialisation grille escape (interne — accès à gc, board, ROWS, etc.) ──
+function prepEscapeMode() {
+    puzzleMode = true;
+    puzzleSNDef = {num:0,stars:'🔓',label:'Escape',desc:'',chains:[],fillRatio:0};
+    puzzleBoard = null;
+    puzzleChains = [];
+    puzzleChainsResolved = new Set();
+    puzzleWordsFound = new Set();
+    puzzleTriggerCells = new Set();
+  }
+  function initPuzzleEscape(escapeLevel) {
+    const { resolvedCells } = escapeLevel;
+    for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) board[r][c]={filled:false,char:''};
+    puzzleTriggerCells = new Set();
+    for(const cell of resolvedCells){
+      const br = (ROWS-1) - cell.row;
+      if(br < 0 || br >= ROWS) continue;
+      if(cell.type==='filler'||cell.type==='void'){
+        // Filler : case solide invisible (supporte les skulls, bloque la gravité)
+        board[br][cell.col]={filled:true,char:'§'};
+        const el=gc(br,cell.col);
+        if(el){el.className='cell empty';el.textContent='';el.style.background='';}
+      } else if(cell.type==='skull'){
+        board[br][cell.col]={filled:true,char:'☠️'};
+        const el=gc(br,cell.col);
+        if(el){el.className='cell filled skull';el.textContent='☠️';el.style.background='';}
+      } else if(cell.type==='trigger'){
+        board[br][cell.col]={filled:true,char:cell.char};
+        puzzleTriggerCells.add(`${br}-${cell.col}`);
+        const el=gc(br,cell.col);
+        if(el){el.className='cell filled puzzle-trigger';el.textContent=cell.char;el.style.background='';}
+      } else {
+        board[br][cell.col]={filled:true,char:cell.char};
+        const el=gc(br,cell.col);
+        if(el){el.className='cell filled';el.textContent=cell.char;el.style.background=kanaBg(cell.char);}
+      }
+    }
+    const pre=scanFullBoard();
+    if(pre.length>0) console.error('[EscapePuzzle] Mot prématuré à l\'init !', pre);
+    escapeRebuildPool(escapeLevel);
+    puzzleMarkTriggers();
+    render();
+    setTimeout(()=>safeSpawn(), 350);
+    console.log('[EscapePuzzle] Grille init —', resolvedCells.length, 'cases,', puzzleTriggerCells.size, 'trigger(s)');
+  }
+
 
   function startPuzzle(levelIdx,snIdx){
     puzzleSNDef=PUZZLE_SN_DEFS[snIdx];
@@ -4756,6 +7525,10 @@ if(gameMode === 'survie') {
     // Pour le bot
     getBoardSnapshot(){return board.map(row=>row.map(c=>({...c})));},
     triggerCalcRows(){ calcRows(); },
+    prepEscapeMode,
+    get puzzleTriggerCells() { return puzzleTriggerCells; },
+    initPuzzleEscape,
+    showOverlay,
     // Prise de contrôle (étape 7)
     freezeForCrossControl,
     resumeAfterCrossControl,
@@ -7758,29 +10531,16 @@ window.addEventListener('load', () => setTimeout(applyFluent, 400));
 })();
 
 </script>
-  <script>
-    // Bouton d'installation PWA
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  document.getElementById('pwa-install-btn').style.display = 'flex';
-});
-
-document.getElementById('pwa-install-btn').addEventListener('click', async () => {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  deferredPrompt = null;
-  document.getElementById('pwa-install-btn').style.display = 'none';
-});
-
-window.addEventListener('appinstalled', () => {
-  document.getElementById('pwa-install-btn').style.display = 'none';
-});
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/fck/sw.js');
-  }
+<!-- Détection Capacitor + TTS natif -->
+<script>
+  // Le plugin est disponible via window.Capacitor.Plugins après cap sync
+  // IMPORTANT : dans load, Capacitor n'est pas prêt avant
+  window._capacitorTTS = null;
+  window.addEventListener('load', function(){
+    if(window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.TextToSpeech){
+      window._capacitorTTS = window.Capacitor.Plugins.TextToSpeech;
+    }
+  });
 </script>
 </body>
 </html>
