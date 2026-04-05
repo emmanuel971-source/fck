@@ -557,7 +557,12 @@ body::before {
 .word-row.boss.pending { border-color: #ff3d6d !important; }
 .word-row.boss.validated { border-color: #52c97a !important; }
 
-.wr-emoji{font-size:clamp(20px,1vw,20px);flex-shrink:0;line-height:1;}
+.wr-emoji{
+  font-size:clamp(20px,1vw,20px);flex-shrink:0;line-height:1;
+  filter:
+    drop-shadow(0 3px 0px rgba(0,0,0,.12))
+    drop-shadow(0 5px 8px rgba(0,0,0,.20));
+}
 .wr-info{flex:1;min-width:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
 .wr-kana{font-size:clamp(22px,7vw,30px);font-weight:900;color:var(--text-dark);line-height:1;font-family:'Noto Sans JP',sans-serif;}
 .wr-romaji{font-size:clamp(17px,5vw,22px);color:var(--sky);font-weight:900;font-family:'Fredoka One',sans-serif;}
@@ -666,7 +671,12 @@ body::before {
 .lvl-card::before{content:'';position:absolute;inset:0;background:var(--lc);opacity:.08;border-radius:22px;pointer-events:none;}
 .lvl-card:active{transform:scale(.97);box-shadow:0 2px 8px rgba(0,0,0,.06);}
 .lvl-card-left{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;}
-.lvl-card-emoji{font-size:clamp(42px,12vw,56px);line-height:1;}
+.lvl-card-emoji{
+  font-size:clamp(42px,12vw,56px);line-height:1;
+  filter:
+    drop-shadow(0 5px 0px rgba(0,0,0,.13))
+    drop-shadow(0 7px 10px rgba(0,0,0,.22));
+}
 .lvl-card-num{font-family:'Fredoka One',cursive;font-size:clamp(15px,4.2vw,20px);}
 .lvl-card-right{flex:1;min-width:0;}
 .lvl-card-name{font-family:'Nunito',sans-serif;font-size:clamp(20px,6vw,27px);color:var(--text-dark);line-height:1.2;font-weight:900;}
@@ -1730,8 +1740,15 @@ flex: 0 0 42%;
   filter:drop-shadow(0 0 10px rgba(255,255,255,.95)) drop-shadow(0 2px 5px rgba(0,0,0,.12));}
 .mode-btn-emoji-right{font-size:clamp(34px,9.5vw,46px);flex-shrink:0;line-height:1;
   filter:drop-shadow(0 0 10px rgba(255,255,255,.95)) drop-shadow(0 2px 5px rgba(0,0,0,.12));}
-.mode-sn-stars{font-size:clamp(22px,6vw,30px);
-  filter:drop-shadow(0 0 8px rgba(255,220,0,.99)) drop-shadow(0 0 16px rgba(255,180,0,.75));}
+.mode-sn-stars{
+  font-size:clamp(32px,9vw,42px);
+  flex-shrink:0;
+  line-height:1;
+  margin-left:auto;
+  filter:
+    drop-shadow(0 5px 0px rgba(0,0,0,.12))
+    drop-shadow(0 7px 10px rgba(0,0,0,.22));
+}
 .mode-sn-label{font-size:clamp(17px,4.5vw,22px);text-shadow:0 1px 4px rgba(0,0,0,.18);}
 .mode-sn-num{font-size:clamp(14px,3.5vw,17px);opacity:.88;font-family:'Nunito',sans-serif;font-weight:800;}
 
@@ -6503,7 +6520,7 @@ function showModeSelect(levelIdx){
   PUZZLE_SN_DEFS.forEach((sn)=>{
     const card=document.createElement('button');
     card.className='mode-sn-card';
-    card.innerHTML=`<span class="mode-sn-stars">${sn.stars}</span><div class="mode-btn-inner"><div class="mode-btn-label">${sn.label}</div></div>`;
+    card.innerHTML=`<div class="mode-btn-inner"><div class="mode-btn-label">${sn.label}</div></div><span class="mode-sn-stars">${sn.stars}</span>`;
     
     card.addEventListener('click',()=>{
       document.getElementById('mode-overlay').classList.add('hidden');
@@ -6903,7 +6920,7 @@ function _fitBattleBoard(){
           el.className='cell empty';el.textContent='';el.style.background='';
         } else {
           el.className=isMalus?'cell filled malus':isSkull?'cell filled skull':'cell filled';
-          el.textContent=board[r][c].char;
+          el.innerHTML=isSkull?`<img src="${_fluentUrl('☠️')}" class="femoji" alt="☠️" style="height:1.1em;width:auto;vertical-align:-.15em;" onerror="window._fluentErr&&window._fluentErr(this,'☠️')">`:board[r][c].char;
           el.style.background=(isMalus||isSkull)?'':kanaBg(board[r][c].char);
           if(isTrig)el.classList.add('puzzle-trigger');
         }
@@ -7641,7 +7658,7 @@ function prepEscapeMode() {
       } else if(cell.type==='skull'){
         board[br][cell.col]={filled:true,char:'☠️'};
         const el=gc(br,cell.col);
-        if(el){el.className='cell filled skull';el.textContent='☠️';el.style.background='';}
+        if(el){el.className='cell filled skull';el.innerHTML=`<img src="${_fluentUrl('☠️')}" class="femoji" alt="☠️"style="height:1.1em;width:auto;vertical-align:-.15em;" onerror="window._fluentErr&&window._fluentErr(this,'☠️')">`;el.style.background='';}
       } else if(cell.type==='trigger'){
         board[br][cell.col]={filled:true,char:cell.char};
         puzzleTriggerCells.add(`${br}-${cell.col}`);
