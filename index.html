@@ -1702,23 +1702,31 @@ flex: 0 0 42%;
 /* ── Cards SN puzzle (style cohérent avec boutons) ── */
 .mode-sn-card{
   display:flex;align-items:center;justify-content:center;gap:10px;
-  border:none;border-radius:24px;padding:16px 20px;cursor:pointer;
+  border-radius:24px;padding:16px 20px;cursor:pointer;
+  background:white;
+  border:2.5px solid transparent;
+  box-shadow:0 6px 20px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.04);
   transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .18s;
-  position:relative;overflow:hidden;color:#1a3050;
+  position:relative;overflow:hidden;color:var(--text-dark);
   font-family:'Fredoka One',cursive;
+}
+.mode-sn-card::before{
+  content:'';position:absolute;inset:0;
+  background:var(--sn-color);
+  opacity:.08;border-radius:22px;pointer-events:none;
 }
 .mode-sn-card::after{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(255,255,255,.28) 0%,transparent 55%);
+  background:linear-gradient(180deg,rgba(255,255,255,.5) 0%,transparent 60%);
   pointer-events:none;
 }
-.mode-sn-card:nth-child(1){background:linear-gradient(135deg,#d4ff44,#aaee22);box-shadow:0 6px 20px rgba(170,220,0,.35);}
-.mode-sn-card:nth-child(2){background:linear-gradient(135deg,#ffe566,#ffcc00);box-shadow:0 6px 20px rgba(255,200,0,.35);}
-.mode-sn-card:nth-child(3){background:linear-gradient(135deg,#ffdd44,#ff8800);box-shadow:0 6px 20px rgba(255,140,0,.35);}
-.mode-sn-card:nth-child(4){background:linear-gradient(135deg,#eec8ff,#cc88ff);box-shadow:0 6px 20px rgba(200,140,255,.35);}
-.mode-sn-card:nth-child(5){background:linear-gradient(135deg,#b4f0ff,#44ccff);box-shadow:0 6px 20px rgba(68,200,255,.35);}
-.mode-sn-card:hover{transform:translateY(-3px) scale(1.03);}
-.mode-sn-card:active{transform:scale(.97);}.mode-btn-emoji{font-size:clamp(34px,9.5vw,46px);flex-shrink:0;line-height:1;
+.mode-sn-card:nth-child(1){--sn-color:#aadc00; border-color:rgba(170,220,0,.35);}
+.mode-sn-card:nth-child(2){--sn-color:#ffc800; border-color:rgba(255,200,0,.35);}
+.mode-sn-card:nth-child(3){--sn-color:#ff8c00; border-color:rgba(255,140,0,.35);}
+.mode-sn-card:nth-child(4){--sn-color:#cc88ff; border-color:rgba(200,136,255,.35);}
+.mode-sn-card:nth-child(5){--sn-color:#44ccff; border-color:rgba(68,204,255,.35);}
+.mode-sn-card:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 10px 28px rgba(0,0,0,.12);}
+.mode-sn-card:active{transform:scale(.97);box-shadow:0 2px 8px rgba(0,0,0,.06);}
   filter:drop-shadow(0 0 10px rgba(255,255,255,.95)) drop-shadow(0 2px 5px rgba(0,0,0,.12));}
 .mode-btn-emoji-right{font-size:clamp(34px,9.5vw,46px);flex-shrink:0;line-height:1;
   filter:drop-shadow(0 0 10px rgba(255,255,255,.95)) drop-shadow(0 2px 5px rgba(0,0,0,.12));}
@@ -2136,29 +2144,47 @@ body.battle-mode .enc-toast-box.show{display:block;animation:encRise 2.2s ease f
 }
 .mode-btn-mobile{
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
-  padding:22px 12px 18px;border-radius:24px;border:none;cursor:pointer;
-  font-family:'Fredoka One',cursive;font-size:16px;color:white;
-  box-shadow:0 6px 20px rgba(0,0,0,.18);transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s;
+  padding:22px 12px 18px;border-radius:24px;cursor:pointer;
+  font-family:'Fredoka One',cursive;font-size:16px;color:var(--text-dark);
+  background:white;
+  border:2.5px solid transparent;
+  box-shadow:0 6px 20px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.04);
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s;
   min-height:110px;position:relative;overflow:hidden;
 }
-.mode-btn-mobile::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.22) 0%,transparent 55%);pointer-events:none;}
-.mode-btn-mobile:active{transform:scale(.95);}
-.mode-btn-mobile:hover{transform:translateY(-3px) scale(1.03);}
+.mode-btn-mobile::before{
+  content:'';position:absolute;inset:0;
+  background:var(--mbm-color);
+  opacity:.08;border-radius:22px;pointer-events:none;
+}
+.mode-btn-mobile::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(255,255,255,.5) 0%,transparent 60%);
+  pointer-events:none;
+}
+.mode-btn-mobile:active{transform:scale(.95);box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.mode-btn-mobile:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 10px 28px rgba(0,0,0,.12);}
 .mode-btn-mobile .mbm-emoji{
   font-size:44px;line-height:1;
-  filter:drop-shadow(0 4px 10px rgba(0,0,0,.25)) drop-shadow(0 0 8px rgba(255,255,255,.6));
+  filter:
+    drop-shadow(0 6px 0px rgba(0,0,0,.15))
+    drop-shadow(0 8px 12px rgba(0,0,0,.25));
   transform:translateY(-2px);
-  transition:transform .2s cubic-bezier(.34,1.56,.64,1);
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1), filter .2s;
 }
-.mode-btn-mobile:hover .mbm-emoji { transform: translateY(-6px) scale(1.15); }
-.mode-btn-mobile .mbm-label{font-size:16px;font-weight:900;text-shadow:0 1px 4px rgba(0,0,0,.3);}
-.mode-btn-mobile .mbm-sub{font-family:'Nunito',sans-serif;font-size:11px;opacity:.9;font-weight:700;text-align:center;}
-/* Couleurs fraîches et pétantes */
-.mbm-solo{background:linear-gradient(135deg,#00e5ff,#0099cc);box-shadow:0 6px 22px rgba(0,180,255,.45);}
-.mbm-puzzle{background:linear-gradient(135deg,#ffdd00,#ff9500);box-shadow:0 6px 22px rgba(255,160,0,.45);}
-.mbm-survie{background:linear-gradient(135deg,#ff4d6d,#c9184a);box-shadow:0 6px 22px rgba(255,50,80,.45);}
-.mbm-quiz{background:linear-gradient(135deg,#b14fff,#7209b7);box-shadow:0 6px 22px rgba(160,50,255,.45);}
-
+.mode-btn-mobile:hover .mbm-emoji{
+  transform:translateY(-6px) scale(1.15);
+  filter:
+    drop-shadow(0 10px 0px rgba(0,0,0,.12))
+    drop-shadow(0 12px 16px rgba(0,0,0,.28));
+}
+.mode-btn-mobile:hover .mbm-emoji{transform:translateY(-6px) scale(1.15);}
+.mode-btn-mobile .mbm-label{font-size:16px;font-weight:900;text-shadow:none;}
+.mode-btn-mobile .mbm-sub{font-family:'Nunito',sans-serif;font-size:11px;opacity:.7;font-weight:700;text-align:center;}
+.mbm-solo  {--mbm-color:#00b4ff; border-color:rgba(0,180,255,.35);}
+.mbm-puzzle{--mbm-color:#ffa000; border-color:rgba(255,160,0,.35);}
+.mbm-survie{--mbm-color:#ff3250; border-color:rgba(255,50,80,.35);}
+.mbm-quiz  {--mbm-color:#a032ff; border-color:rgba(160,50,255,.35);}
 /* ═══ MOBILE IN-GAME LAYOUT ═══ */
 /* ═══ MOBILE IN-GAME : layout full-width ═══ */
 /* Cache le bouton flottant Kana-kun pendant le jeu */
@@ -2451,17 +2477,17 @@ body:has(#tuto-overlay:not(.hidden)) #bot-ui {
       <span class="mbm-sub">Mode solo classique</span>
     </button>
     <button class="mode-btn-mobile mbm-puzzle" onclick="showPuzzlePanel()">
-      <span class="mbm-emoji">⚡</span>
+      <span class="mbm-emoji">🧠</span>
       <span class="mbm-label">Puzzle</span>
       <span class="mbm-sub">Résous les chaînes</span>
     </button>
     <button class="mode-btn-mobile mbm-survie" onclick="modeStart('survie')">
-      <span class="mbm-emoji">🔥</span>
+      <span class="mbm-emoji">⚡</span>
       <span class="mbm-label">Survie</span>
       <span class="mbm-sub">21 niveaux · 1 vie</span>
     </button>
     <button class="mode-btn-mobile mbm-quiz" onclick="document.getElementById('mode-overlay').classList.add('hidden');showQuiz()">
-      <span class="mbm-emoji">📝</span>
+      <span class="mbm-emoji">❓</span>
       <span class="mbm-label">Quiz</span>
       <span class="mbm-sub">Apprends les kana</span>
     </button>
@@ -2722,6 +2748,145 @@ body:has(#tuto-overlay:not(.hidden)) #bot-ui {
 </div>
 
 <script>
+function majStatusBar(hexColor) {
+  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.StatusBar) {
+    try {
+      const StatusBar = window.Capacitor.Plugins.StatusBar;
+      StatusBar.setBackgroundColor({ color: hexColor });
+      StatusBar.setStyle({ style: 'LIGHT' });
+    } catch (e) {
+      console.warn("Erreur StatusBar:", e);
+    }
+  }
+}
+// ═══ FLUENT EMOJI 3D — Microsoft (MIT License) ═══
+// Approche par codepoint unicode — URL calculée dynamiquement, sans dictionnaire
+
+// Convertit un graphème emoji en codepoint(s) hex séparés par des tirets
+// ex: '🐢' → '1f422'  |  '🕷️' → '1f577-fe0f'
+function _emojiToCP(emoji) {
+  return [...emoji]
+    .map(c => c.codePointAt(0).toString(16))
+    .filter(cp => cp !== 'fe0f') // strip variation selector-16
+    .join('-');
+}
+
+const FLUENT_BASE = 'https://uwx.github.io/fluentui-twemoji-3d/export/3D_png/72x72/';
+function _fluentUrl(emoji) { return FLUENT_BASE + _emojiToCP(emoji) + '.png'; }
+
+// Cache des emojis dont l'image est absente → repli sur l'emoji natif
+// Pré-rempli avec les emojis Unicode 15.0+ absents du repo fluentui-twemoji-3d
+const _fluentFailed = new Set(['🫛']); // U+1FADB pea pod — Unicode 15.1, absent du repo
+
+// Détecte si un graphème est un emoji (exclut les ASCII 0-9, #, *)
+const _emojiRe = /\p{Emoji}/u;
+function _isEmoji(g) {
+  if (g.length === 1 && g.codePointAt(0) < 127) return false;
+  return _emojiRe.test(g);
+}
+
+// Remplace les emojis dans un élément DOM par des images Fluent 3D.
+// Ne touche QUE les textNodes directs des éléments non encore traités (data-fd).
+// L'attribut data-fd sur le PARENT évite de retraiter le même noeud.
+function fluent(el) {
+  if (!el) return;
+  const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+
+  // Walker sur tous les textNodes de l'élément, sauf ceux déjà traités
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      // Ignorer si le parent direct est déjà un span fluent
+      if (node.parentElement && node.parentElement.dataset.fd) return NodeFilter.FILTER_REJECT;
+      // Ignorer script/style
+      const tag = node.parentElement && node.parentElement.tagName;
+      if (tag === 'SCRIPT' || tag === 'STYLE') return NodeFilter.FILTER_REJECT;
+      // Ignorer les éléments que le JS du jeu écrit dynamiquement
+      const skipIds = ['mode-level-name','quiz-kana-card','qc0','qc1','qc2','qc3',
+                       'stats-grid','quiz-streak-display','quiz-progress-text',
+                       'quiz-score-display','tt-kana','tt-good','tt-bad','tt-tests',
+                       'tt-streak','tt-date','st-emoji','st-name','st-score',
+                       'score-val','next-kana','level-badge',
+                       'mn-score-val','mn-next-kana','mn-lv-emoji','mn-lv-num',
+                       'tuto-hud-next','tuto-hud-score','tuto-hud-lv-emoji','tuto-hud-lv-num'];
+      let p = node.parentElement;
+      while (p && p !== el) {
+        if (skipIds.includes(p.id)) return NodeFilter.FILTER_REJECT;
+        p = p.parentElement;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+
+  const toReplace = [];
+  let node;
+  while ((node = walker.nextNode())) {
+    const txt = node.textContent;
+    const segs = [...segmenter.segment(txt)];
+    let result = '', changed = false;
+    segs.forEach(seg => {
+      const g = seg.segment;
+      if (_isEmoji(g) && !_fluentFailed.has(g)) {
+        result += `<img src="${_fluentUrl(g)}" class="femoji" alt="${g}" title="${g}" onerror="window._fluentErr&&window._fluentErr(this,'${g}')">`;
+        changed = true;
+      } else {
+        result += g.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+      }
+    });
+    if (changed) toReplace.push({ node, result });
+  }
+
+  // Effectuer les remplacements après le walk (évite de perturber le TreeWalker)
+  toReplace.forEach(({ node, result }) => {
+    const span = document.createElement('span');
+    span.dataset.fd = '1';
+    span.innerHTML = result;
+    node.replaceWith(span);
+  });
+}
+
+// Gestion des images manquantes : repli sur l'emoji natif
+window._fluentErr = function(img, emoji) {
+  _fluentFailed.add(emoji);
+  const span = document.createElement('span');
+  span.textContent = emoji;
+  img.replaceWith(span);
+};
+
+// CSS Fluent
+const _fStyle = document.createElement('style');
+_fStyle.textContent = [
+  'img.femoji { height:1.15em; width:auto; vertical-align:-0.2em; display:inline-block; }',
+  '.wr-emoji img.femoji { height:1.6em; }',
+  '.lvl-card-emoji img.femoji { height:1em; width:100%; object-fit:contain; }',
+  '#mobile-nav img.femoji { height:1.3em; }',
+  '.mode-btn-mobile img.femoji { height:1.5em; }',
+  '.wof-pod-lvl img.femoji { height:1em; }'
+].join('\n');
+document.head.appendChild(_fStyle);
+
+// Liste des zones statiques à traiter — le JS du jeu ne les modifie pas directement
+function applyFluent() {
+  // Zones statiques (HTML fixe, jamais réécrit par le jeu)
+  fluent(document.getElementById('lvl-scroll'));
+  fluent(document.getElementById('menu-overlay'));
+  fluent(document.getElementById('mobile-nav'));
+  fluent(document.getElementById('tuto-overlay'));
+  fluent(document.getElementById('tuto-hud'));
+
+  // Zones partiellement dynamiques — on exclut les sous-éléments JS via skipIds dans fluent()
+  fluent(document.getElementById('mode-overlay'));
+  fluent(document.getElementById('quiz-overlay'));
+  fluent(document.getElementById('stats-overlay'));
+  fluent(document.getElementById('wof-overlay'));
+  fluent(document.getElementById('board-overlay'));
+  fluent(document.getElementById('survie-transition'));
+
+  // word-panel : injecté par le JS mais avec des emojis statiques dans le template
+  fluent(document.getElementById('word-panel'));
+
+  // Menu Kana-kun : créé dynamiquement via appendChild, absent au premier passage
+  fluent(document.getElementById('bot-ui'));
+}
 // ═══════════════════════════════════════════════════════════════════
 //  DONNÉES — niveaux, constantes partagées
 // ═══════════════════════════════════════════════════════════════════
@@ -3481,15 +3646,15 @@ function botChooseBestCol(kana,boardSnap,activeWordsSnap,nextKana,maxDepth){
 //  PUZZLE ENGINE (partagé, sans DOM)
 // ═══════════════════════════════════════════════════════════════════
 const PUZZLE_SN_DEFS=[
-  {num:1,stars:'⭐',    label:'Initiation',   desc:'1 chaîne de 2 mots · Plateau vide',
+  {num:1,stars:'🍬',    label:'Initiation',   desc:'1 chaîne de 2 mots · Plateau vide',
    chains:[{chainLen:2,triggerRow:1}], fillRatio:0.0},
-  {num:2,stars:'⭐⭐',   label:'Apprentissage',desc:'1 chaîne de 3 mots · Quelques neutres',
+  {num:2,stars:'🧮',   label:'Apprentissage',desc:'1 chaîne de 3 mots · Quelques neutres',
    chains:[{chainLen:3,triggerRow:1}], fillRatio:0.10},
-  {num:3,stars:'⭐⭐⭐',  label:'Intermédiaire',desc:'2 chaînes de 2 mots · Profondeur variable',
+  {num:3,stars:'📓',  label:'Intermédiaire',desc:'2 chaînes de 2 mots · Profondeur variable',
    chains:[{chainLen:2,triggerRow:1},{chainLen:2,triggerRow:2}], fillRatio:0.20},
-  {num:4,stars:'⭐⭐⭐⭐', label:'Avancé',       desc:'2 chaînes de 2 mots · Plateau plus rempli',
+  {num:4,stars:'🎓', label:'Avancé',       desc:'2 chaînes de 2 mots · Plateau plus rempli',
    chains:[{chainLen:2,triggerRow:2},{chainLen:2,triggerRow:3}], fillRatio:0.30},
-  {num:5,stars:'⭐⭐⭐⭐⭐',label:'Maîtrise',    desc:'3 chaînes (2+2+3) · Seule 1 en surface !',
+  {num:5,stars:'💎',label:'Maîtrise',    desc:'3 chaînes (2+2+3) · Seule 1 en surface !',
    chains:[{chainLen:2,triggerRow:1},{chainLen:2,triggerRow:3},{chainLen:3,triggerRow:4}], fillRatio:0.40},
 ];
 
@@ -6455,6 +6620,7 @@ if(nextIdx >= ACTIVE_LEVELS.length){
     const p = palettes[nextIdx] || palettes[0];
     const r = document.documentElement.style;
     r.setProperty('--bg-top', p[0]); r.setProperty('--bg-mid', p[1]); r.setProperty('--bg-bot', p[2]);
+    majStatusBar(p[0]);
     // Glissement interne via l'API publique du player
     if(player1 && player1.survieDoSlide) player1.survieDoSlide(nextIdx);
     slideFn(nextIdx);
@@ -7389,6 +7555,8 @@ soundLevelUp();
     root.setProperty('--bg-top',`var(--lv${lv}-top,var(--lv1-top))`);
     root.setProperty('--bg-mid',`var(--lv${lv}-mid,var(--lv1-mid))`);
     root.setProperty('--bg-bot',`var(--lv${lv}-bot,var(--lv1-bot))`);
+const computedTopColor = getComputedStyle(document.documentElement).getPropertyValue(`--lv${lv}-top`).trim() || getComputedStyle(document.documentElement).getPropertyValue('--lv1-top').trim();
+    majStatusBar(computedTopColor);
     const badge=document.getElementById('level-badge');
     if(badge){
       if(puzzleMode){
@@ -7709,6 +7877,7 @@ function showMenu(){
   const p=PALETTES[Math.floor(Math.random()*PALETTES.length)];
   const r=document.documentElement.style;
   r.setProperty('--bg-top',p[0]);r.setProperty('--bg-mid',p[1]);r.setProperty('--bg-bot',p[2]);
+  majStatusBar(p[0]);
 }
 
 function showPuzzleSelect(levelIdx){ showModeSelect(levelIdx); } // compat
@@ -9526,6 +9695,7 @@ function _quizChangeBg(){
   const p = _QUIZ_PALETTES[_quizBgIdx];
   const r = document.documentElement.style;
   r.setProperty('--bg-top',p[0]); r.setProperty('--bg-mid',p[1]); r.setProperty('--bg-bot',p[2]);
+  majStatusBar(p[0]);
 }
 
 function _quizRender(){
@@ -10214,6 +10384,7 @@ if(typeof player1 !== 'undefined') player1.triggerCalcRows();
   root.setProperty('--bg-top', p[0]);
   root.setProperty('--bg-mid', p[1]);
   root.setProperty('--bg-bot', p[2]);
+  majStatusBar(p[0]);
 })();
 
 
@@ -10364,134 +10535,7 @@ function splashEnter(){
 })();
 
 
-// ═══ FLUENT EMOJI 3D — Microsoft (MIT License) ═══
-// Approche par codepoint unicode — URL calculée dynamiquement, sans dictionnaire
 
-// Convertit un graphème emoji en codepoint(s) hex séparés par des tirets
-// ex: '🐢' → '1f422'  |  '🕷️' → '1f577-fe0f'
-function _emojiToCP(emoji) {
-  return [...emoji]
-    .map(c => c.codePointAt(0).toString(16))
-    .filter(cp => cp !== 'fe0f') // strip variation selector-16
-    .join('-');
-}
-
-const FLUENT_BASE = 'https://uwx.github.io/fluentui-twemoji-3d/export/3D_png/72x72/';
-function _fluentUrl(emoji) { return FLUENT_BASE + _emojiToCP(emoji) + '.png'; }
-
-// Cache des emojis dont l'image est absente → repli sur l'emoji natif
-// Pré-rempli avec les emojis Unicode 15.0+ absents du repo fluentui-twemoji-3d
-const _fluentFailed = new Set(['🫛']); // U+1FADB pea pod — Unicode 15.1, absent du repo
-
-// Détecte si un graphème est un emoji (exclut les ASCII 0-9, #, *)
-const _emojiRe = /\p{Emoji}/u;
-function _isEmoji(g) {
-  if (g.length === 1 && g.codePointAt(0) < 127) return false;
-  return _emojiRe.test(g);
-}
-
-// Remplace les emojis dans un élément DOM par des images Fluent 3D.
-// Ne touche QUE les textNodes directs des éléments non encore traités (data-fd).
-// L'attribut data-fd sur le PARENT évite de retraiter le même noeud.
-function fluent(el) {
-  if (!el) return;
-  const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
-
-  // Walker sur tous les textNodes de l'élément, sauf ceux déjà traités
-  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
-    acceptNode(node) {
-      // Ignorer si le parent direct est déjà un span fluent
-      if (node.parentElement && node.parentElement.dataset.fd) return NodeFilter.FILTER_REJECT;
-      // Ignorer script/style
-      const tag = node.parentElement && node.parentElement.tagName;
-      if (tag === 'SCRIPT' || tag === 'STYLE') return NodeFilter.FILTER_REJECT;
-      // Ignorer les éléments que le JS du jeu écrit dynamiquement
-      const skipIds = ['mode-level-name','quiz-kana-card','qc0','qc1','qc2','qc3',
-                       'stats-grid','quiz-streak-display','quiz-progress-text',
-                       'quiz-score-display','tt-kana','tt-good','tt-bad','tt-tests',
-                       'tt-streak','tt-date','st-emoji','st-name','st-score',
-                       'score-val','next-kana','level-badge',
-                       'mn-score-val','mn-next-kana','mn-lv-emoji','mn-lv-num',
-                       'tuto-hud-next','tuto-hud-score','tuto-hud-lv-emoji','tuto-hud-lv-num'];
-      let p = node.parentElement;
-      while (p && p !== el) {
-        if (skipIds.includes(p.id)) return NodeFilter.FILTER_REJECT;
-        p = p.parentElement;
-      }
-      return NodeFilter.FILTER_ACCEPT;
-    }
-  });
-
-  const toReplace = [];
-  let node;
-  while ((node = walker.nextNode())) {
-    const txt = node.textContent;
-    const segs = [...segmenter.segment(txt)];
-    let result = '', changed = false;
-    segs.forEach(seg => {
-      const g = seg.segment;
-      if (_isEmoji(g) && !_fluentFailed.has(g)) {
-        result += `<img src="${_fluentUrl(g)}" class="femoji" alt="${g}" title="${g}" onerror="window._fluentErr&&window._fluentErr(this,'${g}')">`;
-        changed = true;
-      } else {
-        result += g.replace(/&/g,'&amp;').replace(/</g,'&lt;');
-      }
-    });
-    if (changed) toReplace.push({ node, result });
-  }
-
-  // Effectuer les remplacements après le walk (évite de perturber le TreeWalker)
-  toReplace.forEach(({ node, result }) => {
-    const span = document.createElement('span');
-    span.dataset.fd = '1';
-    span.innerHTML = result;
-    node.replaceWith(span);
-  });
-}
-
-// Gestion des images manquantes : repli sur l'emoji natif
-window._fluentErr = function(img, emoji) {
-  _fluentFailed.add(emoji);
-  const span = document.createElement('span');
-  span.textContent = emoji;
-  img.replaceWith(span);
-};
-
-// CSS Fluent
-const _fStyle = document.createElement('style');
-_fStyle.textContent = [
-  'img.femoji { height:1.15em; width:auto; vertical-align:-0.2em; display:inline-block; }',
-  '.wr-emoji img.femoji { height:1.6em; }',
-  '.lvl-card-emoji img.femoji { height:1em; width:100%; object-fit:contain; }',
-  '#mobile-nav img.femoji { height:1.3em; }',
-  '.mode-btn-mobile img.femoji { height:1.5em; }',
-  '.wof-pod-lvl img.femoji { height:1em; }'
-].join('\n');
-document.head.appendChild(_fStyle);
-
-// Liste des zones statiques à traiter — le JS du jeu ne les modifie pas directement
-function applyFluent() {
-  // Zones statiques (HTML fixe, jamais réécrit par le jeu)
-  fluent(document.getElementById('lvl-scroll'));
-  fluent(document.getElementById('menu-overlay'));
-  fluent(document.getElementById('mobile-nav'));
-  fluent(document.getElementById('tuto-overlay'));
-  fluent(document.getElementById('tuto-hud'));
-
-  // Zones partiellement dynamiques — on exclut les sous-éléments JS via skipIds dans fluent()
-  fluent(document.getElementById('mode-overlay'));
-  fluent(document.getElementById('quiz-overlay'));
-  fluent(document.getElementById('stats-overlay'));
-  fluent(document.getElementById('wof-overlay'));
-  fluent(document.getElementById('board-overlay'));
-  fluent(document.getElementById('survie-transition'));
-
-  // word-panel : injecté par le JS mais avec des emojis statiques dans le template
-  fluent(document.getElementById('word-panel'));
-
-  // Menu Kana-kun : créé dynamiquement via appendChild, absent au premier passage
-  fluent(document.getElementById('bot-ui'));
-}
 
 // Lancement initial
 window.addEventListener('load', () => setTimeout(applyFluent, 400));
@@ -10541,6 +10585,7 @@ window.addEventListener('load', () => setTimeout(applyFluent, 400));
       window._capacitorTTS = window.Capacitor.Plugins.TextToSpeech;
     }
   });
+
 </script>
 </body>
 </html>
