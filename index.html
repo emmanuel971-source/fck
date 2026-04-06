@@ -2383,6 +2383,13 @@ body.mobile-ingame #word-panel {
 #mobile-nav .mn-next.pop { animation: nextPop .28s ease forwards; }
 body:has(#tuto-overlay:not(.hidden)) #bot-ui {
     display: none !important;
+
+}
+#bot-ui{
+  touch-action: none !important;
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 </style>
 </head>
@@ -2950,7 +2957,7 @@ const ALL_LEVELS=[
     {kana:'うま',romaji:'uma',meaning:'cheval',emoji:'🐴',boss:false},
     {kana:'うさぎ',romaji:'usagi',meaning:'lapin',emoji:'🐰',boss:true},
   ]},
-  {id:2,theme:'La Mer',clan:'',emoji:'🌊',color:'#00c8e8',words:[
+  {id:2,theme:'Vie Sous-marine',clan:'',emoji:'🐬',color:'#00c8e8',words:[
     {kana:'かい',romaji:'kai',meaning:'coquillage',emoji:'🐚',boss:false},
     {kana:'かめ',romaji:'kame',meaning:'tortue',emoji:'🐢',boss:false},
     {kana:'えび',romaji:'ebi',meaning:'crevette',emoji:'🦐',boss:false},
@@ -6523,9 +6530,12 @@ function switchMenuAlphabet(alphabet, direction) {
 
   const container = document.getElementById('lvl-scroll');
 
+  // 1. On crée un style commun pour les wrappers INCLUANT le layout Flex et le gap !
+  const wrapperStyle = 'position:absolute;inset:0;width:100%;will-change:transform,opacity;display:flex;flex-direction:column;gap:10px;';
+
   // Capturer l'ancien contenu dans un clone
   const oldSlide = document.createElement('div');
-  oldSlide.style.cssText = 'position:absolute;inset:0;width:100%;will-change:transform;';
+  oldSlide.style.cssText = wrapperStyle;
   oldSlide.innerHTML = container.innerHTML;
   container.style.position = 'relative';
   container.style.overflow = 'hidden';
@@ -6539,25 +6549,33 @@ function switchMenuAlphabet(alphabet, direction) {
   if (tabHira) tabHira.classList.toggle('active', alphabet === 'hiragana');
   if (tabKata) tabKata.classList.toggle('active', alphabet === 'katakana');
   updateQuizLists();
-  renderMenuLevels(); // réécrit container.innerHTML → nouveau contenu en place
+  renderMenuLevels(); 
 
   // Le nouveau contenu est maintenant dans container, on l'enveloppe
   const newSlide = document.createElement('div');
-  newSlide.style.cssText = 'position:absolute;inset:0;width:100%;will-change:transform;';
+  newSlide.style.cssText = wrapperStyle;
+  
   // Récupérer le vrai contenu généré (tout sauf oldSlide)
   const realContent = [...container.childNodes].filter(n => n !== oldSlide);
   realContent.forEach(n => newSlide.appendChild(n));
   container.appendChild(newSlide);
 
-  // direction : swipe gauche → nouveau arrive de droite, swipe droite → de gauche
   const fromNew = direction === 'left' ? '100%' : '-100%';
   const toOld   = direction === 'left' ? '-100%' : '100%';
 
-  const opts = { duration: 280, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' };
+  // 2. On ajuste la durée, l'easing, et on prépare les options
+  const opts = { duration: 320, easing: 'cubic-bezier(0.25, 1, 0.5, 1)', fill: 'forwards' };
 
-  oldSlide.animate([{ transform: 'translateX(0)' }, { transform: `translateX(${toOld})` }], opts);
-  newSlide.animate([{ transform: `translateX(${fromNew})` }, { transform: 'translateX(0)' }], opts)
-    .finished.then(() => {
+  // 3. On intègre l'opacité (fondu) dans les keyframes de l'animation
+  oldSlide.animate([
+    { transform: 'translateX(0)', opacity: 1 }, 
+    { transform: `translateX(${toOld})`, opacity: 0 }
+  ], opts);
+
+  newSlide.animate([
+    { transform: `translateX(${fromNew})`, opacity: 0 }, 
+    { transform: 'translateX(0)', opacity: 1 }
+  ], opts).finished.then(() => {
       // Nettoyer : remettre le contenu à plat dans container
       const nodes = [...newSlide.childNodes];
       container.innerHTML = '';
@@ -6565,8 +6583,9 @@ function switchMenuAlphabet(alphabet, direction) {
       container.style.overflow = '';
       nodes.forEach(n => container.appendChild(n));
       if (typeof applyFluent === 'function') applyFluent();
-    });
+  });
 }
+
 
 // Génération initiale au chargement de l'app
 renderMenuLevels();
@@ -9354,59 +9373,103 @@ const panel = document.getElementById('bot-panel');
   if (_savedBottom) { ui.style.bottom = _savedBottom; ui.style.top = 'auto'; }
 
   // ── Drag repositionnable (appui long) ──
-  const LONG_PRESS_MS = 400;
+// ── Drag repositionnable (appui long) ──
+// ── Drag repositionnable (appui long) ──
+  const LONG_PRESS_MS = 300; 
   let _dragActive = false;
   let _longPressTimer = null;
+  let _dragStartX = 0;
   let _dragStartY = 0;
-  let _btnStartBottom = 0;
+  let _offsetBottom = 0;
 
   toggle.addEventListener('touchstart', e => {
+    // 🛡️ Bloque la propagation pour ne pas cliquer sur ce qu'il y a derrière
+    e.stopPropagation();
+
     const touch = e.touches[0];
+    _dragStartX = touch.clientX;
     _dragStartY = touch.clientY;
-    _btnStartBottom = parseInt(ui.style.bottom) || 80;
     _dragActive = false;
+
+    // Calcul de l'écart initial
+    const currentBottom = parseInt(ui.style.bottom) || 80;
+    _offsetBottom = (window.innerHeight - touch.clientY) - currentBottom;
+
+    // On fige l'animation pour que ça colle au doigt
+    toggle.style.transition = 'none';
+
     _longPressTimer = setTimeout(() => {
       _dragActive = true;
-      toggle.style.transform = 'scale(1.2)';
-      toggle.style.boxShadow = '0 6px 28px rgba(168,85,247,.9), 0 0 0 4px rgba(168,85,247,.35)';
+      toggle.style.transform = 'scale(1.15)';
+      toggle.style.boxShadow = '0 8px 32px rgba(168,85,247,.8), 0 0 0 4px rgba(168,85,247,.4)';
       if (navigator.vibrate) navigator.vibrate(40);
     }, LONG_PRESS_MS);
-  }, { passive: true });
+  }, { passive: false });
 
   toggle.addEventListener('touchmove', e => {
-    if (!_dragActive) { clearTimeout(_longPressTimer); return; }
-    e.preventDefault();
-    const dy = e.touches[0].clientY - _dragStartY;
-    let newBottom = Math.max(10, Math.min(window.innerHeight - 80, _btnStartBottom - dy));
+    // 🛡️ On bloque aussi ici pour éviter les conflits de scroll
+    e.stopPropagation();
+
+    const touch = e.touches[0];
+    const dx = touch.clientX - _dragStartX;
+    const dy = touch.clientY - _dragStartY;
+
+    if (!_dragActive) {
+      // Tolérance de 10px avant d'annuler l'appui long
+      if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+        clearTimeout(_longPressTimer);
+      }
+      return; 
+    }
+
+    // Si on est en mode Drag, on empêche le scroll de la page
+    if (e.cancelable) e.preventDefault();
+
+    // Positionnement absolu
+    let newBottom = (window.innerHeight - touch.clientY) - _offsetBottom;
+    
+    // Sécurité pour ne pas sortir de l'écran
+    newBottom = Math.max(20, Math.min(window.innerHeight - 100, newBottom));
+
     ui.style.bottom = newBottom + 'px';
     ui.style.top = 'auto';
+
+    // On déplace le panel en même temps si ouvert
     if (panel.style.display === 'flex') {
       panel.style.bottom = (newBottom + 56) + 'px';
       panel.style.top = 'auto';
     }
   }, { passive: false });
 
-  toggle.addEventListener('touchend', () => {
+  toggle.addEventListener('touchend', e => {
+    e.stopPropagation();
     clearTimeout(_longPressTimer);
+    
+    // On remet la transition fluide pour le retour à la normale
+    toggle.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease';
+
     if (_dragActive) {
       _dragActive = false;
       toggle.style.transform = '';
       toggle.style.boxShadow = '0 3px 14px rgba(168,85,247,.5)';
       localStorage.setItem('kanakun-btn-bottom', ui.style.bottom);
-      return;
+      
+      // Empêche le clic accidentel lors du relâchement après un drag
+      if (e.cancelable) e.preventDefault();
+      return; 
     }
-    // ── Clic court : ouvrir/fermer panel ──
-    const open = panel.style.display === 'flex';
-    panel.style.display = open ? 'none' : 'flex';
-    toggle.style.transform = open ? '' : 'rotate(15deg) scale(1.08)';
-    toggle.style.boxShadow = open ? '0 3px 14px rgba(168,85,247,.5)' : '0 4px 20px rgba(168,85,247,.75), 0 0 0 3px rgba(168,85,247,.25)';
-    if (!open && typeof fluent === 'function') setTimeout(() => fluent(document.getElementById('bot-ui')), 50);
-    const quizVisible = !document.getElementById('quiz-overlay').classList.contains('hidden');
-    if (quizVisible) {
-      if (!open) { if (typeof _quizPause === 'function') _quizPause(); }
-      else        { if (typeof _quizResume === 'function') _quizResume(); }
+    
+    // ── Clic court (Ouverture/Fermeture) ──
+    const isVisible = (panel.style.display === 'flex');
+    if (isVisible) {
+      panel.style.display = 'none';
+    } else {
+      panel.style.display = 'flex';
+      // Recalculer la position du panel pour qu'il soit au dessus du bouton
+      const currentB = parseInt(ui.style.bottom) || 80;
+      panel.style.bottom = (currentB + 56) + 'px';
     }
-  }, { passive: true });
+  }, { passive: false });  
 
   // ── Hover effect on nav buttons ──
   ['bot-nav-tuto','bot-nav-wof','bot-nav-stats'].forEach(id => {
