@@ -1139,16 +1139,37 @@ body::before {
   bottom: 0; left: 0; right: 0;
   z-index: 230;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 10px 16px 12px;
+  gap: 6px;
+  padding: 8px 16px 10px;
   background: linear-gradient(135deg, #ff8c42, #ffb347);
   box-shadow: 0 -4px 20px rgba(255,120,30,.35), 0 -1px 0 rgba(255,255,255,.3);
   pointer-events: none;
 }
+/* Ligne d'icônes + texte */
+#tuto-info-banner .tib-row {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+/* Barre de progression */
+#tuto-progress-track {
+  width: calc(100% - 16px); max-width: 360px;
+  height: 5px;
+  background: rgba(0,0,0,.2);    /* ← était rgba(255,255,255,.3) */
+  border-radius: 4px;
+  overflow: hidden;
+}
+#tuto-progress-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #6366f1, #a855f7);    /* ← était #fff */
+  border-radius: 4px;
+  transform-origin: left;
+  transition: none;
+}
 #tuto-info-banner .tib-icon {
-  font-size: clamp(20px, 5vw, 26px);
+  font-size: clamp(28px, 7vw, 36px);    /* ← était clamp(20px,5vw,26px) */
   animation: tibBounce 1.4s ease-in-out infinite alternate;
   flex-shrink: 0;
 }
@@ -1347,44 +1368,46 @@ flex: 0 0 42%;
 }
 
 /* ── Bulle manga du robot — parole de Kana-kun ── */
-#tuto-bubble{
-  position:absolute;z-index:50;
-  left:50%;top:50%;
-  transform:translate(-50%,-50%);
-  width:calc(100% - 48px);max-width:340px;
-  background:rgba(255,255,255,.96);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  color:#1a1040;
-  font-family:'Nunito',sans-serif;font-weight:800;font-size:clamp(14px,4vw,17px);
-  border-radius:22px 22px 22px 6px;
-  padding:14px 18px 16px 18px;
-  text-align:left;line-height:1.55;
-  box-shadow:0 8px 32px rgba(168,85,247,.22),0 2px 0 rgba(168,85,247,.12),0 1px 0 rgba(255,255,255,.9);
-  border:2.5px solid #a855f7;
-  pointer-events:none;
+#tuto-bubble {
+  position: absolute; z-index: 50;
+  left: 50%; top: calc(50% - 70px);   /* ← était 50%, on remonte */
+  transform: translate(-50%, -50%);
+  width: calc(100% - 32px); max-width: 360px;
+  background: rgba(255,255,255,.96);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  color: #1a1040;
+  font-family: 'Nunito', sans-serif; font-weight: 800;
+  font-size: clamp(18px, 5.5vw, 24px);
+  border-radius: 22px 22px 22px 6px;
+  padding: 18px 22px 22px 22px;
+  text-align: left; line-height: 1.5;
+  box-shadow: 0 8px 32px rgba(168,85,247,.22), 0 2px 0 rgba(168,85,247,.12), 0 1px 0 rgba(255,255,255,.9);
+  border: 2.5px solid #a855f7;
+  pointer-events: none;
 }
 /* Encart robot en bas à gauche de la bulle — image Fluent injectée par JS */
-#tuto-bubble-robot{
-  position:absolute;
-  left:-4px;bottom:-38px;
-  font-size:32px;
-  line-height:1;
-  filter:drop-shadow(0 2px 6px rgba(168,85,247,.5));
-  animation:robotBobble 1.6s ease-in-out infinite alternate;
-  pointer-events:none;
+#tuto-bubble-robot {
+  position: absolute;
+  left: -4px; bottom: -88px;    /* ← était -52px */
+  font-size: 64px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(168,85,247,.5));
+  animation: robotBobble 1.6s ease-in-out infinite alternate;
+  pointer-events: none;
 }
-#tuto-bubble-robot img.femoji { height: 32px; width: auto; vertical-align: middle; }
+#tuto-bubble-robot img.femoji { height: 64px; width: auto; vertical-align: middle; }
+
 @keyframes robotBobble{from{transform:translateY(0) rotate(-4deg)}to{transform:translateY(-4px) rotate(4deg)}}
 /* Petite queue de bulle en bas à gauche (style manga) */
-#tuto-bubble::after{
-  content:'';
-  position:absolute;
-  bottom:-16px;left:18px;
-  width:0;height:0;
-  border-left:14px solid transparent;
-  border-right:6px solid transparent;
-  border-top:16px solid #a855f7;
-  filter:drop-shadow(0 2px 3px rgba(168,85,247,.2));
+#tuto-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -16px; left: 18px;    /* longueur normale */
+  width: 0; height: 0;
+  border-left: 14px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 16px solid #a855f7;    /* longueur normale */
+  filter: drop-shadow(0 2px 3px rgba(168,85,247,.2));
 }
 #tuto-bubble.hidden{display:none !important;}
 /* Ligne colorée violette en haut + nom du bot */
@@ -1394,22 +1417,23 @@ flex: 0 0 42%;
   margin-bottom:6px;display:flex;align-items:center;gap:5px;
 }
 #tuto-bubble-header::before{content:'';display:inline-block;width:18px;height:2px;background:#a855f7;border-radius:2px;vertical-align:middle;}
-@keyframes bubbleIn{
-  from{opacity:0;transform:translate(-50%,-50%) scale(.82) translateY(10px)}
-  to{opacity:1;transform:translate(-50%,-50%) scale(1) translateY(0)}
+@keyframes bubbleIn {
+  from { opacity:0; transform:translate(-50%,-50%) scale(.82) translateY(10px) }
+  to   { opacity:1; transform:translate(-50%,-50%) scale(1)   translateY(0)    }
 }
 
 /* Flèche directionnelle optionnelle */
-#tuto-bubble-arrow{
-  position:absolute;font-size:24px;font-weight:900;color:#a855f7;
-  animation:arrowPulse .8s ease-in-out infinite alternate;
-  pointer-events:none;
+#tuto-bubble-arrow {
+  position: absolute; font-size: 42px;
+  animation: arrowPulse .8s ease-in-out infinite alternate;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 8px rgba(168,85,247,.6));
 }
-@keyframes arrowPulse{from{opacity:.7;transform:scale(1)}to{opacity:1;transform:scale(1.35)}}
-#tuto-bubble-arrow.arrow-right{right:-36px;top:50%;transform:translateY(-50%);}
-#tuto-bubble-arrow.arrow-down{bottom:-38px;left:50%;transform:translateX(-50%);}
-#tuto-bubble-arrow.arrow-up{top:-38px;left:50%;transform:translateX(-50%);}
-#tuto-bubble-arrow.hidden{display:none !important;}
+@keyframes arrowPulse { from{opacity:.8;transform:scale(1)} to{opacity:1;transform:scale(1.25)} }
+#tuto-bubble-arrow.arrow-right { right: -52px; top: 50%; transform: translateY(-50%); }
+#tuto-bubble-arrow.arrow-down  { bottom: -58px; left: 50%; transform: translateX(-50%); }
+#tuto-bubble-arrow.arrow-up    { top: -58px; left: 50%; transform: translateX(-50%); }
+#tuto-bubble-arrow.hidden      { display: none !important; }
 
 /* Footer — caché, le bouton C'est parti est dans la bulle */
 #tuto-footer{display:none;}
@@ -1599,7 +1623,13 @@ flex: 0 0 42%;
   background:linear-gradient(135deg,#f9d000,#ff8c42);color:#fff;
   box-shadow:0 4px 14px rgba(249,208,0,.4);transform:scale(1.02);
 }
-
+/* Tabs Hiragana/Katakana du menu niveaux : même style que les stats */
+#tab-menu-hira.active, #tab-menu-kata.active {
+  background: linear-gradient(135deg, #a855f7, #6366f1);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(168,85,247,.4);
+  transform: scale(1.02);
+}
 /* ── Panels ── */
 .mode-panel{
   width:calc(100% - 32px);max-width:340px;
@@ -2690,11 +2720,16 @@ body:has(#tuto-overlay:not(.hidden)) #bot-ui {
   <div id="tuto-footer"></div>
 
   <!-- Bandeau d'info "Comment jouer" -->
-  <div id="tuto-info-banner">
+ <div id="tuto-info-banner">
+  <div class="tib-row">
     <div class="tib-icon">📖</div>
     <div class="tib-text">Tu es dans la section<span>Comment jouer</span></div>
     <div class="tib-icon">🎮</div>
   </div>
+  <div id="tuto-progress-track">
+    <div id="tuto-progress-fill"></div>
+  </div>
+</div>
 </div>
 
 
@@ -2908,21 +2943,21 @@ function applyFluent() {
 //  DONNÉES — niveaux, constantes partagées
 // ═══════════════════════════════════════════════════════════════════
 const ALL_LEVELS=[
-  {id:1,theme:'La Mer',clan:'',emoji:'🌊',color:'#00c8e8',words:[
-    {kana:'かい',romaji:'kai',meaning:'coquillage',emoji:'🐚',boss:false},
-    {kana:'かめ',romaji:'kame',meaning:'tortue',emoji:'🐢',boss:false},
-    {kana:'えび',romaji:'ebi',meaning:'crevette',emoji:'🦐',boss:false},
-    {kana:'たこ',romaji:'tako',meaning:'pieuvre',emoji:'🐙',boss:false},
-    {kana:'いるか',romaji:'iruka',meaning:'dauphin',emoji:'🐬',boss:true},
-  ]},
-  {id:2,theme:'Les Domestiques',clan:'',emoji:'🐾',color:'#ffaa7a',words:[
+  {id:1,theme:'Nos Compagnons',clan:'',emoji:'🐱',color:'#ffaa7a',words:[
     {kana:'ねこ',romaji:'neko',meaning:'chat',emoji:'🐱',boss:false},
     {kana:'いぬ',romaji:'inu',meaning:'chien',emoji:'🐶',boss:false},
     {kana:'うし',romaji:'ushi',meaning:'vache',emoji:'🐄',boss:false},
     {kana:'うま',romaji:'uma',meaning:'cheval',emoji:'🐴',boss:false},
     {kana:'うさぎ',romaji:'usagi',meaning:'lapin',emoji:'🐰',boss:true},
   ]},
-  {id:3,theme:'La Forêt',clan:'',emoji:'🌿',color:'#5cb85c',words:[
+  {id:2,theme:'La Mer',clan:'',emoji:'🌊',color:'#00c8e8',words:[
+    {kana:'かい',romaji:'kai',meaning:'coquillage',emoji:'🐚',boss:false},
+    {kana:'かめ',romaji:'kame',meaning:'tortue',emoji:'🐢',boss:false},
+    {kana:'えび',romaji:'ebi',meaning:'crevette',emoji:'🦐',boss:false},
+    {kana:'たこ',romaji:'tako',meaning:'pieuvre',emoji:'🐙',boss:false},
+    {kana:'いるか',romaji:'iruka',meaning:'dauphin',emoji:'🐬',boss:true},
+  ]},
+  {id:3,theme:'La Forêt',clan:'',emoji:'🐾',color:'#5cb85c',words:[
     {kana:'くま',romaji:'kuma',meaning:'ours',emoji:'🐻',boss:false},
     {kana:'しか',romaji:'shika',meaning:'cerf',emoji:'🦌',boss:false},
     {kana:'さる',romaji:'saru',meaning:'singe',emoji:'🐒',boss:false},
@@ -2930,7 +2965,7 @@ const ALL_LEVELS=[
     {kana:'きつね',romaji:'kitsune',meaning:'renard',emoji:'🦊',boss:true},
     
   ]},
-  {id:4,theme:'La Savane',clan:'',emoji:'🌍',color:'#e8833a',words:[
+  {id:4,theme:'La Savane',clan:'',emoji:'🌿',color:'#e8833a',words:[
     {kana:'とら',romaji:'tora',meaning:'tigre',emoji:'🐯',boss:false},
     {kana:'かば',romaji:'kaba',meaning:'hippopo',emoji:'🦛',boss:false},
     {kana:'へび',romaji:'hebi',meaning:'serpent',emoji:'🐍',boss:false},
@@ -2972,14 +3007,14 @@ const ALL_LEVELS=[
     {kana:'もも',romaji:'momo',meaning:'pêche',emoji:'🍑',boss:false},
     {kana:'すいか',romaji:'suika',meaning:'pastèque',emoji:'🍉',boss:true},
   ]},
-  {id:10,theme:'Ciel & Saisons',clan:'',emoji:'🌸',color:'#ffb3d9',words:[
+  {id:10,theme:'Ciel & Saisons',clan:'',emoji:'❄️',color:'#ffb3d9',words:[
     {kana:'そら',romaji:'sora',meaning:'ciel',emoji:'☁️',boss:false},
     {kana:'つき',romaji:'tsuki',meaning:'lune',emoji:'🌙',boss:false},
     {kana:'ほし',romaji:'hoshi',meaning:'étoile',emoji:'🌟',boss:false},
     {kana:'ゆき',romaji:'yuki',meaning:'neige',emoji:'❄️',boss:false},
     {kana:'さくら',romaji:'sakura',meaning:'cerisier',emoji:'🌸',boss:true},
   ]},
-  {id:11,theme:'Terre & Végétation',clan:'',emoji:'🌿',color:'#72c472',words:[
+  {id:11,theme:'Terre & Végétation',clan:'',emoji:'🌸',color:'#72c472',words:[
     {kana:'やま',romaji:'yama',meaning:'montagne',emoji:'⛰️',boss:false},
     {kana:'もり',romaji:'mori',meaning:'forêt',emoji:'🌲',boss:false},
     {kana:'くさ',romaji:'kusa',meaning:'herbe',emoji:'🌿',boss:false},
@@ -3042,7 +3077,14 @@ const ALL_LEVELS=[
     {kana:'おじ',romaji:'oji',meaning:'oncle',emoji:'👨',boss:false},
     {kana:'むすめ',romaji:'musume',meaning:'fille',emoji:'👧',boss:true},
   ]},
-  {id:20,theme:'Japon traditionnel A',clan:'',emoji:'🏯',color:'#e8833a',words:[
+  {id:20,theme:'Japon traditionnel A',clan:'',emoji:'⚔️',color:'#4db8d4',words:[
+    {kana:'ふえ',romaji:'fue',meaning:'flûte',emoji:'🎵',boss:false},
+    {kana:'たい',romaji:'tai',meaning:'daurade',emoji:'🐟',boss:false},
+    {kana:'こま',romaji:'koma',meaning:'toupie',emoji:'🪀',boss:false},
+    {kana:'はお',romaji:'hao',meaning:'robe trad.',emoji:'👗',boss:false},
+    {kana:'かたな',romaji:'katana',meaning:'sabre',emoji:'⚔️',boss:true},
+  ]},
+  {id:21,theme:'Japon traditionnel B',clan:'',emoji:'🏯',color:'#e8833a',words:[
     {kana:'おに',romaji:'oni',meaning:'démon',emoji:'👹',boss:false},
     {kana:'みや',romaji:'miya',meaning:'sanctuaire',emoji:'⛩️',boss:false},
     {kana:'まい',romaji:'mai',meaning:'danse',emoji:'💃',boss:false},
@@ -3050,16 +3092,9 @@ const ALL_LEVELS=[
     {kana:'とりい',romaji:'torii',meaning:'portail shinto',emoji:'⛩️',boss:true},
     {kana:'ゆかた',romaji:'yukata',meaning:'yukata',emoji:'👘',boss:true},
   ]},
-  {id:21,theme:'Japon traditionnel B',clan:'',emoji:'⚔️',color:'#4db8d4',words:[
-    {kana:'ふえ',romaji:'fue',meaning:'flûte',emoji:'🎵',boss:false},
-    {kana:'たい',romaji:'tai',meaning:'daurade',emoji:'🐟',boss:false},
-    {kana:'こま',romaji:'koma',meaning:'toupie',emoji:'🪀',boss:false},
-    {kana:'はお',romaji:'hao',meaning:'robe trad.',emoji:'👗',boss:false},
-    {kana:'かたな',romaji:'katana',meaning:'sabre',emoji:'⚔️',boss:true},
-  ]},
 ];
 const ALL_LEVELS_KATA = [
-  {id:1, theme:'Animaux 1', clan:'', emoji:'🐱', color:'#ffaa7a', words:[
+  {id:1, theme:'Animaux 1', clan:'', emoji:'🐶', color:'#ffaa7a', words:[
     {kana:'ネコ', romaji:'neko', meaning:'chat', emoji:'🐱', boss:false},
     {kana:'ウマ', romaji:'uma', meaning:'cheval', emoji:'🐴', boss:false},
     {kana:'ヤギ', romaji:'yagi', meaning:'chèvre', emoji:'🐐', boss:false},
@@ -7889,6 +7924,10 @@ function showMenu(){
   document.getElementById('menu-overlay').classList.remove('hidden');
   document.getElementById('wof-overlay').classList.add('hidden');
   document.getElementById('wof-entry-overlay').classList.add('hidden');
+  const modeGrid = document.querySelector('.mode-grid-2x2');
+  if(modeGrid) modeGrid.style.display = 'grid';
+  const btnRetour = document.getElementById('btn-retour-niveaux');
+  if(btnRetour) btnRetour.style.display = 'block';
   // Couleur de fond aléatoire à chaque retour au menu
   const PALETTES=[['#d4f4ff','#c8f7ef','#d4fff0'],['#fff3d4','#ffe8c0','#fdffd4'],['#d8ffd4','#e8ffd0','#fdffd4'],['#fff0d4','#ffe8cc','#fff8d4'],['#ffd4f0','#f0d4ff','#fff9d4'],['#d4eeff','#c8f4ff','#d4fff8'],['#fffbd4','#fff5c0','#fdffd4'],['#d8ffd4','#e8ffd0','#fdffd4'],['#ffd4e8','#ffe8d0','#fff9d4'],['#d4ffe8','#d4fff7','#f0ffd4'],['#d4eeff','#e8f4ff','#fff8d4'],['#d4ffd8','#f0ffd4','#fff7d4'],['#ffe8d4','#fff0e0','#fffbd4'],['#ead4ff','#ffd4f0','#fff4ff'],['#d4eeff','#d4f8ff','#f0f8ff'],['#ffd4d4','#ffe0d4','#fff4d4'],['#ead4ff','#ffd4f8','#fff9ff'],['#ffe8d4','#fff0e0','#fffbd4'],['#d4ffe8','#d4fff7','#f0fff8'],['#ffe8d0','#ffd4b0','#fff8e8'],['#d4eeff','#c8f4ff','#e8f8ff']];
   const p=PALETTES[Math.floor(Math.random()*PALETTES.length)];
@@ -7968,7 +8007,15 @@ function startFromTuto(){
   showMenu();
 }
 function _tutoDelay(ms){ return new Promise(r=>{ const t=setTimeout(r,ms); _tutoTimers.push(t); }); }
-function _stopTutoCinematic(){ _tutoRunning=false; _tutoTimers.forEach(t=>clearTimeout(t)); _tutoTimers=[]; _hideTutoBubble(); }
+function _stopTutoCinematic(){
+  _tutoRunning = false;
+  _tutoTimers.forEach(t => clearTimeout(t));
+  _tutoTimers = [];
+  _hideTutoBubble();
+  // Reset barre de progression
+  const pf = document.getElementById('tuto-progress-fill');
+  if(pf){ pf.style.transition = 'none'; pf.style.width = '100%'; }
+}
 function _tutoCell(r,c){ return document.querySelector('#tuto-board [data-r="'+r+'"][data-c="'+c+'"]'); }
 function _tutoBuildBoard(){
   const totalH = window.innerHeight || document.documentElement.clientHeight;
@@ -8041,9 +8088,9 @@ function _showTutoBubble(text, arrow){
     arrowEl.classList.remove('hidden');
     arrowEl.className='arrow-'+arrow;
     arrowEl.id='tuto-bubble-arrow'; // keep id
-    if(arrow==='right') arrowEl.textContent='→';
-    else if(arrow==='down') arrowEl.textContent='↓';
-    else if(arrow==='up') arrowEl.textContent='↑';
+if(arrow==='right') arrowEl.textContent = '👉';
+else if(arrow==='down') arrowEl.textContent = '👇';
+else if(arrow==='up')  arrowEl.textContent = '☝️';
   }
   // Re-trigger animation
   b.style.animation='none'; void b.offsetWidth; b.style.animation='bubbleIn .35s cubic-bezier(.34,1.56,.64,1) forwards';
@@ -8073,6 +8120,15 @@ function _tutoValidateWord(kana){
 
 async function _startTutoCinematic(){
   _stopTutoCinematic(); _tutoRunning=true;
+// Lancer la barre de progression globale du tuto
+const _tutoPFill = document.getElementById('tuto-progress-fill');
+if (_tutoPFill) {
+  _tutoPFill.style.transition = 'none';
+  _tutoPFill.style.width = '100%';
+  void _tutoPFill.offsetWidth;
+  _tutoPFill.style.transition = 'width 46000ms linear';
+  _tutoPFill.style.width = '0%';
+}
   _tutoBuildBoard();
   const R = window._tutoRows || 12;
   // Sync HUD
@@ -8097,10 +8153,10 @@ async function _startTutoCinematic(){
   _showTutoBubble('☝️ En haut à droite : le prochain kana\nà faire tomber, et ton score !', 'up');
   await _tutoDelay(3000); if(!_tutoRunning) return;
 
-  // 3. Panel bas — 3s
+  // 3. Panel bas — 4s
   _tutoWordPanel('かい','kai','coquillage','🐚', true);
   _showTutoBubble('👇 En bas : les mots à former\npendant la partie !', 'down');
-  await _tutoDelay(3000); if(!_tutoRunning) return;
+  await _tutoDelay(4000); if(!_tutoRunning) return;
 
   // 4. Déplacer — か descend col 5 pendant 3s puis glisse
   _showTutoBubble('🎮 ← → pour déplacer le kana\nqui tombe !', null);
@@ -8110,32 +8166,32 @@ async function _startTutoCinematic(){
     if(!_tutoRunning) return;
     if(r>0) _tutoClearCell(r-1,col);
     _tutoSetCell(r,col,'か','active');
-    await _tutoDelay(Math.floor(3000/midRow));
+    await _tutoDelay(Math.floor(4000/midRow));
   }
   if(!_tutoRunning) return;
 
-  // 5. Glisse gauche — 3s
+  // 5. Glisse gauche — 4s
   _showTutoBubble('← Glisse à gauche vers\nla bonne colonne !', null);
   for(let c=col-1;c>=3;c--){
     if(!_tutoRunning) return;
     _tutoClearCell(midRow-1,c+1); _tutoSetCell(midRow-1,c,'か','active');
-    await _tutoDelay(Math.floor(3000/(col-3)));
+    await _tutoDelay(Math.floor(4000/(col-3)));
   }
   col=3; if(!_tutoRunning) return;
 
-  // 6. Soft drop — 3s
+  // 6. Soft drop — 4s
   _showTutoBubble('↓ Maintenir bas =\nchute rapide !', null);
   const startRow=midRow-1;
   for(let r=startRow+1;r<R-1;r++){
     if(!_tutoRunning) return;
     _tutoClearCell(r-1,col); _tutoSetCell(r,col,'か','active');
-    await _tutoDelay(Math.floor(3000/(R-startRow)));
+    await _tutoDelay(Math.floor(4000/(R-startRow)));
   }
   if(!_tutoRunning) return;
   _tutoClearCell(R-2,col); _tutoSetCell(R-1,col,'か','filled'); soundDrop();
   await _tutoDelay(600); if(!_tutoRunning) return;
 
-  // 7. い descend — 3s
+  // 7. い descend — 4s
   document.getElementById('tuto-next').textContent='い'; document.getElementById('tuto-next').style.background=kanaBg('い');
   const hudN7=document.getElementById('tuto-hud-next'); if(hudN7){hudN7.textContent='い';hudN7.style.background=kanaBg('い');}
   _showTutoBubble('Maintenant pose い\njuste à côté de か !', null);
@@ -8145,7 +8201,7 @@ async function _startTutoCinematic(){
     if(!_tutoRunning) return;
     if(r>0) _tutoClearCell(r-1,col);
     _tutoSetCell(r,col,'い','active');
-    await _tutoDelay(Math.floor(3000/midRow2));
+    await _tutoDelay(Math.floor(4000/midRow2));
   }
   if(!_tutoRunning) return;
 
@@ -9260,14 +9316,23 @@ window._toggleBotPanel = function(){ /* sera remplacé par le IIFE ci-dessous */
   const panel=document.getElementById('bot-panel');
   const toggle=document.getElementById('bot-toggle');
 
-  toggle.addEventListener('click',()=>{
-    const open=panel.style.display==='flex';
-    panel.style.display=open?'none':'flex';
-    toggle.style.transform=open?'':'rotate(15deg) scale(1.08)';
-    toggle.style.boxShadow=open?'0 3px 14px rgba(168,85,247,.5)':'0 4px 20px rgba(168,85,247,.75), 0 0 0 3px rgba(168,85,247,.25)';
-    // Re-fluenter à chaque ouverture (sécurité si DOM mis à jour)
-    if(!open && typeof fluent==='function') setTimeout(()=>fluent(document.getElementById('bot-ui')),50);
-  });
+toggle.addEventListener('click', () => {
+  const open = panel.style.display === 'flex';
+  panel.style.display = open ? 'none' : 'flex';
+  toggle.style.transform = open ? '' : 'rotate(15deg) scale(1.08)';
+  toggle.style.boxShadow = open ? '0 3px 14px rgba(168,85,247,.5)' : '0 4px 20px rgba(168,85,247,.75), 0 0 0 3px rgba(168,85,247,.25)';
+  if(!open && typeof fluent==='function') setTimeout(()=>fluent(document.getElementById('bot-ui')), 50);
+
+  // Pause/resume Quiz selon ouverture/fermeture du panel
+  const quizVisible = !document.getElementById('quiz-overlay').classList.contains('hidden');
+  if (quizVisible) {
+    if (!open) {
+      if (typeof _quizPause === 'function') _quizPause();
+    } else {
+      if (typeof _quizResume === 'function') _quizResume();
+    }
+  }
+});
 
   // Hover effect on nav buttons
   ['bot-nav-tuto','bot-nav-wof','bot-nav-stats'].forEach(id=>{
@@ -9276,29 +9341,56 @@ window._toggleBotPanel = function(){ /* sera remplacé par le IIFE ci-dessous */
     btn.addEventListener('mouseleave',()=>{btn.style.transform='';});
   });
 
-  document.getElementById('bot-nav-tuto').addEventListener('click',()=>{panel.style.display='none';toggle.style.transform='';toggle.style.boxShadow='0 3px 14px rgba(168,85,247,.5)';showTuto();});
-  document.getElementById('bot-nav-wof').addEventListener('click',()=>{panel.style.display='none';toggle.style.transform='';toggle.style.boxShadow='0 3px 14px rgba(168,85,247,.5)';showWallOfFame();});
-
-  document.getElementById('bot-nav-stats').addEventListener('click',()=>{panel.style.display='none';toggle.style.transform='';toggle.style.boxShadow='0 3px 14px rgba(168,85,247,.5)';showStats();});
+document.getElementById('bot-nav-tuto').addEventListener('click', () => {
+  panel.style.display = 'none'; toggle.style.transform = ''; toggle.style.boxShadow = '0 3px 14px rgba(168,85,247,.5)';
+  if(typeof player1 !== 'undefined') player1.stopGame();
+  if(typeof hideQuiz === 'function') hideQuiz();   // ← arrêt propre du quiz
+  if(typeof _mobileNavHide === 'function') _mobileNavHide();
+  showTuto();
+});
+document.getElementById('bot-nav-wof').addEventListener('click', () => {
+  panel.style.display = 'none'; toggle.style.transform = ''; toggle.style.boxShadow = '0 3px 14px rgba(168,85,247,.5)';
+  if(typeof player1 !== 'undefined') player1.stopGame();
+  if(typeof hideQuiz === 'function') hideQuiz();   // ← arrêt propre du quiz
+  if(typeof _mobileNavHide === 'function') _mobileNavHide();
+  showWallOfFame();
+});
+document.getElementById('bot-nav-stats').addEventListener('click', () => {
+  panel.style.display = 'none'; toggle.style.transform = ''; toggle.style.boxShadow = '0 3px 14px rgba(168,85,247,.5)';
+  if(typeof player1 !== 'undefined') player1.stopGame();
+  if(typeof hideQuiz === 'function') hideQuiz();   // ← arrêt propre du quiz
+  if(typeof _mobileNavHide === 'function') _mobileNavHide();
+  showStats();
+});
 
   // Fonction globale pour ouvrir/fermer le panel depuis la nav in-game
-  window._toggleBotPanel = function(){
-    // En mode in-game, bot-ui est caché mais le panel est toujours dans le DOM
-    const open = panel.style.display === 'flex';
-    // Repositionner le panel en haut à gauche si on est en mode nav
-    const nav = document.getElementById('mobile-nav');
-    if(nav && nav.classList.contains('visible')){
-      panel.style.position = 'fixed';
-      panel.style.top = '58px';
-      panel.style.left = '8px';
-      panel.style.right = 'auto';
-      panel.style.bottom = 'auto';
-      panel.style.zIndex = '600';
+window._toggleBotPanel = function(){
+  const open = panel.style.display === 'flex';
+  const nav = document.getElementById('mobile-nav');
+  if(nav && nav.classList.contains('visible')){
+    panel.style.position = 'fixed';
+    panel.style.top = '58px';
+    panel.style.left = '8px';
+    panel.style.right = 'auto';
+    panel.style.bottom = 'auto';
+    panel.style.zIndex = '600';
+  }
+  panel.style.display = open ? 'none' : 'flex';
+  toggle.style.transform = open ? '' : 'rotate(15deg) scale(1.08)';
+  if(!open && typeof fluent==='function') setTimeout(()=>fluent(panel), 50);
+
+  // ← AJOUTER : pause/resume Quiz selon ouverture/fermeture du panel
+  const quizVisible = !document.getElementById('quiz-overlay').classList.contains('hidden');
+  if (quizVisible) {
+    if (!open) {
+      // On ouvre le panel → pause
+      if (typeof _quizPause === 'function') _quizPause();
+    } else {
+      // On ferme le panel → reprise
+      if (typeof _quizResume === 'function') _quizResume();
     }
-    panel.style.display = open ? 'none' : 'flex';
-    toggle.style.transform = open ? '' : 'rotate(15deg) scale(1.08)';
-    if(!open && typeof fluent==='function') setTimeout(()=>fluent(panel),50);
-  };
+  }
+};
 
 })();
 
@@ -9824,7 +9916,43 @@ function _quizStopTimer(){
   fill.style.transition = 'none';
   fill.style.width = '100%';
 }
+let _quizPausedAt = null;      // timestamp du moment où on a pausé
+let _quizTimeRemaining = null; // ms restantes au moment de la pause
 
+function _quizPause() {
+  if (_quizPausedAt !== null) return; // déjà en pause
+  if (_quizAnswered) return;          // question déjà répondue, rien à pauser
+  // Calculer le temps restant approximativement
+  _quizTimeRemaining = _quizTimerTimeout ? QUIZ_TIMER_MS : null;
+  // On freeze la barre CSS
+  const fill = document.getElementById('quiz-timer-fill');
+  const computed = getComputedStyle(fill).width;
+  const parentW = fill.parentElement.offsetWidth;
+  const pct = parentW > 0 ? (parseFloat(computed) / parentW * 100) : 100;
+  fill.style.transition = 'none';
+  fill.style.width = pct + '%';
+  // Recalculer le temps restant à partir du pourcentage visuel
+  _quizTimeRemaining = Math.round(pct / 100 * QUIZ_TIMER_MS);
+  _quizPausedAt = Date.now();
+  // Stopper les timeouts
+  if (_quizTimerTimeout)  { clearTimeout(_quizTimerTimeout);  _quizTimerTimeout  = null; }
+  if (_quizAutoTimeout)   { clearTimeout(_quizAutoTimeout);   _quizAutoTimeout   = null; }
+}
+
+function _quizResume() {
+  if (_quizPausedAt === null) return; // pas en pause
+  if (_quizAnswered) { _quizPausedAt = null; return; }
+  _quizPausedAt = null;
+  if (_quizTimeRemaining !== null && _quizTimeRemaining > 0) {
+    const fill = document.getElementById('quiz-timer-fill');
+    fill.style.transition = `width ${_quizTimeRemaining}ms linear`;
+    fill.style.width = '0%';
+    _quizTimerTimeout = setTimeout(() => {
+      if (!_quizAnswered) _quizReveal(-1);
+    }, _quizTimeRemaining);
+  }
+  _quizTimeRemaining = null;
+}
 function quizAnswer(choiceIdx){
   if(_quizAnswered) return;
   _quizStopTimer();
@@ -10088,6 +10216,7 @@ function statsSetTab(tab){
 
 function showStats(){
   document.getElementById('menu-overlay').classList.add('hidden');
+  document.getElementById('wof-overlay').classList.add('hidden');
   document.getElementById('stats-overlay').classList.remove('hidden');
   const cs = document.getElementById('confetti-stats');
   if(cs && !cs.children.length && typeof fillConfetti==='function') fillConfetti(cs);
@@ -10590,6 +10719,89 @@ window.addEventListener('load', () => setTimeout(applyFluent, 400));
     _patch('showWordFound', 80);
   });
 })();
+// ═══ SWIPE ENTRE ONGLETS ═══
+// ═══ SWIPE ENTRE ONGLETS ═══
+(function _initTabSwipe() {
+
+  function slideContent(el, direction) {
+    if (!el) return;
+    const from = direction === 'left' ? '32px' : '-32px';
+    el.animate([
+      { opacity: 0, transform: `translateX(${from})` },
+      { opacity: 1, transform: 'translateX(0)' }
+    ], { duration: 230, easing: 'cubic-bezier(.34,1.3,.64,1)', fill: 'forwards' });
+  }
+
+  function bindSwipe(container, tabs, switchFn, contentEl, getActive) {
+    if (!container) return;
+    let x0 = null, y0 = null, axis = null; // axis : 'h' | 'v' | null
+
+    container.addEventListener('touchstart', e => {
+      x0 = e.touches[0].clientX;
+      y0 = e.touches[0].clientY;
+      axis = null; // toujours réinitialiser ici
+    }, { passive: true });
+
+    container.addEventListener('touchmove', e => {
+      if (x0 === null) return;
+      const dx = Math.abs(e.touches[0].clientX - x0);
+      const dy = Math.abs(e.touches[0].clientY - y0);
+      // On détermine l'axe dominant seulement la première fois
+      if (axis === null && (dx > 6 || dy > 6)) {
+        axis = dx >= dy ? 'h' : 'v';
+      }
+      if (axis === 'h') e.preventDefault(); // bloque le scroll si swipe horizontal
+    }, { passive: false });
+
+    container.addEventListener('touchend', e => {
+      if (x0 === null || axis !== 'h') { x0 = null; axis = null; return; }
+      const dx = e.changedTouches[0].clientX - x0;
+      x0 = null; axis = null;
+      if (Math.abs(dx) < 40) return;
+      const cur = getActive();
+      const next = dx < 0 ? cur + 1 : cur - 1;
+      if (next < 0 || next >= tabs.length) return;
+      const dir = dx < 0 ? 'left' : 'right';
+      switchFn(tabs[next]);
+      slideContent(contentEl, dir);
+    }, { passive: true });
+  }
+
+  window.addEventListener('load', () => {
+
+    // ── 1. STATS (3 onglets) ──
+    const STATS_TABS = ['hiragana', 'katakana', 'vocab'];
+    bindSwipe(
+      document.getElementById('stats-overlay'),
+      STATS_TABS,
+      statsSetTab,
+      document.getElementById('stats-scroll'),
+      () => STATS_TABS.indexOf(_statsTab)
+    );
+
+    // ── 2. MENU NIVEAUX (2 onglets) ──
+    const MENU_TABS = ['hiragana', 'katakana'];
+    bindSwipe(
+      document.getElementById('lvl-scroll'),
+      MENU_TABS,
+      switchMenuAlphabet,
+      document.getElementById('lvl-scroll'),
+      () => MENU_TABS.indexOf(currentAlphabet)
+    );
+
+    // ── 3. QUIZ (2 onglets) ──
+    const QUIZ_TABS = ['hiragana', 'vocab'];
+    bindSwipe(
+      document.getElementById('quiz-overlay'),
+      QUIZ_TABS,
+      quizSetMode,
+      document.querySelector('.quiz-grid') || document.getElementById('quiz-overlay'),
+      () => QUIZ_TABS.indexOf(_quizMode)
+    );
+
+  });
+})();
+
 
 </script>
 <!-- Détection Capacitor + TTS natif -->
