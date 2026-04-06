@@ -2391,6 +2391,17 @@ body:has(#tuto-overlay:not(.hidden)) #bot-ui {
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
+/* ── Animation Kana-kun menu ouvert ── */
+@keyframes botTalking {
+  0% { transform: scale(1) rotate(15deg); }
+  50% { transform: scale(1.12) rotate(22deg); }
+  100% { transform: scale(1) rotate(15deg); }
+}
+.bot-talking {
+  animation: botTalking 1.5s infinite ease-in-out !important;
+  /* Une lueur un peu plus vive pour indiquer qu'il est actif */
+  box-shadow: 0 4px 24px rgba(168,85,247,.7), 0 0 0 3px rgba(168,85,247,.4) !important;
+}
 </style>
 </head>
 <body>
@@ -9334,9 +9345,9 @@ window._toggleBotPanel = function(){ /* sera remplacé par le IIFE ci-dessous */
 (()=>{
   const ui=document.createElement('div');
   ui.id='bot-ui';
-  ui.style.cssText='position:fixed;bottom:80px;right:12px;z-index:500;display:flex;flex-direction:column;align-items:flex-end;gap:6px;';
+  ui.style.cssText='position:fixed;bottom:80px;right:12px;z-index:500;';
   ui.innerHTML=`
-    <div id="bot-panel" style="background:rgba(20,10,50,.95);border:2px solid #a855f7;border-radius:20px;padding:14px 16px 10px;color:#fff;font-family:'Nunito',sans-serif;font-size:13px;min-width:190px;display:none;flex-direction:column;gap:10px;box-shadow:0 4px 28px rgba(168,85,247,.5);">
+    <div id="bot-panel" style="background:rgba(20,10,50,.95);border:2px solid #a855f7;border-radius:20px;padding:14px 16px 10px;color:#fff;font-family:'Nunito',sans-serif;font-size:13px; width: max-content; min-width: 210px; display:none;flex-direction:column;gap:10px;box-shadow:0 4px 28px rgba(168,85,247,.5);">
       <div style="display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(168,85,247,.35);padding-bottom:8px;">
         <span style="font-size:26px;line-height:1;filter:drop-shadow(0 0 8px rgba(168,85,247,.8));">🤖</span>
         <div>
@@ -9375,101 +9386,192 @@ const panel = document.getElementById('bot-panel');
   // ── Drag repositionnable (appui long) ──
 // ── Drag repositionnable (appui long) ──
 // ── Drag repositionnable (appui long) ──
+// ── Drag repositionnable & Machine à états ──
   const LONG_PRESS_MS = 300; 
-  let _dragActive = false;
+  const DRAG_ABORT_MS = 3000; // Reset si on a déclenché le mode drag sans bouger
+  const MENU_AUTO_CLOSE_MS = 3500; // Fermeture auto du menu
+
+  let _dragState = 'IDLE'; // États: 'IDLE', 'WAITING', 'READY', 'DRAGGING'
   let _longPressTimer = null;
+  let _abortDragTimer = null;
+  let _autoCloseTimer = null;
+  
   let _dragStartX = 0;
   let _dragStartY = 0;
   let _offsetBottom = 0;
 
+  // Fonction de retour à l'état de repos (sauve des vies !)
+  function resetBotToIdle() {
+    _dragState = 'IDLE';
+    toggle.style.transform = '';
+    toggle.style.boxShadow = '0 3px 14px rgba(168,85,247,.5)';
+    toggle.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease';
+    clearTimeout(_longPressTimer);
+    clearTimeout(_abortDragTimer);
+  }
+
+  function closeBotMenu() {
+    panel.style.display = 'none';
+    toggle.classList.remove('bot-talking');
+    toggle.style.transform = ''; // On le remet droit
+    clearTimeout(_autoCloseTimer);
+  }
+
+function openBotMenu() {
+    // 1. On purge TOUS les styles parasites potentiellement laissés par le mode "in-game" (Fix Bug 2)
+    panel.style.position = 'absolute';
+    panel.style.top = '';
+    panel.style.bottom = '';
+    panel.style.left = '';
+    panel.style.right = '0'; // Aligné à droite du bouton
+
+    // 2. On calcule la place disponible au-dessus (Fix Bug 1)
+    const currentBottom = parseInt(ui.style.bottom) || 80;
+    const spaceAbove = window.innerHeight - currentBottom - 50;
+
+    if (spaceAbove < 280) {
+      // Pas assez de place en haut : on l'ouvre vers le bas
+      panel.style.top = '54px'; 
+      panel.style.bottom = 'auto';
+    } else {
+      // Assez de place : on l'ouvre vers le haut (comportement normal)
+      panel.style.bottom = '54px'; 
+      panel.style.top = 'auto';
+    }
+
+    panel.style.display = 'flex';
+    toggle.classList.add('bot-talking');
+
+    // Timer d'auto-fermeture
+    clearTimeout(_autoCloseTimer);
+    _autoCloseTimer = setTimeout(() => {
+      closeBotMenu();
+    }, MENU_AUTO_CLOSE_MS);
+  }
+
   toggle.addEventListener('touchstart', e => {
-    // 🛡️ Bloque la propagation pour ne pas cliquer sur ce qu'il y a derrière
     e.stopPropagation();
+
+    // Si le menu est ouvert, n'importe quel nouveau touch annule la fermeture auto
+    if (panel.style.display === 'flex') {
+      clearTimeout(_autoCloseTimer);
+    }
+
+    // Si le bouton est coincé dans un état de drag/attente, un simple touch le reset immédiatement
+    if (_dragState === 'READY' || _dragState === 'DRAGGING') {
+      resetBotToIdle();
+      return; 
+    }
 
     const touch = e.touches[0];
     _dragStartX = touch.clientX;
     _dragStartY = touch.clientY;
-    _dragActive = false;
+    _dragState = 'WAITING';
 
-    // Calcul de l'écart initial
     const currentBottom = parseInt(ui.style.bottom) || 80;
     _offsetBottom = (window.innerHeight - touch.clientY) - currentBottom;
-
-    // On fige l'animation pour que ça colle au doigt
     toggle.style.transition = 'none';
 
     _longPressTimer = setTimeout(() => {
-      _dragActive = true;
-      toggle.style.transform = 'scale(1.15)';
-      toggle.style.boxShadow = '0 8px 32px rgba(168,85,247,.8), 0 0 0 4px rgba(168,85,247,.4)';
-      if (navigator.vibrate) navigator.vibrate(40);
+      if (_dragState === 'WAITING') {
+        _dragState = 'READY'; // Prêt à être bougé
+        toggle.style.transform = 'scale(1.15)';
+        toggle.style.boxShadow = '0 8px 32px rgba(168,85,247,.8), 0 0 0 4px rgba(168,85,247,.4)';
+        if (navigator.vibrate) navigator.vibrate(40);
+
+        // Si l'utilisateur reste le doigt posé mais ne bouge pas, on reset après 3s
+        _abortDragTimer = setTimeout(() => {
+          if (_dragState === 'READY') resetBotToIdle();
+        }, DRAG_ABORT_MS);
+      }
     }, LONG_PRESS_MS);
   }, { passive: false });
 
   toggle.addEventListener('touchmove', e => {
-    // 🛡️ On bloque aussi ici pour éviter les conflits de scroll
     e.stopPropagation();
+    if (_dragState === 'IDLE') return;
 
     const touch = e.touches[0];
-    const dx = touch.clientX - _dragStartX;
-    const dy = touch.clientY - _dragStartY;
+    const dx = Math.abs(touch.clientX - _dragStartX);
+    const dy = Math.abs(touch.clientY - _dragStartY);
 
-    if (!_dragActive) {
+    if (_dragState === 'WAITING') {
       // Tolérance de 10px avant d'annuler l'appui long
-      if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
-        clearTimeout(_longPressTimer);
+      if (dx > 10 || dy > 10) {
+        resetBotToIdle(); 
       }
       return; 
     }
 
-    // Si on est en mode Drag, on empêche le scroll de la page
-    if (e.cancelable) e.preventDefault();
+    if (_dragState === 'READY') {
+      _dragState = 'DRAGGING';
+      clearTimeout(_abortDragTimer); // On a commencé à bouger, on annule l'auto-reset
+    }
 
-    // Positionnement absolu
-    let newBottom = (window.innerHeight - touch.clientY) - _offsetBottom;
-    
-    // Sécurité pour ne pas sortir de l'écran
-    newBottom = Math.max(20, Math.min(window.innerHeight - 100, newBottom));
+if (_dragState === 'DRAGGING') {
+      if (e.cancelable) e.preventDefault();
+      
+      let newBottom = (window.innerHeight - touch.clientY) - _offsetBottom;
+      newBottom = Math.max(20, Math.min(window.innerHeight - 100, newBottom));
 
-    ui.style.bottom = newBottom + 'px';
-    ui.style.top = 'auto';
+      ui.style.bottom = newBottom + 'px';
+      ui.style.top = 'auto';
 
-    // On déplace le panel en même temps si ouvert
-    if (panel.style.display === 'flex') {
-      panel.style.bottom = (newBottom + 56) + 'px';
-      panel.style.top = 'auto';
+      // Si le menu est ouvert pendant qu'on le glisse, on vérifie s'il faut le retourner
+      if (panel.style.display === 'flex' && panel.style.position === 'absolute') {
+        const spaceAbove = window.innerHeight - newBottom - 50;
+        if (spaceAbove < 280) {
+          panel.style.top = '54px';
+          panel.style.bottom = 'auto';
+        } else {
+          panel.style.bottom = '54px';
+          panel.style.top = 'auto';
+        }
+      }
     }
   }, { passive: false });
 
   toggle.addEventListener('touchend', e => {
     e.stopPropagation();
     clearTimeout(_longPressTimer);
-    
-    // On remet la transition fluide pour le retour à la normale
-    toggle.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease';
 
-    if (_dragActive) {
-      _dragActive = false;
-      toggle.style.transform = '';
-      toggle.style.boxShadow = '0 3px 14px rgba(168,85,247,.5)';
+    if (_dragState === 'READY' || _dragState === 'DRAGGING') {
+      // Fin du déplacement ou clic de reset pendant l'état READY
       localStorage.setItem('kanakun-btn-bottom', ui.style.bottom);
-      
-      // Empêche le clic accidentel lors du relâchement après un drag
+      resetBotToIdle();
       if (e.cancelable) e.preventDefault();
       return; 
     }
-    
-    // ── Clic court (Ouverture/Fermeture) ──
-    const isVisible = (panel.style.display === 'flex');
-    if (isVisible) {
-      panel.style.display = 'none';
-    } else {
-      panel.style.display = 'flex';
-      // Recalculer la position du panel pour qu'il soit au dessus du bouton
-      const currentB = parseInt(ui.style.bottom) || 80;
-      panel.style.bottom = (currentB + 56) + 'px';
+
+    if (_dragState === 'WAITING') {
+      // Clic court validé !
+      resetBotToIdle();
+      
+      const isVisible = (panel.style.display === 'flex');
+      if (isVisible) {
+        closeBotMenu();
+      } else {
+        openBotMenu();
+      }
     }
-  }, { passive: false });  
+  }, { passive: false });
+
+  // LE FILET DE SÉCURITÉ ANDROID
+  toggle.addEventListener('touchcancel', e => {
+    resetBotToIdle();
+  });
+
+  // Si on interagit avec le panneau lui-même, on réinitialise le timer de fermeture auto
+  panel.addEventListener('touchstart', () => {
+    if (panel.style.display === 'flex') {
+      clearTimeout(_autoCloseTimer);
+      _autoCloseTimer = setTimeout(() => {
+        closeBotMenu();
+      }, MENU_AUTO_CLOSE_MS);
+    }
+  }, { passive: true });
+
+
 
   // ── Hover effect on nav buttons ──
   ['bot-nav-tuto','bot-nav-wof','bot-nav-stats'].forEach(id => {
@@ -9483,19 +9585,26 @@ const panel = document.getElementById('bot-panel');
   document.getElementById('bot-nav-stats').addEventListener('click', () => { panel.style.display='none'; toggle.style.transform=''; toggle.style.boxShadow='0 3px 14px rgba(168,85,247,.5)'; if(typeof player1!=='undefined') player1.stopGame(); if(typeof hideQuiz==='function') hideQuiz(); if(typeof _mobileNavHide==='function') _mobileNavHide(); showStats(); });
 
   // ── Fonction globale pour la nav in-game ──
-  window._toggleBotPanel = function(){
+window._toggleBotPanel = function(){
     const open = panel.style.display === 'flex';
     const nav = document.getElementById('mobile-nav');
-    if(nav && nav.classList.contains('visible')){
-      panel.style.position = 'fixed';
-      panel.style.top = '58px';
-      panel.style.left = '8px';
-      panel.style.right = 'auto';
-      panel.style.bottom = 'auto';
-      panel.style.zIndex = '600';
+    
+    if (open) {
+      closeBotMenu();
+    } else {
+      openBotMenu(); // On nettoie tout et on ouvre par défaut
+      
+      // SI on est en jeu (topbar), on écrase avec les styles fixes
+      if(nav && nav.classList.contains('visible')){
+        panel.style.position = 'fixed';
+        panel.style.top = '58px';
+        panel.style.left = '8px';
+        panel.style.right = 'auto';
+        panel.style.bottom = 'auto';
+        panel.style.zIndex = '600';
+      }
     }
-    panel.style.display = open ? 'none' : 'flex';
-    toggle.style.transform = open ? '' : 'rotate(15deg) scale(1.08)';
+    
     if(!open && typeof fluent==='function') setTimeout(()=>fluent(panel),50);
     const quizVisible = !document.getElementById('quiz-overlay').classList.contains('hidden');
     if (quizVisible) {
