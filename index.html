@@ -195,6 +195,21 @@ body::before {
 @keyframes battleEndLose{0%{opacity:0;transform:scale(.85)}100%{opacity:1;transform:scale(1)}}
 @keyframes trophyBounce{0%,100%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.18) rotate(3deg)}}
 
+/* ═══ PLAYER ARENAS — ambiance translucide solo ═══ */
+.player-arena {
+  flex: 1; display: flex; flex-direction: column;
+  min-width: 0; min-height: 0; overflow: hidden; position: relative;
+  background: linear-gradient(160deg,
+    rgba(var(--arena-tint-rgb, 200,240,255), 0.18) 0%,
+    rgba(var(--arena-tint-rgb, 200,240,255), 0.08) 100%);
+}
+.p1-arena {
+  border-right: 1.5px solid rgba(var(--arena-tint-rgb,100,200,220), 0.35);
+}
+.p2-arena {
+  border-left: 1.5px solid rgba(var(--arena-tint-rgb,100,200,220), 0.35);
+}
+
 /* ═══ BATTLE CENTER COLUMN ═══ */
 #battle-center {
   width: clamp(72px, 9vw, 108px);
@@ -203,92 +218,118 @@ body::before {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 14px 6px 10px;
-  background: linear-gradient(180deg, #5b21b6 0%, #4c1d95 40%, #3b0764 100%);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-left: 2px solid #a855f7;
-  border-right: 2px solid #a855f7;
-  box-shadow: 0 0 32px rgba(168,85,247,.35) inset, 0 0 18px rgba(168,85,247,.2);
-  gap: 10px;
+  padding: 18px 6px 12px;
+  /* fond posé par JS via --bc-top/mid/bot */
+  background: linear-gradient(180deg,
+    var(--bc-top, #e8d4ff) 0%,
+    var(--bc-mid, #d4e8ff) 50%,
+    var(--bc-bot, #d4fff0) 100%);
+  border-left:  1.5px solid rgba(255,255,255,.55);
+  border-right: 1.5px solid rgba(255,255,255,.55);
+  box-shadow:
+    inset 0 0 28px rgba(255,255,255,.18),
+    0 0 24px rgba(0,0,0,.08);
+  gap: 12px;
   z-index: 2;
   overflow: hidden;
+  position: relative;
 }
-/* Halo violet animé en fond */
+
+/* Effet shiny — rai de lumière diagonal en boucle */
 #battle-center::before {
   content: '';
   position: absolute;
-  width: 120%;
+  top: -60%;
+  left: -40%;
+  width: 60%;
+  height: 220%;
+  background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,.38) 50%, transparent 70%);
+  transform: skewX(-12deg);
+  animation: bcShiny 3.8s ease-in-out infinite;
+  pointer-events: none;
+  display: none;  
+}
+@keyframes bcShiny {
+  0%   { left: -60%; opacity: 0; }
+  15%  { opacity: 1; }
+  55%  { left: 120%; opacity: 1; }
+  56%  { opacity: 0; }
+  100% { left: 120%; opacity: 0; }
+}
+
+/* Halo coloré animé en fond */
+#battle-center::after {
+  content: '';
+  position: absolute;
+  width: 140%;
   aspect-ratio: 1;
-  background: radial-gradient(circle, rgba(168,85,247,.25) 0%, transparent 70%);
-  animation: blobDrift 8s ease-in-out infinite alternate;
+  background: radial-gradient(circle,
+    rgba(255,255,255,.22) 0%,
+    transparent 68%);
+  animation: blobDrift 7s ease-in-out infinite alternate;
   pointer-events: none;
 }
-#battle-center .bc-logo-kana {
-  font-family: 'Noto Sans JP', sans-serif;
-  font-weight: 900;
-  font-size: clamp(18px, 2.8vw, 28px);
-  background: linear-gradient(135deg,#ff6b35,#ffbe0b,#6bcb77,#4d96ff,#c77dff);
-  background-size: 300% 300%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: kanaRainbow 3s linear infinite;
-  line-height: 1;
-  text-align: center;
-  letter-spacing: -1px;
-  filter: drop-shadow(0 0 6px rgba(255,255,255,.3));
-}
-#battle-center .bc-logo-drop {
-  font-family: 'Black Han Sans', sans-serif;
-  font-size: clamp(13px, 2vw, 19px);
-  background: linear-gradient(180deg,#fff700,#ffb300,#ff6b6b,#cc0000);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  line-height: 1;
-  text-align: center;
-  letter-spacing: 2px;
-  animation: shimmerDrop 2.2s ease-in-out infinite;
-}
+
+/* VS — pièce centrale dominante */
 #battle-center .bc-vs {
   font-family: 'Fredoka One', cursive;
-  font-size: clamp(22px, 3.2vw, 32px);
-  color: #fff;
-  text-shadow: -1px -1px 0 rgba(0,0,0,.5), 1px -1px 0 rgba(0,0,0,.5), -1px 1px 0 rgba(0,0,0,.5), 1px 1px 0 rgba(0,0,0,.5), 0 0 18px rgba(255,255,255,.6);
-  animation: vsPulse 1.2s ease-in-out infinite alternate;
-  margin: 4px 0;
+  font-size: clamp(60px, 5vw, 52px);
+  background: linear-gradient(135deg, #1a1a6e 0%, #3b0080 50%, #1a3a8f 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 0 rgba(255,255,255,.6))
+          drop-shadow(0 0 12px var(--bc-glow, rgba(168,85,247,.5)));
+  animation: vsPulse 1.4s ease-in-out infinite alternate;
+  letter-spacing: 2px;
+  z-index: 1;
 }
-@keyframes vsPulse { from{transform:scale(1);opacity:.85} to{transform:scale(1.18);opacity:1} }
+@keyframes vsPulse {
+  from { transform: scale(1);    opacity: .88; }
+  to   { transform: scale(1.14); opacity: 1;   }
+}
+
+/* Emoji du niveau */
 #battle-center .bc-level-emoji {
-  font-size: clamp(28px, 4.5vw, 46px);
+  font-size: clamp(80px, 5vw, 50px);
   line-height: 1;
-  filter: drop-shadow(0 2px 8px rgba(0,0,0,.4));
-  animation: dropBounce 2.4s ease-in-out infinite;
+  filter: drop-shadow(0 3px 10px rgba(0,0,0,.25));
+  animation: dropBounce 2.6s ease-in-out infinite;
+  z-index: 1;
 }
+
+/* Nom du niveau */
 #battle-center .bc-level-name {
   font-family: 'Fredoka One', cursive;
-  font-size: clamp(9px, 1.3vw, 14px);
-  color: #fff;
+  font-size: clamp(20px, 1.2vw, 13px);
+  color: rgba(30,30,60,.75);
   text-align: center;
-  letter-spacing: .5px;
-  line-height: 1.2;
-  text-shadow: 0 1px 4px rgba(0,0,0,.5);
+  letter-spacing: .4px;
+  line-height: 1.3;
+  z-index: 1;
 }
+
+/* Séparateur */
 #battle-center .bc-divider {
-  width: 75%;
+  width: 70%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.45), transparent);
-  margin: 2px 0;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255,255,255,.7),
+    transparent);
+  margin: 0;
+  z-index: 1;
 }
-/* Petit robot arbitre en bas */
+
+/* Robot arbitre en bas */
 #battle-center .bc-robot {
-  font-size: clamp(20px, 3vw, 30px);
+  font-size: clamp(60px, 3.2vw, 32px);
   line-height: 1;
   margin-top: auto;
-  padding-bottom: 6px;
-  filter: drop-shadow(0 0 8px rgba(168,85,247,.7));
+  padding-bottom: 8px;
+  filter: drop-shadow(0 0 10px rgba(255,255,255,.5));
   animation: robotBobble 1.6s ease-in-out infinite alternate;
+  z-index: 1;
 }
 
 /* ═══ PLAYER BADGE (grosse icône) ═══ */
@@ -558,16 +599,16 @@ body::before {
 .word-row.boss.validated { border-color: #52c97a !important; }
 
 .wr-emoji{
-  font-size:clamp(20px,1vw,20px);flex-shrink:0;line-height:1;
+  font-size:clamp(24px,1vw,20px);flex-shrink:0;line-height:1;
   filter:
     drop-shadow(0 3px 0px rgba(0,0,0,.12))
     drop-shadow(0 5px 8px rgba(0,0,0,.20));
 }
 .wr-info{flex:1;min-width:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-.wr-kana{font-size:clamp(22px,7vw,30px);font-weight:900;color:var(--text-dark);line-height:1;font-family:'Noto Sans JP',sans-serif;}
-.wr-romaji{font-size:clamp(17px,5vw,22px);color:var(--sky);font-weight:900;font-family:'Fredoka One',sans-serif;}
-.wr-meaning{font-size:clamp(15px,4.2vw,19px);color:var(--text-mid);font-family:'Nunito',sans-serif;font-weight:700;}
-.wr-mult{font-family:'Fredoka One',cursive;font-size:clamp(19px,6vw,25px);color:var(--mint);text-shadow:0 0 5px rgba(46,216,160,.4);min-width:36px;text-align:right;flex-shrink:0;}
+.wr-kana{font-size:clamp(24px,7vw,30px);font-weight:900;color:var(--text-dark);line-height:1;font-family:'Noto Sans JP',sans-serif;}
+.wr-romaji{font-size:clamp(24px,5vw,22px);color:var(--sky);font-weight:900;font-family:'Fredoka One',sans-serif;}
+.wr-meaning{font-size:clamp(24px,4.2vw,19px);color:var(--text-mid);font-family:'Nunito',sans-serif;font-weight:700;}
+.wr-mult{font-family:'Fredoka One',cursive;font-size:clamp(24px,6vw,25px);color:var(--mint);text-shadow:0 0 5px rgba(46,216,160,.4);min-width:36px;text-align:right;flex-shrink:0;}
 .word-row.boss .wr-mult{color:var(--coral);}
 .wr-mult.bump{animation:multBump .32s cubic-bezier(.34,1.56,.64,1);}
 @keyframes multBump{0%{transform:scale(1)}50%{transform:scale(1.7) rotate(-5deg)}100%{transform:scale(1)}}
@@ -1144,8 +1185,8 @@ body::before {
   justify-content: center;
   gap: 6px;
   padding: 8px 16px 10px;
-  background: linear-gradient(135deg, #ff8c42, #ffb347);
-  box-shadow: 0 -4px 20px rgba(255,120,30,.35), 0 -1px 0 rgba(255,255,255,.3);
+  background: linear-gradient(135deg, #00aaee, #4db8d4); /* Bleu ciel soutenu */
+  box-shadow: 0 -4px 20px rgba(0,170,238,.35), 0 -1px 0 rgba(255,255,255,.3);
   pointer-events: none;
 }
 /* Ligne d'icônes + texte */
@@ -1232,16 +1273,16 @@ body::before {
 /* ═══ TUTO OVERLAY ═══ */
 #tuto-overlay {
   position: fixed; inset: 0; z-index: 220;
-  background: linear-gradient(160deg, #fff4e0 0%, #ffe8c0 45%, #ffd49a 100%);
+  background: linear-gradient(160deg, #d4eeff 0%, #e8f4ff 45%, #fff8d4 100%); 
   display: flex; flex-direction: column; align-items: stretch;
   overflow: hidden;
 }
 #tuto-overlay::before {
   content: ''; position: fixed; inset: 0;
   background:
-    radial-gradient(ellipse 55% 40% at 10% 20%, rgba(255,140,60,.25) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 35% at 90% 80%, rgba(255,180,60,.22) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 30% at 50% 55%, rgba(255,100,30,.12) 0%, transparent 65%);
+    radial-gradient(ellipse 55% 40% at 10% 20%, rgba(0,170,238,.20) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 90% 80%, rgba(100,200,255,.22) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 50% 55%, rgba(46,216,255,.12) 0%, transparent 65%);
   pointer-events: none; z-index: 0;
   animation: blobDrift 8s ease-in-out infinite alternate;
 }
@@ -1342,10 +1383,10 @@ background: rgba(var(--nav-tint-rgb, 200,240,255), 0.45); /* Comme #mobile-nav *
 }
 #tuto-board{
   flex:1;display:grid;grid-template-columns:repeat(8,1fr);
-  background:rgba(255,248,232,.9);
-  border-left:2px solid rgba(255,160,60,.3);
-  border-right:2px solid rgba(255,160,60,.3);
-  border-top:2px solid rgba(255,160,60,.3);
+  background:rgba(240,250,255,.9); /* Fond très légèrement bleuté/blanc */
+  border-left:2px solid rgba(0,170,238,.3);
+  border-right:2px solid rgba(0,170,238,.3);
+  border-top:2px solid rgba(0,170,238,.3);
   overflow:hidden;
 }
 /* Sidebar desktop : cachée en mode mobile */
@@ -1448,6 +1489,7 @@ flex: 0 0 42%;
 }
 #tuto-start-btn:hover{transform:scale(1.05);}
 #tuto-start-btn.hidden{display:none !important;}
+
 
 /* ═══ KEYBINDS OVERLAY ═══ */
 #keybinds-overlay {
@@ -1975,7 +2017,11 @@ body.battle-mode .arena-inner{
 
 /* Game stack : board-col + word-panel empilés — largeur fixée par JS */
 body.battle-mode .arena-game-stack{
-  display:flex;flex-direction:column;flex:none;min-height:0;
+  display:flex;
+  flex-direction:column;
+  flex: 1; /* <-- Remplace flex: none; par flex: 1; */
+  height: 100%; /* <-- Ajoute cette ligne */
+  min-height:0;
 }
 
 /* Board col */
@@ -1991,16 +2037,18 @@ body.battle-mode .cell.filled{font-size:var(--battle-cell-fs,clamp(12px,1.8vw,20
 /* Word panel — hérite la largeur du game-stack */
 body.battle-mode .arena-word-panel{
   background:var(--surface);border-top:2px solid var(--border);
-  flex-shrink:0;padding:4px 6px 6px;
+  flex: 1; /* <-- Remplace flex-shrink: 0; par flex: 1; */
+  max-height: none; /* <-- Modifie max-height: 28dvh; par max-height: none; */
+  padding:4px 6px 6px;
   display:flex;flex-direction:column;gap:3px;
-  max-height:28dvh;overflow-y:auto;width:100%;
+  overflow-y:auto;width:100%;
 }
 body.battle-mode .arena-word-panel .word-row{padding:4px 8px;border-radius:10px;gap:5px;animation:none;}
-body.battle-mode .arena-word-panel .wr-emoji{font-size:clamp(16px,2.1vw,20px);}
-body.battle-mode .arena-word-panel .wr-kana{font-size:clamp(14px,1.8vw,18px);}
-body.battle-mode .arena-word-panel .wr-romaji{font-size:clamp(10px,1.3vw,14px);}
-body.battle-mode .arena-word-panel .wr-meaning{font-size:clamp(9px,1.1vw,12px);}
-body.battle-mode .arena-word-panel .wr-mult{font-size:clamp(11px,1.4vw,15px);}
+body.battle-mode .arena-word-panel .wr-emoji{font-size:clamp(20px,2.6vw,26px);}
+body.battle-mode .arena-word-panel .wr-kana{font-size:clamp(26px,2.6vw,22px);}
+body.battle-mode .arena-word-panel .wr-romaji{font-size:clamp(26px,2.6vw,16px);}
+body.battle-mode .arena-word-panel .wr-meaning{font-size:clamp(26px,2.6vw,14px);}
+body.battle-mode .arena-word-panel .wr-mult{font-size:clamp(26px,2.6vw,17px);}
 
 /* Side panel — large, next-kana visible */
 body.battle-mode .arena-side{
@@ -2040,6 +2088,11 @@ body.battle-mode .arena-side .player-name-badge{
 }
 .p1-arena .player-name-badge{color:var(--sky);background:rgba(0,170,238,.12);}
 .p2-arena .player-name-badge{color:#c77dff;background:rgba(168,85,247,.12);}
+body.battle-mode div[id^="board-p"] {
+  background: rgba(255, 255, 255, 0.18) !important;
+  backdrop-filter: blur(8px) saturate(1.4);
+  -webkit-backdrop-filter: blur(8px) saturate(1.4);
+}
 /* Level badge */
 body.battle-mode .arena-side .level-badge-box{
   font-family:'Fredoka One',sans-serif;font-size:clamp(10px,1.2vw,13px);
@@ -2238,6 +2291,46 @@ body.battle-mode .enc-toast-box.show{display:block;animation:encRise 2.2s ease f
 body.mobile-ingame #bot-toggle {
   display: none !important;
 }
+/* ═══ LAYOUT TABLETTE (solo + battle) — identique desktop ═══ */
+body.device-tablet #shell {
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+body.device-tablet #middle {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  min-height: 0;
+  overflow: hidden;
+}
+
+body.device-tablet #board-col {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+body.device-tablet #side-panel {
+  display: flex !important;
+}
+
+body.device-tablet #word-panel {
+  max-height: 42dvh;
+  overflow-y: auto;
+}
+
+body.device-tablet #mobile-nav {
+  display: none !important;
+}
+/* ═══════════════════════════════════════════════════════════════════ */
 /* Shell : pleine largeur, pas de max-width ni centrage */
 body.mobile-ingame #shell {
   padding-top: 54px;
@@ -2534,7 +2627,7 @@ body:has(#tuto-overlay:not(.hidden)) #bot-ui {
     <div class="mode-level-badge" id="mode-level-name"></div>
   </div>
 
-  <!-- Grille 2×2 mobile -->
+<!-- Grille 2×2 mobile -->
   <div class="mode-grid-2x2">
     <button class="mode-btn-mobile mbm-solo" onclick="modeStart('solo')">
       <span class="mbm-emoji">🎮</span>
@@ -2555,6 +2648,13 @@ body:has(#tuto-overlay:not(.hidden)) #bot-ui {
       <span class="mbm-emoji">❓</span>
       <span class="mbm-label">Quiz</span>
       <span class="mbm-sub">Apprends les kana</span>
+    </button>
+    <button class="mode-btn-mobile mbm-vsbot" id="btn-mode-vsbot"
+            style="display:none"
+            onclick="modeStart('vsBot')">
+      <span class="mbm-emoji">⚔️</span>
+      <span class="mbm-label">vs CPU</span>
+      <span class="mbm-sub">Affronte le bot IA</span>
     </button>
   </div>
 
@@ -2740,7 +2840,7 @@ body:has(#tuto-overlay:not(.hidden)) #bot-ui {
   <!-- Bandeau d'info "Comment jouer" -->
  <div id="tuto-info-banner">
   <div class="tib-row">
-    <div class="tib-icon">📖</div>
+    <div class="tib-icon">ℹ️</div>
     <div class="tib-text">Tu es dans la section<span>Comment jouer</span></div>
     <div class="tib-icon">🎮</div>
   </div>
@@ -2829,6 +2929,52 @@ function majStatusBar(hexColor) {
     }
   }
 }
+// ═══ DÉTECTION DEVICE (phone / tablet) ═══
+(function detectDevice() {
+  function _applyDeviceClass(type) {
+    window.DEVICE_TYPE = type;
+    document.body.classList.remove('device-phone', 'device-tablet');
+    document.body.classList.add('device-' + type);
+  }
+
+  // Fallback résolution : la petite dimension >= 600px → tablette
+  function _fallback() {
+    const smallSide = Math.min(screen.width, screen.height);
+    _applyDeviceClass(smallSide >= 600 ? 'tablet' : 'phone');
+  }
+
+  // Tentative Capacitor Device plugin
+  try {
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Device) {
+      window.Capacitor.Plugins.Device.getInfo().then(function(info) {
+        _applyDeviceClass(info.deviceType === 'tablet' ? 'tablet' : 'phone');
+      }).catch(_fallback);
+    } else {
+      _fallback();
+    }
+  } catch(e) {
+    _fallback();
+  }
+})();
+// ═══ VERROUILLAGE ORIENTATION ═══
+(function lockOrientation() {
+  try {
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.ScreenOrientation) {
+      const SO = window.Capacitor.Plugins.ScreenOrientation;
+      // On attend que DEVICE_TYPE soit défini (detectDevice s'exécute juste avant)
+      const orientation = window.DEVICE_TYPE === 'tablet' ? 'landscape' : 'portrait';
+      SO.lock({ orientation: orientation }).catch(function(e) {
+        console.warn('[ScreenOrientation] lock failed:', e);
+      });
+    }
+    // Pas de fallback navigateur : l'API Screen Orientation Web est trop restrictive
+    // (nécessite un geste utilisateur). On ignore silencieusement.
+  } catch(e) {
+    console.warn('[ScreenOrientation] erreur:', e);
+  }
+})();
+// ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
 // ═══ FLUENT EMOJI 3D — Microsoft (MIT License) ═══
 // Approche par codepoint unicode — URL calculée dynamiquement, sans dictionnaire
 
@@ -2877,7 +3023,7 @@ function fluent(el) {
                        'tt-streak','tt-date','st-emoji','st-name','st-score',
                        'score-val','next-kana','level-badge',
                        'mn-score-val','mn-next-kana','mn-lv-emoji','mn-lv-num',
-                       'tuto-hud-next','tuto-hud-score','tuto-hud-lv-emoji','tuto-hud-lv-num'];
+                       'tuto-hud-next','tuto-hud-score','tuto-hud-lv-num'];
       let p = node.parentElement;
       while (p && p !== el) {
         if (skipIds.includes(p.id)) return NodeFilter.FILTER_REJECT;
@@ -6296,10 +6442,12 @@ const targetBlueprintId = `escape_d${difficulty}_${topology}`;
     });
     return;
   }
-  // Activer le layout mobile AVANT startGame
-  document.body.classList.add('mobile-ingame');
-  const nav = document.getElementById('mobile-nav');
-  if (nav) nav.classList.add('visible');
+// Activer le layout mobile AVANT startGame
+  if(window.DEVICE_TYPE !== 'tablet') {
+    document.body.classList.add('mobile-ingame');
+    const nav = document.getElementById('mobile-nav');
+    if(nav) nav.classList.add('visible');
+  }
 
   // Stocker AVANT startGame
   _escapeLevel = escapeLevel;
@@ -6603,6 +6751,9 @@ renderMenuLevels();
 
 // ── Afficher l'écran de choix de mode pour un niveau ──
 function showModeSelect(levelIdx){
+  // Afficher le bouton vsBot uniquement sur tablette
+  const btnVsBot = document.getElementById('btn-mode-vsbot');
+  if(btnVsBot) btnVsBot.style.display = window.DEVICE_TYPE === 'tablet' ? '' : 'none';
   pendingLevelIdx=levelIdx;
   const lvl = ACTIVE_LEVELS[levelIdx];
   const fUrl = _fluentUrl(lvl.emoji);
@@ -6622,11 +6773,13 @@ function showModeSelect(levelIdx){
     card.addEventListener('click',()=>{
       document.getElementById('mode-overlay').classList.add('hidden');
       document.getElementById('menu-overlay').classList.add('hidden');
-      document.body.classList.add('mobile-ingame');
-      const nav = document.getElementById('mobile-nav');
-      if(nav) nav.classList.add('visible');
+if(window.DEVICE_TYPE !== 'tablet') {
+        document.body.classList.add('mobile-ingame');
+        const nav = document.getElementById('mobile-nav');
+        if(nav) nav.classList.add('visible');
+      }
       
-      // 🌟 NOUVEAU : On lance le mode Escape avec la difficulté (sn.num va de 1 à 5)
+      // 🌟 NOUVEAU : On lance le mode Escape
       startPuzzleEscape(levelIdx, sn.num); 
       
       if(typeof _mobileNavShow==='function') setTimeout(_mobileNavShow, 50);
@@ -6662,9 +6815,11 @@ function modeStart(mode){
   document.getElementById('mode-overlay').classList.add('hidden');
   gameMode=mode;
   // Activer le layout mobile AVANT startGame pour que calcRows() en tienne compte
-  document.body.classList.add('mobile-ingame');
-  const nav = document.getElementById('mobile-nav');
-  if(nav) nav.classList.add('visible');
+  if(window.DEVICE_TYPE !== 'tablet') {
+    document.body.classList.add('mobile-ingame');
+    const nav = document.getElementById('mobile-nav');
+    if(nav) nav.classList.add('visible');
+  }
   if(mode==='solo'){
     startGame(pendingLevelIdx);
   } else if(mode==='survie'){
@@ -8203,25 +8358,25 @@ if (_tutoPFill) {
   document.getElementById('tuto-start-btn').classList.add('hidden');
   _hideTutoBubble();
 
-  // 1. Bienvenue — 3s
+ // 1. Bienvenue — 3s
   await _tutoDelay(500); if(!_tutoRunning) return;
-  _showTutoBubble('🌊 Bienvenue dans かなDROP !\nApprends le japonais en jouant !', null);
+  _showTutoBubble('Bienvenue dans ce tutoriel !!!\n Je vais t\'expliquer comment jouer !', null);
   await _tutoDelay(3000); if(!_tutoRunning) return;
 
   // 2. Top-bar HUD — 3s (en haut désormais)
   const hudNextVal = 'か';
   if(hudNext){ hudNext.textContent=hudNextVal; hudNext.style.background=kanaBg(hudNextVal); }
   document.getElementById('tuto-next').textContent='か'; document.getElementById('tuto-next').style.background=kanaBg('か');
-  _showTutoBubble('☝️ En haut à droite : le prochain kana\nà faire tomber, et ton score !', 'up');
+  _showTutoBubble('En haut s\'affiche ton score\net le prochain kana qui va tomber !', 'up');
   await _tutoDelay(3000); if(!_tutoRunning) return;
 
   // 3. Panel bas — 4s
   _tutoWordPanel('かい','kai','coquillage','🐚', true);
-  _showTutoBubble('👇 En bas : les mots à former\npendant la partie !', 'down');
+  _showTutoBubble('En bas ce sont les mots que tu devras former\npendant la partie !', 'down');
   await _tutoDelay(4000); if(!_tutoRunning) return;
 
   // 4. Déplacer — か descend col 5 pendant 3s puis glisse
-  _showTutoBubble('🎮 ← → pour déplacer le kana\nqui tombe !', null);
+  _showTutoBubble('👈 Swipe 👉 pour déplacer le kana\nqui tombe !', null);
   let col=5;
   const midRow=Math.floor(R*0.32);
   for(let r=0;r<midRow;r++){
@@ -8233,7 +8388,7 @@ if (_tutoPFill) {
   if(!_tutoRunning) return;
 
   // 5. Glisse gauche — 4s
-  _showTutoBubble('← Glisse à gauche vers\nla bonne colonne !', null);
+  _showTutoBubble('Choisis la colonne où tu veux faire atterrir le kana !', null);
   for(let c=col-1;c>=3;c--){
     if(!_tutoRunning) return;
     _tutoClearCell(midRow-1,c+1); _tutoSetCell(midRow-1,c,'か','active');
@@ -8242,7 +8397,7 @@ if (_tutoPFill) {
   col=3; if(!_tutoRunning) return;
 
   // 6. Soft drop — 4s
-  _showTutoBubble('↓ Maintenir bas =\nchute rapide !', null);
+  _showTutoBubble('👇 Glisse vers le bas ou appuie long =\nchute rapide !', null);
   const startRow=midRow-1;
   for(let r=startRow+1;r<R-1;r++){
     if(!_tutoRunning) return;
@@ -8256,7 +8411,7 @@ if (_tutoPFill) {
   // 7. い descend — 4s
   document.getElementById('tuto-next').textContent='い'; document.getElementById('tuto-next').style.background=kanaBg('い');
   const hudN7=document.getElementById('tuto-hud-next'); if(hudN7){hudN7.textContent='い';hudN7.style.background=kanaBg('い');}
-  _showTutoBubble('Maintenant pose い\njuste à côté de か !', null);
+  _showTutoBubble('Ensuite si tu poses い\njuste à côté de か...', null);
   col=5;
   const midRow2=Math.floor(R*0.32);
   for(let r=0;r<midRow2;r++){
@@ -8268,7 +8423,7 @@ if (_tutoPFill) {
   if(!_tutoRunning) return;
 
   // 8. Glisse droite + hard drop — 3s
-  _showTutoBubble('⬇ Drop ! Pose-le\nd\'un coup !', null);
+  _showTutoBubble('Drop ! Il tombe d\'un coup !', null);
   _tutoClearCell(midRow2-1,col); _tutoSetCell(midRow2-1,4,'い','active');
   await _tutoDelay(500); col=4; if(!_tutoRunning) return;
   const startRow2=midRow2-1;
@@ -8282,7 +8437,7 @@ if (_tutoPFill) {
   await _tutoDelay(600); if(!_tutoRunning) return;
 
   // 9. Le mot se forme ! — 3s
-  _showTutoBubble('✨ かい ! Le mot est formé !\nTu gagnes des points !', null);
+  _showTutoBubble('Le mot かい est formé !\nTu gagnes des points ! Et le mot suivant apparait.', null);
   await _tutoDelay(800); if(!_tutoRunning) return;
   soundCombo();
   _tutoSetCell(R-1,3,'か','combo-flash'); _tutoSetCell(R-1,4,'い','combo-flash');
@@ -8305,7 +8460,7 @@ if (_tutoPFill) {
   _tutoWordPanel('かめ','kame','tortue','🐢', false);
   document.getElementById('tuto-next').textContent='め'; document.getElementById('tuto-next').style.background=kanaBg('め');
   const hudNme=document.getElementById('tuto-hud-next'); if(hudNme){hudNme.textContent='め';hudNme.style.background=kanaBg('め');}
-  _showTutoBubble('🐢 Nouveau mot : かめ !\nLes mots peuvent aussi\nse former verticalement !', null);
+  _showTutoBubble('Un nouveau mot à écrire : かめ !', null);
   await _tutoDelay(3000); if(!_tutoRunning) return;
 
   // め descend col 4 jusqu'en bas — 3s
@@ -8324,7 +8479,7 @@ if (_tutoPFill) {
   // か descend col 4 — s'arrête juste au-dessus de め — 3s
   document.getElementById('tuto-next').textContent='か'; document.getElementById('tuto-next').style.background=kanaBg('か');
   const hudNka=document.getElementById('tuto-hud-next'); if(hudNka){hudNka.textContent='か';hudNka.style.background=kanaBg('か');}
-  _showTutoBubble('か descend dans la\nmême colonne, par-dessus め !', null);
+  _showTutoBubble('Tu peux poser か dans la même colonne, par-dessus め !', null);
   for(let r=0;r<R-2;r++){
     if(!_tutoRunning) return;
     if(r>0) _tutoClearCell(r-1,vcol);
@@ -8336,7 +8491,7 @@ if (_tutoPFill) {
   await _tutoDelay(700); if(!_tutoRunning) return;
 
   // Le mot vertical se forme !
-  _showTutoBubble('✨ かめ ! Vertical aussi !\nC\'est la même logique !', null);
+  _showTutoBubble('かめ est validé verticalement !\nC\'est la même logique !', null);
   await _tutoDelay(800); if(!_tutoRunning) return;
   soundCombo();
   _tutoSetCell(R-2,vcol,'か','combo-flash'); _tutoSetCell(R-1,vcol,'め','combo-flash');
@@ -8352,10 +8507,11 @@ if (_tutoPFill) {
   _tutoClearCell(R-2,vcol); _tutoClearCell(R-1,vcol);
 
   // 10. Fin — bouton C'est parti dans la bulle
-  _showTutoBubble('🎉 Tu as tout compris !\nHorizontal, vertical…\nÀ toi de jouer !', null);
+  _showTutoBubble('Voilà tu sais tout !\nÀ toi de jouer !', null);
   await _tutoDelay(800); if(!_tutoRunning) return;
   document.getElementById('tuto-start-btn').classList.remove('hidden');
 }
+ 
 
 function startRebind(pid, action){
   if(_rebindTarget) cancelRebind();
@@ -8829,10 +8985,30 @@ function enterBattleMode(levelIdx){
   const p1Label = gameMode === 'botVsBot' ? 'Bot Alpha' : 'Joueur 1';
 const p2Label = gameMode === 'vsBot' ? 'CPU' : (gameMode === 'botVsBot' ? 'Bot Beta' : 'Joueur 2');
 
-  const lv = ACTIVE_LEVELS[currentLevelIdx];
-  const centerCol = `<div id="battle-center">
-    <div class="bc-logo-kana">かな</div>
-    <div class="bc-logo-drop">DROP!</div>
+const lv = ACTIVE_LEVELS[currentLevelIdx];
+
+  // Palette aléatoire pour le battle-center
+  const _BC_PALETTES = [
+    { top:'#e8d4ff', mid:'#d4d8ff', bot:'#d4f0ff', glow:'rgba(168,85,247,.55)'  },
+    { top:'#d4f4ff', mid:'#c8f7ef', bot:'#d4fff0', glow:'rgba(0,200,200,.55)'   },
+    { top:'#fff3d4', mid:'#ffe8c0', bot:'#fdffd4', glow:'rgba(255,180,0,.45)'   },
+    { top:'#ffd4f0', mid:'#f0d4ff', bot:'#fff9d4', glow:'rgba(255,100,180,.5)'  },
+    { top:'#d4eeff', mid:'#c8f4ff', bot:'#d4fff8', glow:'rgba(0,170,238,.55)'   },
+    { top:'#d8ffd4', mid:'#e8ffd0', bot:'#fdffd4', glow:'rgba(100,200,80,.5)'   },
+    { top:'#ffe8d4', mid:'#fff0e0', bot:'#fffbd4', glow:'rgba(255,140,60,.45)'  },
+    { top:'#ffd4e8', mid:'#ffe8d0', bot:'#fff9d4', glow:'rgba(255,80,120,.5)'   },
+    { top:'#d4ffe8', mid:'#d4fff7', bot:'#f0ffd4', glow:'rgba(46,216,160,.5)'   },
+    { top:'#ead4ff', mid:'#ffd4f0', bot:'#fff4ff', glow:'rgba(180,100,255,.55)' },
+  ];
+  const _bcp = _BC_PALETTES[Math.floor(Math.random() * _BC_PALETTES.length)];
+
+
+  const centerCol = `<div id="battle-center" style="
+    --bc-top:${_bcp.top};
+    --bc-mid:${_bcp.mid};
+    --bc-bot:${_bcp.bot};
+    --bc-glow:${_bcp.glow};
+  ">
     <div class="bc-divider"></div>
     <div class="bc-vs">VS</div>
     <div class="bc-divider"></div>
@@ -10870,7 +11046,8 @@ function splashEnter(){
     }
   }
 
-  window._mobileNavShow = function(){
+window._mobileNavShow = function(){
+    if(window.DEVICE_TYPE === 'tablet') return;
     const nav = document.getElementById('mobile-nav');
     if(nav) nav.classList.add('visible');
     document.body.classList.add('mobile-ingame');
