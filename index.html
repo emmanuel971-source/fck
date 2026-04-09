@@ -230,8 +230,8 @@ body::before {
     inset 0 0 28px rgba(255,255,255,.18),
     0 0 24px rgba(0,0,0,.08);
   gap: 12px;
-  z-index: 2;
-  overflow: hidden;
+  z-index: 10;
+  overflow: visible;
   position: relative;
 }
 
@@ -273,7 +273,7 @@ body::before {
 /* VS — pièce centrale dominante */
 #battle-center .bc-vs {
   font-family: 'Fredoka One', cursive;
-  font-size: clamp(60px, 5vw, 52px);
+  font-size: clamp(50px, 5vw, 52px);
   background: linear-gradient(135deg, #1a1a6e 0%, #3b0080 50%, #1a3a8f 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -282,7 +282,8 @@ body::before {
           drop-shadow(0 0 12px var(--bc-glow, rgba(168,85,247,.5)));
   animation: vsPulse 1.4s ease-in-out infinite alternate;
   letter-spacing: 2px;
-  z-index: 1;
+  z-index: 2;
+  margin-top: 80px;
 }
 @keyframes vsPulse {
   from { transform: scale(1);    opacity: .88; }
@@ -1986,12 +1987,14 @@ body.battle-mode{overflow:hidden;}
 
 body.battle-mode #shell{
   max-width:100vw;flex-direction:row;height:100dvh;gap:0;
+  isolation:isolate;
+  overflow:visible;
 }
 
 /* Chaque demi-écran */
 .player-arena{
   flex:1;display:flex;flex-direction:column;
-  min-width:0;min-height:0;overflow:hidden;position:relative;
+  min-width:0;min-height:0;overflow:visible;position:relative;
   background:transparent;
 }
 .p1-arena{
@@ -2035,13 +2038,19 @@ body.battle-mode .cell{font-size:var(--battle-cell-fs,clamp(12px,1.8vw,20px));}
 body.battle-mode .cell.filled{font-size:var(--battle-cell-fs,clamp(12px,1.8vw,20px));}
 
 /* Word panel — hérite la largeur du game-stack */
-body.battle-mode .arena-word-panel{
-  background:var(--surface);border-top:2px solid var(--border);
-  flex: 1; /* <-- Remplace flex-shrink: 0; par flex: 1; */
-  max-height: none; /* <-- Modifie max-height: 28dvh; par max-height: none; */
-  padding:4px 6px 6px;
-  display:flex;flex-direction:column;gap:3px;
-  overflow-y:auto;width:100%;
+body.battle-mode .arena-word-panel {
+  background: rgba(255, 255, 255, 0.18) !important;
+  backdrop-filter: blur(8px) saturate(1.4);
+  -webkit-backdrop-filter: blur(8px) saturate(1.4);
+  border-top: 2px solid rgba(255, 255, 255, 0.35);
+  flex: 1;
+  max-height: none;
+  padding: 4px 6px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow-y: auto;
+  width: 100%;
 }
 body.battle-mode .arena-word-panel .word-row{padding:4px 8px;border-radius:10px;gap:5px;animation:none;}
 body.battle-mode .arena-word-panel .wr-emoji{font-size:clamp(20px,2.6vw,26px);}
@@ -2051,12 +2060,19 @@ body.battle-mode .arena-word-panel .wr-meaning{font-size:clamp(26px,2.6vw,14px);
 body.battle-mode .arena-word-panel .wr-mult{font-size:clamp(26px,2.6vw,17px);}
 
 /* Side panel — large, next-kana visible */
-body.battle-mode .arena-side{
-  flex-shrink:0;width:clamp(82px,10vw,112px);
-  display:flex;flex-direction:column;
-  background:var(--surface);
-  border-left:0px solid var(--border);border-top:0px solid var(--border);
-  padding:10px 6px 8px;gap:10px;align-items:center;overflow:hidden;
+body.battle-mode .arena-side {
+  flex-shrink: 0;
+  width: clamp(82px, 10vw, 112px);
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.18) !important;
+  backdrop-filter: blur(8px) saturate(1.4);
+  -webkit-backdrop-filter: blur(8px) saturate(1.4);
+  border-left: 2px solid rgba(255, 255, 255, 0.35);
+  padding: 10px 6px 8px;
+  gap: 10px;
+  align-items: center;
+  overflow: hidden;
 }
 body.battle-mode .arena-side .side-label{
   font-family:'Fredoka One','Nunito',sans-serif;
@@ -2652,8 +2668,8 @@ body:has(#tuto-overlay:not(.hidden)) #bot-ui {
     <button class="mode-btn-mobile mbm-vsbot" id="btn-mode-vsbot"
             style="display:none"
             onclick="modeStart('vsBot')">
-      <span class="mbm-emoji">⚔️</span>
-      <span class="mbm-label">vs CPU</span>
+      <span class="mbm-emoji">🤖</span>
+      <span class="mbm-label">Verus CPU</span>
       <span class="mbm-sub">Affronte le bot IA</span>
     </button>
   </div>
@@ -6751,9 +6767,20 @@ renderMenuLevels();
 
 // ── Afficher l'écran de choix de mode pour un niveau ──
 function showModeSelect(levelIdx){
-  // Afficher le bouton vsBot uniquement sur tablette
+  // Afficher le bouton vsBot uniquement sur tablette avec résolution suffisante.
+  // On reproduit exactement la formule de calcRows() en mode battle pour savoir
+  // si les deux grilles rentrent confortablement dans l'écran en paysage.
+  const _bW = Math.max(window.screen.width, window.screen.height);  // grande dim = landscape
+  const _bH = Math.min(window.screen.width, window.screen.height);
+  const _centreW  = Math.max(72, Math.min(108, _bW * 0.09));        // clamp(72,9vw,108)
+  const _arenaW   = (_bW - _centreW) / 2;                           // moitié de l'écran
+  const _maxBoardW = _arenaW - 120;                                  // moins le side panel
+  const _maxBoardH = _bH - 50 - 60;                                 // moins chrome + word-panel estimé
+  const _cellW    = Math.min(_maxBoardH / 15, _maxBoardW / 8);
+  const _totalW   = 2 * (8 * _cellW + 120) + _centreW;
+  const hasBattleRoom = window.DEVICE_TYPE === 'tablet' && (_totalW + 10) <= _bW;
   const btnVsBot = document.getElementById('btn-mode-vsbot');
-  if(btnVsBot) btnVsBot.style.display = window.DEVICE_TYPE === 'tablet' ? '' : 'none';
+  if(btnVsBot) btnVsBot.style.display = hasBattleRoom ? '' : 'none';
   pendingLevelIdx=levelIdx;
   const lvl = ACTIVE_LEVELS[levelIdx];
   const fUrl = _fluentUrl(lvl.emoji);
@@ -7156,12 +7183,13 @@ function _fitBattleBoard(){
       if(active&&r===active.y&&c===active.x){
         const isActiveMalus=active.char==='💩';
         el.className='cell active'+(isActiveMalus?' is-malus':'');
-        el.textContent=active.char;
+        el.innerHTML=isActiveMalus?`<img src="${_fluentUrl('💩')}" class="femoji" alt="💩" style="height:1.1em;width:auto;vertical-align:-.15em;" onerror="window._fluentErr&&window._fluentErr(this,'💩')">`:active.char;
         el.style.background=isActiveMalus?'linear-gradient(135deg,#fdf3ea,#f7e8d5)':kanaBg(active.char);
       }else if(active&&r===gy&&c===active.x&&gy!==active.y){
         const isGhostMalus=active.char==='💩';
         el.className='cell ghost'+(isGhostMalus?' is-malus':'');
-        el.textContent=active.char;el.style.background='';
+        el.innerHTML=isGhostMalus?`<img src="${_fluentUrl('💩')}" class="femoji" alt="💩" style="height:1.1em;width:auto;vertical-align:-.15em;opacity:.45;" onerror="window._fluentErr&&window._fluentErr(this,'💩')">`:active.char;
+        el.style.background='';
         if(isTrig)el.classList.add('puzzle-trigger');
       }else if(board[r][c].filled){
         const isMalus=board[r][c].char==='💩';
@@ -7172,7 +7200,7 @@ function _fitBattleBoard(){
           el.className='cell empty';el.textContent='';el.style.background='';
         } else {
           el.className=isMalus?'cell filled malus':isSkull?'cell filled skull':'cell filled';
-          el.innerHTML=isSkull?`<img src="${_fluentUrl('☠️')}" class="femoji" alt="☠️" style="height:1.1em;width:auto;vertical-align:-.15em;" onerror="window._fluentErr&&window._fluentErr(this,'☠️')">`:board[r][c].char;
+          el.innerHTML=isMalus?`<img src="${_fluentUrl('💩')}" class="femoji" alt="💩" style="height:1.1em;width:auto;vertical-align:-.15em;" onerror="window._fluentErr&&window._fluentErr(this,'💩')">`:isSkull?`<img src="${_fluentUrl('☠️')}" class="femoji" alt="☠️" style="height:1.1em;width:auto;vertical-align:-.15em;" onerror="window._fluentErr&&window._fluentErr(this,'☠️')">`:board[r][c].char;
           el.style.background=(isMalus||isSkull)?'':kanaBg(board[r][c].char);
           if(isTrig)el.classList.add('puzzle-trigger');
         }
@@ -7393,7 +7421,7 @@ function renderPanel(){
     const isMalus = active.char === '💩';
     if(el){
       el.className = isMalus ? 'cell filled malus land' : 'cell filled land';
-      el.textContent=active.char;
+      el.innerHTML = isMalus ? `<img src="${_fluentUrl('💩')}" class="femoji" alt="💩" style="height:1.1em;width:auto;vertical-align:-.15em;" onerror="window._fluentErr&&window._fluentErr(this,'💩')">` : active.char;
       el.style.background = isMalus ? '' : kanaBg(active.char);
       setTimeout(()=>el.classList.remove('land'),380);
     }
@@ -9003,6 +9031,24 @@ const lv = ACTIVE_LEVELS[currentLevelIdx];
   const _bcp = _BC_PALETTES[Math.floor(Math.random() * _BC_PALETTES.length)];
 
 
+// Version light du logo sans les bulles/gouttes et avec des animations réduites
+  const lightLogo = `
+    <div class="logo-wrap" style="transform: scale(0.35); margin-top: -20px; margin-bottom: -15px; animation: floatPulse 4s ease-in-out infinite;">
+      <div class="logo-card">
+        <div class="kana-group">
+          <span class="kana-outline-d">かな</span>
+          <span class="kana-outline-w">かな</span>
+          <span class="kana-main" style="animation: none; background-position: 0% 50%;">かな</span>
+        </div>
+        <div class="drop-group">
+          <span class="drop-outline-d">DROP!</span>
+          <span class="drop-outline-w">DROP!</span>
+          <span class="drop-main" style="animation: none;">DROP!</span>
+        </div>
+      </div>
+    </div>
+  `;
+
   const centerCol = `<div id="battle-center" style="
     --bc-top:${_bcp.top};
     --bc-mid:${_bcp.mid};
@@ -9017,6 +9063,38 @@ const lv = ACTIVE_LEVELS[currentLevelIdx];
     <div class="bc-robot">🤖</div>
   </div>`;
   shell.innerHTML = buildArenaHTML('p1', p1Label) + centerCol + buildArenaHTML('p2', p2Label);
+
+  // ── Logo KanaDrop fixé au-dessus de tout (hors stacking contexts des arenas) ──
+  const _battleLogo = document.createElement('div');
+  _battleLogo.id = 'battle-center-logo';
+  _battleLogo.innerHTML = lightLogo;
+  _battleLogo.style.cssText = `
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: scale(0.60);
+    transform-origin: center top;
+  `;
+  document.body.appendChild(_battleLogo);
+
+  // Positionner le logo sur la colonne centrale après le premier rendu
+  function _repositionBattleLogo() {
+    const bc = document.getElementById('battle-center');
+    const bl = document.getElementById('battle-center-logo');
+    if (bc && bl) {
+      const r = bc.getBoundingClientRect();
+      bl.style.left   = r.left + 'px';
+      bl.style.top    = r.top  + 'px';
+      bl.style.width  = r.width + 'px';
+      bl.style.top = (r.top + 20) + 'px'
+    }
+  }
+  requestAnimationFrame(_repositionBattleLogo);
+  window.addEventListener('resize', _repositionBattleLogo);
+  window._battleLogoResizeHandler = _repositionBattleLogo;
   // Bulles de fond pour le mode battle — position:absolute dans #shell
   // (fixed ne fonctionne pas car shell crée un stacking context avec overflow:hidden)
   const _cBattle = document.createElement('div');
@@ -9056,7 +9134,12 @@ const lv = ACTIVE_LEVELS[currentLevelIdx];
       _startBotOnP2();        // Bot Worker sur P2 (inchangé)
       _startBotOnP1();        // Bot Worker sur P1 (nouveau)
       _showDemoControls();    // Panneau de contrôle démo
-    }, 600);
+}, 600);
+  }
+
+  // 🌟 Appel de Fluent 3D pour s'assurer que le Robot, l'emoji Level et les icônes Joueurs soient en 3D
+  if (typeof fluent === 'function') {
+    setTimeout(() => fluent(document.getElementById('shell')), 80);
   }
 }
 
@@ -9412,6 +9495,12 @@ function _showDemoControls(){
 function exitBattleMode(){
   const _cb = document.getElementById('confetti-battle');
   if(_cb) _cb.remove();
+  const _bl = document.getElementById('battle-center-logo');
+  if(_bl) _bl.remove();
+  if(window._battleLogoResizeHandler) {
+    window.removeEventListener('resize', window._battleLogoResizeHandler);
+    window._battleLogoResizeHandler = null;
+  }
   _teardownBattleKeyboard();
   _destroyBotWorker();
   crossControlActive = false;
