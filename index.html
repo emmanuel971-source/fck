@@ -1176,6 +1176,211 @@ body::before {
 #stats-back-btn { font-family:'Fredoka One',cursive; font-size:clamp(15px,4vw,18px); padding:11px 32px; border:none; border-radius:50px; background:linear-gradient(135deg,#a855f7,#6366f1); color:#fff; cursor:pointer; box-shadow:0 5px 18px rgba(168,85,247,.4); transition:transform .18s cubic-bezier(.34,1.56,.64,1); flex-shrink:0; margin:8px 16px 16px; align-self:center; }
 #stats-back-btn:hover { transform:translateY(-2px) scale(1.03); }
 
+/* ═══════════════════════════════════════════════════
+   VICTORY DEBRIEF OVERLAY
+   ═══════════════════════════════════════════════════ */
+#victory-overlay {
+  position:fixed;inset:0;z-index:295;
+  display:flex;flex-direction:column;align-items:center;
+  background:linear-gradient(160deg,var(--bg-top) 0%,var(--bg-mid) 50%,var(--bg-bot) 100%);
+  overflow:hidden;
+}
+#victory-overlay::before {
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 55% 40% at 10% 20%,rgba(168,85,247,.18) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 35% at 90% 80%,rgba(99,102,241,.15) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 30% at 50% 10%,rgba(255,215,0,.1) 0%,transparent 60%);
+  animation:blobDrift 8s ease-in-out infinite alternate;
+}
+#victory-overlay.hidden { display:none !important; }
+#victory-inner {
+  position:relative;z-index:1;
+  width:100%;max-width:480px;height:100dvh;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+/* Header */
+#victory-header {
+  flex-shrink:0;
+  padding:clamp(12px,2.5dvh,20px) 16px 6px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+}
+#victory-congrats {
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(18px,5vw,24px);
+  color:var(--sky);
+  text-shadow:0 2px 10px rgba(255,255,255,1),0 0 18px rgba(0,170,238,.3);
+  text-align:center;line-height:1.2;
+  animation:victoryPop .45s cubic-bezier(.34,1.56,.64,1) both;
+}
+#victory-score {
+  font-family:'Nunito',sans-serif;font-weight:800;
+  font-size:clamp(13px,3.5vw,15px);
+  color:var(--text-mid);text-align:center;
+  animation:victoryPop .45s .06s cubic-bezier(.34,1.56,.64,1) both;
+}
+#victory-score strong { color:#a855f7; }
+#victory-debrief-lbl {
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(16px,4.5vw,20px);
+  color:#a855f7;
+  text-shadow:0 0 14px rgba(168,85,247,.3);
+  text-align:center;margin-top:4px;
+  animation:victoryPop .45s .11s cubic-bezier(.34,1.56,.64,1) both;
+}
+#victory-robot {
+  font-size:44px;line-height:1;
+  filter:drop-shadow(0 0 12px rgba(168,85,247,.6));
+  animation:robotBobble 1.6s ease-in-out infinite alternate;
+  margin-top:3px;
+}
+/* Bulle Kana-kun — reprend #tuto-bubble */
+#victory-bubble {
+  margin:0 16px;flex-shrink:0;
+  background:rgba(255,255,255,.96);
+  border:2.5px solid #a855f7;
+  border-radius:22px 22px 22px 6px;
+  padding:11px 16px 13px;
+  font-family:'Nunito',sans-serif;font-weight:800;
+  font-size:clamp(13px,3.4vw,15px);
+  color:#1a1040;line-height:1.55;
+  box-shadow:0 8px 28px rgba(168,85,247,.18),0 2px 0 rgba(168,85,247,.1);
+  position:relative;
+  animation:victoryBubbleIn .45s .22s cubic-bezier(.34,1.56,.64,1) both;
+  opacity:0;animation-fill-mode:forwards;
+}
+#victory-bubble::before {
+  content:'';position:absolute;
+  top:-13px;left:22px;
+  border-left:10px solid transparent;
+  border-right:6px solid transparent;
+  border-bottom:13px solid #a855f7;
+  transition:left .25s, right .25s;
+}
+/* Onglet Vocab : queue à droite, bulle miroir */
+#victory-bubble.bubble-vocab {
+  border-radius:22px 22px 6px 22px;
+}
+#victory-bubble.bubble-vocab::before {
+  left:auto;
+  right:22px;
+  border-left:6px solid transparent;
+  border-right:10px solid transparent;
+}
+#victory-bubble strong { color:#a855f7; }
+.victory-bubble-label {
+  font-family:'Fredoka One',cursive;font-size:11px;
+  color:#a855f7;letter-spacing:1.5px;text-transform:uppercase;
+  margin-bottom:5px;display:flex;align-items:center;gap:5px;
+}
+.victory-bubble-label::before {
+  content:'';display:inline-block;width:16px;height:2px;
+  background:#a855f7;border-radius:2px;
+}
+/* Onglets — reprend #stats-tabs */
+#victory-tabs {
+  display:flex;gap:8px;width:calc(100% - 32px);
+  background:rgba(255,255,255,.45);border-radius:20px;padding:5px;
+  box-shadow:0 4px 18px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.8);
+  flex-shrink:0;margin:9px 16px 0;align-self:center;
+}
+.victory-tab {
+  flex:1;font-family:'Fredoka One',cursive;font-size:clamp(14px,3.8vw,17px);
+  border:none;border-radius:15px;padding:10px 8px;
+  cursor:pointer;background:transparent;color:var(--text-dim);
+  transition:all .22s;
+}
+.victory-tab.active {
+  background:linear-gradient(135deg,#a855f7,#6366f1);color:#fff;
+  box-shadow:0 4px 14px rgba(168,85,247,.4);transform:scale(1.02);
+}
+/* Scroll — reprend #stats-scroll */
+#victory-scroll {
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  padding:10px 16px 8px;
+  -webkit-overflow-scrolling:touch;
+}
+#victory-scroll::-webkit-scrollbar { display:none; }
+.victory-tab-content { display:none; }
+.victory-tab-content.active {
+  display:block;
+  animation:victorySlideUp .28s cubic-bezier(.34,1.56,.64,1) both;
+}
+/* En-tête de section style cahier */
+.victory-ped-header {
+  display:flex;align-items:center;gap:8px;
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(14px,3.8vw,16px);
+  color:var(--text-mid);
+  padding-bottom:9px;margin-bottom:11px;
+  border-bottom:2px dashed rgba(0,170,238,.32);
+}
+/* Grille kanas — reprend #stats-grid / .stats-kana-cell */
+#victory-kana-grid {
+  display:grid;grid-template-columns:repeat(5,1fr);gap:8px;
+}
+.victory-kana-chip {
+  aspect-ratio:1;border-radius:14px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:var(--cell-bg);border:1.5px solid rgba(0,170,238,.22);
+  box-shadow:0 3px 8px rgba(0,0,0,.08);
+  animation:victoryChipIn .35s cubic-bezier(.34,1.56,.64,1) both;
+}
+.victory-kana-char {
+  font-family:'Noto Sans JP',sans-serif;font-weight:900;
+  font-size:clamp(21px,5.8vw,28px);color:#1a1040;line-height:1;
+}
+.victory-kana-roma {
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(10px,2.6vw,12px);color:var(--sky);margin-top:2px;
+}
+/* Grille vocabulaire — reprend .ov-word */
+#victory-vocab-grid {
+  display:flex;flex-wrap:wrap;gap:9px;justify-content:center;
+}
+.victory-vocab-card {
+  background:rgba(255,255,255,.92);
+  border:2px solid var(--border);
+  border-radius:16px;padding:9px 12px;text-align:center;
+  box-shadow:0 4px 14px rgba(0,0,0,.08);
+  min-width:76px;flex:1;max-width:112px;
+  animation:victoryCardIn .4s cubic-bezier(.34,1.56,.64,1) both;
+}
+.victory-vocab-card.boss { border-color:var(--neon-gold);box-shadow:0 4px 16px rgba(232,160,0,.25); }
+.vvc-emoji  { font-size:22px;display:block;margin-bottom:3px; }
+.vvc-kana   { font-family:'Noto Sans JP',sans-serif;font-size:17px;font-weight:700;color:var(--sky);display:block; }
+.vvc-kana.boss { color:var(--neon-gold); }
+.vvc-romaji { font-size:11px;color:var(--text-dim);display:block;letter-spacing:.3px; }
+.vvc-meaning{ font-size:11px;color:var(--text-mid);display:block;font-weight:800;margin-top:1px; }
+/* Boutons */
+#victory-btn-group {
+  flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;
+  gap:6px;padding:6px 16px 14px;
+}
+.victory-btn {
+  font-family:'Fredoka One',cursive;font-size:clamp(15px,4vw,18px);
+  padding:11px 32px;border:none;border-radius:50px;
+  background:linear-gradient(135deg,#a855f7,#6366f1);color:#fff;
+  cursor:pointer;box-shadow:0 5px 18px rgba(168,85,247,.4);
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1);
+  width:100%;max-width:300px;
+}
+.victory-btn:hover { transform:translateY(-2px) scale(1.03); }
+.victory-btn:active { transform:scale(.95); }
+.victory-btn.secondary {
+  background:rgba(255,255,255,.85);color:var(--text-mid);
+  border:2px solid var(--border);
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
+  font-size:clamp(13px,3.5vw,15px);padding:9px 24px;
+}
+/* Keyframes propres */
+@keyframes victoryPop      { from{opacity:0;transform:scale(.75)} to{opacity:1;transform:none} }
+@keyframes victoryBubbleIn { from{opacity:0;transform:scale(.88) translateY(6px)} to{opacity:1;transform:none} }
+@keyframes victorySlideUp  { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+@keyframes victoryChipIn   { from{opacity:0;transform:scale(.65)} to{opacity:1;transform:none} }
+@keyframes victoryCardIn   { from{opacity:0;transform:scale(.7) rotate(-4deg)} to{opacity:1;transform:none} }
+
 #tuto-info-banner {
   position: fixed;
   bottom: 0; left: 0; right: 0;
@@ -7775,8 +7980,20 @@ soundLevelUp();
   if(typeof KS!=='undefined') KS.saveSoloBest(scoreId, score, KS.getPlayerName('p1'));
   const lvlData=ACTIVE_LEVELS[currentLevelIdx];
   const isLast=currentLevelIdx>=ACTIVE_LEVELS.length-1;
-  const nextLvl=ACTIVE_LEVELS[currentLevelIdx+1];
-    showOverlay({title:`🎉 クリア！ Niveau ${lvlData.id}`,sub:`<span style="font-size:26px">${lvlData.emoji}</span><br><strong style="color:var(--neon-violet)">${lvlData.theme}</strong> maîtrisé !<br>Score : <strong style="color:var(--neon-violet)">${score.toLocaleString()}</strong>`,words:LEVEL_WORDS_LOCAL,btn1:isLast?'🏆 Rejouer depuis le début':`Niveau ${lvlData.id+1} → ${nextLvl.theme}`,act1:isLast?()=>startGame(0):()=>startGame(currentLevelIdx+1),btn2:'Rejouer ce niveau 🔄',act2:()=>startGame(currentLevelIdx)});
+  const nextLvl=isLast?null:ACTIVE_LEVELS[currentLevelIdx+1];
+  // Masquer word-panel et side-panel
+  const _wp=document.getElementById('word-panel');const _sp=document.getElementById('side-panel');
+  if(_wp)_wp.style.visibility='hidden';if(_sp)_sp.style.visibility='hidden';
+  showVictoryDebrief({
+    congrats:`🎉 クリア！ Niveau ${lvlData.id} · ${lvlData.theme} ${lvlData.emoji}`,
+    score,
+    words: LEVEL_WORDS_LOCAL,
+    btn1Text: isLast ? '🏆 Rejouer depuis le début' : `Niveau ${lvlData.id+1} → ${nextLvl.theme}`,
+    btn1Action: () => {
+      if(_wp)_wp.style.visibility='';if(_sp)_sp.style.visibility='';
+      isLast ? startGame(0) : startGame(currentLevelIdx+1);
+    },
+  });
   }
 
   // ── Puzzle helpers ──
@@ -7806,11 +8023,18 @@ soundLevelUp();
   function puzzleVictory(){
     clearInterval(dropTimer);gameRunning=false;resolvingWords=false;soundLevelUp();
     const lvlData=ALL_LEVELS[currentLevelIdx];const snDef=puzzleSNDef;
-    showOverlay({
-      title:'⚡ Puzzle réussi !',
-      sub:`<span style="font-size:26px">${lvlData.emoji}</span><br><strong style="color:var(--neon-violet)">${lvlData.theme} · SN-${snDef.num} ${snDef.stars}</strong><br>${snDef.label} maîtrisé !<br>Score : <strong style="color:var(--neon-violet)">${score.toLocaleString()}</strong>`,
-      words:[],btn1:'⚡ Rejouer ce puzzle',act1:()=>startPuzzle(currentLevelIdx,PUZZLE_SN_DEFS.indexOf(snDef)),
-      btn2:`SN-${Math.min(snDef.num+1,5)} suivant →`,act2:()=>startPuzzle(currentLevelIdx,Math.min(snDef.num,4)),
+    const _wp=document.getElementById('word-panel');const _sp=document.getElementById('side-panel');
+    if(_wp)_wp.style.visibility='hidden';if(_sp)_sp.style.visibility='hidden';
+    showVictoryDebrief({
+      congrats:`⚡ Puzzle réussi ! ${lvlData.emoji} ${lvlData.theme} · SN-${snDef.num} ${snDef.stars}`,
+      score,
+      words: LEVEL_WORDS_LOCAL,
+      btn1Text: `SN-${Math.min(snDef.num+1,5)} suivant →`,
+      btn1Action: () => {
+        if(_wp)_wp.style.visibility='';if(_sp)_sp.style.visibility='';
+        startPuzzle(currentLevelIdx, Math.min(snDef.num, 4));
+      },
+      isPuzzle: true,
     });
   }
 
@@ -10015,11 +10239,19 @@ function showWallOfFame(hiIdx){
     _wofPodiumBurst();
   }
 }
+let _wofFromVictory = false; // true si WoF lancé depuis le débrief victoire
+
 function hideWallOfFame(){
   document.getElementById('wof-overlay').classList.add('hidden');
   if(typeof _mobileNavHide==='function') _mobileNavHide();
   if(typeof resumeConfetti==='function') resumeConfetti();
-  document.getElementById('menu-overlay').classList.remove('hidden');
+  if (_wofFromVictory) {
+    _wofFromVictory = false;
+    // Retour au débrief — il est encore visible derrière le WoF
+    // (victory-overlay n'a pas été fermé, juste recouvert)
+  } else {
+    document.getElementById('menu-overlay').classList.remove('hidden');
+  }
 }
 
 // Lance plusieurs explosions de particules pour le podium
@@ -10083,13 +10315,17 @@ const _origSSB=KS.saveSoloBest.bind(KS);
 KS.saveSoloBest=function(levelId,score,name){
   const r=_origSSB(levelId,score,name);
   if(KS.isHighscore(score)){
-    const lv=ALL_LEVELS.find(l=>l.id===levelId);
-    setTimeout(()=>showWofEntry({
-      score,levelId,
-      levelEmoji:lv?lv.emoji:'🎮',
-      levelTheme:lv?lv.theme:'',
-      onDone:()=>{}
-    }),800);
+    const lv=ALL_LEVELS.find(l=>l.id===levelId)||ALL_LEVELS_KATA.find(l=>l.id===levelId);
+    setTimeout(()=>{
+      // Marquer qu'on vient du débrief (victory-overlay toujours visible)
+      _wofFromVictory = !document.getElementById('victory-overlay').classList.contains('hidden');
+      showWofEntry({
+        score,levelId,
+        levelEmoji:lv?lv.emoji:'🎮',
+        levelTheme:lv?lv.theme:'',
+        onDone:()=>{}
+      });
+    },800);
   }
   return r;
 };
@@ -11169,6 +11405,149 @@ window._mobileNavShow = function(){
 
 
 
+// ═══ VICTORY DEBRIEF ═══
+// Ordre officiel de la table des kanas (clés de KANA_TO_ROMAJI dans l'ordre)
+const _KANA_ORDER = Object.keys(KANA_TO_ROMAJI);
+
+function _victoryBubbleMessages(nbKanas, nbWords) {
+  return {
+    kanas: `Tu as utilisé <strong>${nbKanas} kana${nbKanas>1?'s':''}</strong> japonais ! Tu pourras les réviser dans le <strong>Mode Quiz</strong> ✨`,
+    vocab: `Tu as appris <strong>${nbWords} mot${nbWords>1?'s':''}</strong> japonais ! Tu pourras les réviser dans le <strong>Mode Quiz</strong> ✨`,
+  };
+}
+
+function _victorySetTab(tab) {
+  document.querySelectorAll('.victory-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('vtab-' + tab).classList.add('active');
+  document.querySelectorAll('.victory-tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('vcontent-' + tab).classList.add('active');
+  // Queue manga : gauche pour Kanas, droite pour Vocab
+  const bubble = document.getElementById('victory-bubble');
+  if (tab === 'vocab') {
+    bubble.classList.add('bubble-vocab');
+  } else {
+    bubble.classList.remove('bubble-vocab');
+  }
+  // Transition du texte
+  const txt = document.getElementById('victory-bubble-text');
+  txt.style.cssText = 'opacity:0;transform:translateY(4px);transition:opacity .2s,transform .2s';
+  const msgs = _victoryBubbleMessages(
+    document.getElementById('victory-kana-grid').children.length,
+    document.getElementById('victory-vocab-grid').children.length
+  );
+  setTimeout(() => {
+    txt.innerHTML = msgs[tab];
+    txt.style.cssText = 'opacity:1;transform:none;transition:opacity .2s,transform .2s';
+  }, 170);
+}
+
+// Bouton "Changer de niveau" : ferme le débrief + restaure les panels + ouvre le menu
+function _victoryGoMenu() {
+  hideVictoryDebrief();
+  const _wp = document.getElementById('word-panel');
+  const _sp = document.getElementById('side-panel');
+  if (_wp) _wp.style.visibility = '';
+  if (_sp) _sp.style.visibility = '';
+  showMenu();
+}
+
+function showVictoryDebrief({ congrats, score, words, btn1Text, btn1Action, isPuzzle = false }) {
+  // ── 1. Header ──
+  document.getElementById('victory-congrats').textContent = congrats;
+  document.getElementById('victory-score').innerHTML =
+    `Score : <strong>${score.toLocaleString('fr-FR')}</strong> pts · Super travail !`;
+
+  // ── 2. Kanas : extraire les kanas uniques des mots, triés selon la table officielle ──
+  const allChars = new Set();
+  words.forEach(w => [...w.kana].forEach(ch => {
+    // Ignorer les petits kana isolés (ゃゅょっャュョッ) et les voyelles longues (ー)
+    if (!/[ゃゅょっャュョッー]/.test(ch)) allChars.add(ch);
+  }));
+  // Trier selon l'ordre de KANA_TO_ROMAJI (qui respecte la table officielle)
+  const sortedKanas = _KANA_ORDER.filter(k => allChars.has(k));
+  // Kanas éventuellement absents de KANA_TO_ROMAJI (digraphes) → on les ajoute à la fin
+  allChars.forEach(ch => { if (!sortedKanas.includes(ch)) sortedKanas.push(ch); });
+
+  // ── 3. Grille kanas ──
+  const kanaGrid = document.getElementById('victory-kana-grid');
+  kanaGrid.innerHTML = '';
+  sortedKanas.forEach((ch, i) => {
+    const roma = KANA_TO_ROMAJI[ch] || ch;
+    const chip = document.createElement('div');
+    chip.className = 'victory-kana-chip';
+    chip.style.animationDelay = `${i * 0.03}s`;
+    chip.innerHTML = `<span class="victory-kana-char">${ch}</span><span class="victory-kana-roma">${roma}</span>`;
+    kanaGrid.appendChild(chip);
+  });
+
+  // ── 4. Grille vocabulaire ──
+  const vocabGrid = document.getElementById('victory-vocab-grid');
+  vocabGrid.innerHTML = '';
+  words.forEach((w, i) => {
+    const card = document.createElement('div');
+    card.className = 'victory-vocab-card' + (w.boss ? ' boss' : '');
+    card.style.animationDelay = `${i * 0.04}s`;
+    card.innerHTML = `
+      <span class="vvc-emoji">${w.emoji}</span>
+      <span class="vvc-kana${w.boss ? ' boss' : ''}">${w.kana}${w.boss ? ' ⭐' : ''}</span>
+      <span class="vvc-romaji">${w.romaji}</span>
+      <span class="vvc-meaning">${w.meaning}</span>`;
+    vocabGrid.appendChild(card);
+  });
+
+  // ── 5. Bulle initiale (onglet Kanas par défaut) ──
+  const msgs = _victoryBubbleMessages(sortedKanas.length, words.length);
+  document.getElementById('victory-bubble-text').innerHTML = msgs.kanas;
+
+  // ── 6. Reset tabs sur Kanas ──
+  document.querySelectorAll('.victory-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('vtab-kanas').classList.add('active');
+  document.querySelectorAll('.victory-tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('vcontent-kanas').classList.add('active');
+
+  // ── 7. Bouton principal ──
+  const btn1 = document.getElementById('victory-btn1');
+  btn1.textContent = btn1Text;
+  btn1.onclick = () => { hideVictoryDebrief(); btn1Action(); };
+
+  // ── 8. Affichage ──
+  document.getElementById('victory-overlay').classList.remove('hidden');
+  if (typeof resumeConfetti === 'function') resumeConfetti();
+  if (typeof applyFluent === 'function') setTimeout(() => applyFluent(), 80);
+}
+
+function hideVictoryDebrief() {
+  document.getElementById('victory-overlay').classList.add('hidden');
+  if (typeof pauseConfetti === 'function') pauseConfetti();
+}
+
+// ── Swipe entre onglets de la victoire ──
+window.addEventListener('load', () => {
+  const WIN_TABS = ['kanas', 'vocab'];
+  const winScroll = document.getElementById('victory-scroll');
+  if (!winScroll) return;
+  let x0 = null, y0 = null, axis = null;
+  const winOverlay = document.getElementById('victory-overlay');
+  winOverlay.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; axis = null; }, { passive: true });
+  winOverlay.addEventListener('touchmove', e => {
+    if (x0 === null) return;
+    const dx = Math.abs(e.touches[0].clientX - x0), dy = Math.abs(e.touches[0].clientY - y0);
+    if (axis === null && (dx > 6 || dy > 6)) axis = dx >= dy ? 'h' : 'v';
+    if (axis === 'h') e.preventDefault();
+  }, { passive: false });
+  winOverlay.addEventListener('touchend', e => {
+    if (x0 === null || axis !== 'h') { x0 = null; axis = null; return; }
+    const dx = e.changedTouches[0].clientX - x0;
+    x0 = null; axis = null;
+    if (Math.abs(dx) < 40) return;
+    const cur = WIN_TABS.indexOf(document.querySelector('.victory-tab.active')?.id.replace('vtab-', '') || 'kanas');
+    const next = dx < 0 ? cur + 1 : cur - 1;
+    if (next < 0 || next >= WIN_TABS.length) return;
+    _victorySetTab(WIN_TABS[next]);
+  }, { passive: true });
+});
+
+// ══════════════════════════════════════════════════
 // Lancement initial
 window.addEventListener('load', () => setTimeout(applyFluent, 400));
 
@@ -11287,6 +11666,40 @@ bindSwipe(
 
 
 </script>
+<!-- ═══ VICTORY DEBRIEF OVERLAY ═══ -->
+<div id="victory-overlay" class="hidden">
+  <div id="victory-inner">
+    <div id="victory-header">
+      <div id="victory-congrats"></div>
+      <div id="victory-score"></div>
+      <div id="victory-debrief-lbl">Débrief de Kana-kun</div>
+      <div id="victory-robot">🤖</div>
+    </div>
+    <div id="victory-bubble">
+      <div class="victory-bubble-label">Kana-kun</div>
+      <span id="victory-bubble-text"></span>
+    </div>
+    <div id="victory-tabs">
+      <button class="victory-tab active" id="vtab-kanas" onclick="_victorySetTab('kanas')">✍️ Kanas</button>
+      <button class="victory-tab"       id="vtab-vocab"  onclick="_victorySetTab('vocab')">📖 Vocabulaire</button>
+    </div>
+    <div id="victory-scroll">
+      <div class="victory-tab-content active" id="vcontent-kanas">
+        <div class="victory-ped-header"><span>✍️</span> Kanas rencontrés dans ce niveau</div>
+        <div id="victory-kana-grid"></div>
+      </div>
+      <div class="victory-tab-content" id="vcontent-vocab">
+        <div class="victory-ped-header"><span>📖</span> Vocabulaire du niveau</div>
+        <div id="victory-vocab-grid"></div>
+      </div>
+    </div>
+    <div id="victory-btn-group">
+      <button class="victory-btn" id="victory-btn1"></button>
+      <button class="victory-btn secondary" id="victory-btn-menu" onclick="_victoryGoMenu()">📋 Changer de niveau</button>
+    </div>
+  </div>
+</div>
+
 <!-- Détection Capacitor + TTS natif -->
 <script>
   // Le plugin est disponible via window.Capacitor.Plugins après cap sync
