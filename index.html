@@ -6708,20 +6708,21 @@ const targetBlueprintId = `escape_d${difficulty}_${topology}`;
 function puzzleVictoryEscape(){
   if(!_escapeLevel){ if(typeof _puzzleVictoryOrig !== 'undefined' && _puzzleVictoryOrig) _puzzleVictoryOrig(); return; }
   const lvlData=ACTIVE_LEVELS[currentLevelIdx];
-  
-  // CORRECTION 1 : On récupère le dernier mot via _escapeLevel.words
-  const escapeWord=_escapeLevel.words.at(-1); 
-  
   const _el=_escapeLevel; // capturer avant reset
   _escapeLevel=null; _escapePool=[];
-  
-  player1.showOverlay({
-    title:'🔓 Évasion réussie !',
-    // CORRECTION 2 : On utilise player1.score au lieu de score tout court
-    sub:`<span style="font-size:26px">${lvlData.emoji}</span><br><strong style="color:var(--neon-violet)">${lvlData.theme}</strong><br>La chaîne a libéré <strong style="color:var(--neon-gold)">${escapeWord.kana}</strong> !<br>Score : <strong style="color:var(--neon-violet)">${player1.score.toLocaleString()}</strong>`,
-    words:[],
-    btn1:'🔓 Rejouer ce puzzle',act1:()=>startPuzzleEscape(currentLevelIdx,_el.blueprint.id),
-    btn2:'📋 Menu principal',act2:()=>showMenu(),
+  soundLevelUp();
+  const _wp=document.getElementById('word-panel');const _sp=document.getElementById('side-panel');
+  if(_wp)_wp.style.visibility='hidden';if(_sp)_sp.style.visibility='hidden';
+  showVictoryDebrief({
+    congrats:`🔓 Évasion réussie ! ${lvlData.emoji} ${lvlData.theme}`,
+    score: player1 ? player1.score : 0,
+    words: lvlData.words,
+    btn1Text: '🔓 Rejouer ce puzzle',
+    btn1Action: () => {
+      if(_wp)_wp.style.visibility='';if(_sp)_sp.style.visibility='';
+      startPuzzleEscape(currentLevelIdx, _el.blueprint.id);
+    },
+    isPuzzle: true,
   });
 }
 function puzzleFillColumnBelow(board,bRows,bCols,allWords,col,fromRowIdx,reservedCells){
@@ -11510,10 +11511,15 @@ function showVictoryDebrief({ congrats, score, words, btn1Text, btn1Action, isPu
   btn1.textContent = btn1Text;
   btn1.onclick = () => { hideVictoryDebrief(); btn1Action(); };
 
-  // ── 8. Affichage ──
+  // ── 8. Affichage + Fluent 3D ──
   document.getElementById('victory-overlay').classList.remove('hidden');
   if (typeof resumeConfetti === 'function') resumeConfetti();
-  if (typeof applyFluent === 'function') setTimeout(() => applyFluent(), 80);
+  // Appliquer Fluent 3D sur tous les emojis injectés dynamiquement
+  if (typeof fluent === 'function') {
+    setTimeout(() => {
+      fluent(document.getElementById('victory-overlay'));
+    }, 80);
+  }
 }
 
 function hideVictoryDebrief() {
