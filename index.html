@@ -1936,49 +1936,158 @@ flex: 0 0 42%;
   to{box-shadow:0 7px 32px rgba(255,0,102,.7),0 0 20px rgba(249,208,0,.4),0 2px 6px rgba(0,0,0,.08);}
 }
 
-/* ── Overlay transition survie ── */
-#survie-transition{
-  position:fixed;inset:0;z-index:500;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:12px;
-  background:rgba(10,5,30,.88);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  pointer-events:none;
+/* ══════════════════════════════════════════════════════
+   OVERLAY TRANSITION SURVIE
+══════════════════════════════════════════════════════ */
+#survie-transition {
+  position: fixed; inset: 0; z-index: 500;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 0; pointer-events: none; overflow: hidden;
+  background: linear-gradient(160deg,
+    var(--st-c1, rgba(123,47,255,.94)) 0%,
+    var(--st-c2, rgba(255,0,102,.92))  45%,
+    var(--st-c3, rgba(0,170,238,.94))  100%);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  opacity: 0; transform: scale(1.02);
+  transition: opacity .22s ease, transform .22s ease;
 }
-#survie-transition.hidden{display:none!important;}
-#survie-transition .st-label{
-  font-family:'Fredoka One',cursive;
-  font-size:clamp(14px,3.5vw,18px);
-  color:#a855f7;letter-spacing:3px;text-transform:uppercase;
+#survie-transition.visible { opacity: 1; transform: scale(1); }
+#survie-transition.hidden  { display: none !important; }
+
+/* ── Magic bubbles (cdots identiques au jeu) ── */
+#st-bubbles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.st-cdot {
+  position: absolute; border-radius: 50%; opacity: 0;
+  animation: cdotFloat var(--cd) ease-in-out var(--cdelay) infinite;
 }
-#survie-transition .st-emoji{
-  font-size:clamp(64px,18vw,100px);
-  line-height:1;
-  animation:stEmojiBounce .5s cubic-bezier(.34,1.56,.64,1) both;
+@keyframes cdotFloat {
+  0%   { opacity: 0; transform: translateY(0) scale(.5); }
+  30%  { opacity: var(--cop); }
+  70%  { opacity: var(--cop); }
+  100% { opacity: 0; transform: translateY(-40px) scale(1); }
 }
-@keyframes stEmojiBounce{from{opacity:0;transform:scale(.4) rotate(-15deg)}to{opacity:1;transform:scale(1) rotate(0deg)}}
-#survie-transition .st-name{
-  font-family:'Fredoka One',cursive;
-  font-size:clamp(22px,6vw,34px);
-  color:#fff;
-  text-shadow:-2px -2px 0 #1a0050,2px -2px 0 #1a0050,-2px 2px 0 #1a0050,2px 2px 0 #1a0050;
+
+/* ── Label ── */
+.st-label {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(22px, 6vw, 34px);
+  color:var(--lavender); text-align: center;
+  opacity: 0; position: relative; z-index: 1; margin-top: 2px;
+  margin-bottom: 8px; position: relative; z-index: 1;
+  animation: stFadeDown .3s ease both;
 }
-#survie-transition .st-score{
-  font-family:'Fredoka One',cursive;
-  font-size:clamp(16px,4vw,22px);
-  color:#f9d000;
-  text-shadow:0 0 12px rgba(249,208,0,.6);
+@keyframes stFadeDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-#survie-transition .st-bar{
-  width:160px;height:6px;border-radius:50px;
-  background:rgba(255,255,255,.15);overflow:hidden;margin-top:4px;
+
+/* ── Arène centrale ── */
+.st-arena {
+  position: relative; width: 200px; height: 200px;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1; margin: 4px 0;
 }
-#survie-transition .st-bar-fill{
-  height:100%;border-radius:50px;
-  background:linear-gradient(90deg,#a855f7,#4d96ff);
-  animation:stBarFill var(--stDur,1.8s) linear forwards;
+
+/* Ancien emoji — explose exactement comme quizKanaExplode */
+.st-emoji-old {
+  position: absolute;
+  font-size: clamp(72px, 20vw, 96px); line-height: 1;
+  animation: stOldExplode .38s ease var(--crashAt, .32s) forwards;
 }
-@keyframes stBarFill{from{width:0%}to{width:100%}}
+@keyframes stOldExplode {
+  0%   { transform: scale(1);   opacity: 1; filter: brightness(1); }
+  35%  { transform: scale(1.3); opacity: .7; filter: brightness(1.6); }
+  100% { transform: scale(0);   opacity: 0; filter: brightness(2.2); }
+}
+
+/* Nouvel emoji — tombe du ciel (quizKanaDrop sans translateX) */
+.st-emoji-new {
+  position: absolute;
+  font-size: clamp(72px, 20vw, 96px); line-height: 1;
+  opacity: 0;
+  animation: stNewDrop .55s cubic-bezier(.36,.07,.19,.97) var(--dropAt, .68s) both;
+}
+@keyframes stNewDrop {
+  0%   { opacity: 0; transform: translateY(-220px) scale(.4) rotate(8deg); }
+  55%  { opacity: 1; transform: translateY(18px) scaleY(.78) scaleX(1.16) rotate(-3deg); }
+  72%  {             transform: translateY(-10px) scaleY(1.08) scaleX(.94) rotate(1deg); }
+  88%  {             transform: translateY(5px)   scaleY(.97)  scaleX(1.02); }
+  100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+}
+
+/* Ondes de choc à l'impact */
+.st-shockwave {
+  position: absolute; width: 100px; height: 100px;
+  border-radius: 50%; border: 4px solid rgba(255,255,255,.85);
+  pointer-events: none; opacity: 0;
+  animation: shockwaveRing .5s ease-out var(--shockAt, .72s) forwards;
+}
+.st-shockwave:nth-child(2) {
+  animation-delay: calc(var(--shockAt, .72s) + .07s);
+  border-color: rgba(255,220,0,.75);
+}
+@keyframes shockwaveRing {
+  0%   { opacity: .9; transform: scale(.3); }
+  99%  { opacity: 0;  transform: scale(2.8); }
+  100% { opacity: 0;  transform: scale(2.8); display: none; }
+}
+
+/* "準備！" flash final */
+.st-ready {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(28px, 7vw, 42px); color: #fff;
+  text-shadow: 0 0 30px rgba(255,255,255,.8), 0 0 60px rgba(255,255,255,.4);
+  opacity: 0; letter-spacing: 3px; position: absolute;
+  animation: readyPop .45s cubic-bezier(.34,1.56,.64,1) var(--readyAt, 2.5s) both;
+}
+@keyframes readyPop {
+  0%   { opacity: 0; transform: scale(.3) rotate(-8deg); }
+  60%  { opacity: 1; transform: scale(1.15) rotate(2deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+/* ── Textes en dessous ── */
+.st-level-badge {
+  font-family: 'Fredoka One', cursive; font-size: clamp(12px, 3vw, 15px);
+  color:var(--lavender); background: rgba(255,255,255,.18);
+  border: 1.5px solid rgba(255,255,255,.35); border-radius: 50px;
+  padding: 4px 16px; letter-spacing: 1.5px; opacity: 0;
+  position: relative; z-index: 1; margin-top: 6px;
+  animation: stFadeDown .35s ease var(--badgeAt, .95s) both;
+}
+.st-name {
+  font-family: 'Fredoka One', cursive; font-size: clamp(22px, 6vw, 34px);
+  color:var(--lavender); text-align: center;
+  opacity: 0; position: relative; z-index: 1; margin-top: 2px;
+  animation: stNameReveal .4s cubic-bezier(.34,1.56,.64,1) var(--nameAt, 1.12s) both;
+}
+@keyframes stNameReveal {
+  from { opacity: 0; transform: scale(.7) translateY(10px); }
+  to   { opacity: 1; transform: scale(1)  translateY(0); }
+}
+.st-score {
+  font-family: 'Fredoka One', cursive; font-size: clamp(14px, 3.5vw, 18px);
+  color:var(--lavender);
+  opacity: 0; position: relative; z-index: 1; margin-top: 4px;
+  animation: stScoreIn .4s cubic-bezier(.34,1.56,.64,1) var(--scoreAt, 1.28s) both;
+}
+@keyframes stScoreIn {
+  from { opacity: 0; transform: scale(.6); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.st-bar {
+  width:180px; height:6px; border-radius:50px;
+  background:var(--lavender); overflow:hidden; margin-top:14px;
+  opacity:0; position:relative; z-index:1;
+  animation:stFadeDown .3s ease var(--barAt,1.38s) both;
+}
+.st-bar-fill {
+  height:100%; border-radius:50px; background:rgba(0,0,0,.3);
+  width:100%; animation:stBarEmpty var(--stDur,1800ms) linear var(--barAt,1.38s) forwards;
+}
+@keyframes stBarEmpty { from{width:100%} to{width:0%} }
 /* Contenu centré avec emojis de chaque côté */
 .mode-btn-inner{
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -2439,11 +2548,15 @@ body.battle-mode .enc-toast-box.show{display:block;animation:encRise 2.2s ease f
 
 /* ═══ SPLASH SCREEN ═══ */
 #splash-screen {
-  position:fixed;inset:0;z-index:9999;
-  background:linear-gradient(160deg,var(--bg-top) 0%,var(--bg-mid) 50%,var(--bg-bot) 100%);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  cursor:pointer;
-  transition:opacity .5s ease;
+  position: fixed; inset: 0; z-index: 9999;
+  background: linear-gradient(160deg, var(--bg-top) 0%, var(--bg-mid) 50%, var(--bg-bot) 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer;
+  
+  /* --- MODIFICATIONS ICI --- */
+  transition: opacity 0.25s ease-out; /* 0.5s est trop long pour du mobile, 0.25s est le standard */
+  will-change: opacity; /* Prévient le GPU qu'on va modifier l'opacité */
+  transform: translateZ(0); /* Force la création d'un calque GPU dédié */
 }
 #splash-screen.fade-out{opacity:0;pointer-events:none;}
 #splash-screen .splash-tap{
@@ -3006,10 +3119,18 @@ body:has(#tuto-overlay:not(.hidden)) #bot-ui {
 
 <!-- ═══ SURVIE TRANSITION ═══ -->
 <div id="survie-transition" class="hidden">
+  <div id="st-bubbles"></div>
   <div class="st-label">Niveau suivant !</div>
-  <div class="st-emoji" id="st-emoji">🌊</div>
-  <div class="st-name" id="st-name">La Mer</div>
-  <div class="st-score" id="st-score">Score : 0</div>
+  <div class="st-arena" id="st-arena">
+    <div class="st-shockwave"></div>
+    <div class="st-shockwave"></div>
+    <div class="st-emoji-old" id="st-emoji-old">🌊</div>
+    <div class="st-emoji-new" id="st-emoji-new">🌸</div>
+    <div class="st-ready"    id="st-ready">準備！</div>
+  </div>
+  <div class="st-level-badge" id="st-level-badge">NIVEAU 2</div>
+  <div class="st-name"        id="st-name">Le Printemps</div>
+  <div class="st-score"       id="st-score">Score cumulé : 0</div>
   <div class="st-bar"><div class="st-bar-fill" id="st-bar-fill"></div></div>
 </div>
 
@@ -3236,7 +3357,7 @@ function fluent(el) {
       const skipIds = ['mode-level-name','quiz-kana-card','qc0','qc1','qc2','qc3',
                        'stats-grid','quiz-streak-display','quiz-progress-text',
                        'quiz-score-display','tt-kana','tt-good','tt-bad','tt-tests',
-                       'tt-streak','tt-date','st-emoji','st-name','st-score',
+                       'tt-streak','tt-date','st-emoji-old','st-emoji-new','st-name','st-score',
                        'score-val','next-kana','level-badge',
                        'mn-score-val','mn-next-kana','mn-lv-emoji','mn-lv-num',
                        'tuto-hud-next','tuto-hud-score','tuto-hud-lv-num'];
@@ -7088,42 +7209,149 @@ function _survieLaunchLevel(){
  * Appelé depuis levelDone() quand gameMode==='survie'.
  * score = score du niveau qui vient de se terminer.
  */
+/* ── Helpers transition survie ── */
+const _ST_CDOT_COLS = ['#00c8e8','#5cb85c','#e8833a','#c4a8ff','#72e8b8','#ffaa7a'];
+function _stFillBubbles(container) {
+  container.innerHTML = '';
+  for (let i = 0; i < 38; i++) {
+    const d = document.createElement('div'); d.className = 'st-cdot';
+    const sz = Math.random() * 18 + 9;
+    d.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;background:${_ST_CDOT_COLS[i%_ST_CDOT_COLS.length]};--cd:${(Math.random()*5+3).toFixed(1)}s;--cdelay:${(Math.random()*4).toFixed(1)}s;--cop:.28;`;
+    container.appendChild(d);
+  }
+}
+function _stResetEl(id) {
+  const el = document.getElementById(id);
+  const cl = el.cloneNode(true);
+  el.parentNode.replaceChild(cl, el);
+  return cl;
+}
+function _stResetShockwaves(arena) {
+  arena.querySelectorAll('.st-shockwave').forEach(s => s.remove());
+  for (let i = 0; i < 2; i++) {
+    const sw = document.createElement('div'); sw.className = 'st-shockwave';
+    arena.insertBefore(sw, arena.firstChild);
+    sw.addEventListener('animationend', () => sw.remove(), { once: true });
+  }
+}
+function _stOverlayColors(lv) {
+  const c = lv.color || '#a855f7';
+  const hex = c.replace('#','');
+  const r = parseInt(hex.slice(0,2),16), g = parseInt(hex.slice(2,4),16), b = parseInt(hex.slice(4,6),16);
+  // Mélange vers blanc pour obtenir des pastels clairs style splash/menu
+  const mix = (v, strength=0.55) => Math.round(v + (255 - v) * strength);
+  const pr = mix(r), pg = mix(g), pb = mix(b);
+  return [
+    `rgba(${pr},${Math.min(255,pg+8)},${Math.min(255,pb+12)},.96)`,
+    `rgba(${Math.min(255,pr+10)},${pg},${Math.min(255,pb+18)},.94)`,
+    `rgba(${Math.min(255,pr+6)},${Math.min(255,pg+14)},${pb},.96)`
+  ];
+}
+const _ST_T = { crash:.32, shock:.70, drop:.68, badge:.94, name:1.10, score:1.26, bar:1.36, ready:2.48, total:3400 };
+
 function _survieSlideToNextLevel(currentScore, slideFn){
   _survieScore += currentScore;
   const nextIdx = _survieLevelIdx + 1;
 
-if(nextIdx >= ACTIVE_LEVELS.length){
+  if(nextIdx >= ACTIVE_LEVELS.length){
     _survieVictory();
     return;
   }
 
   _survieLevelIdx = nextIdx;
-  const nextLv = ACTIVE_LEVELS[nextIdx];
+  const fromLv = ACTIVE_LEVELS[nextIdx - 1];
+  const nextLv  = ACTIVE_LEVELS[nextIdx];
+  const ov = document.getElementById('survie-transition');
+  const T  = _ST_T;
 
-  // Flash rapide du nom du niveau suivant (non bloquant)
-  const tr = document.getElementById('survie-transition');
-  document.getElementById('st-emoji').textContent = nextLv.emoji;
-  document.getElementById('st-name').textContent  = `→ Niveau ${nextLv.id} · ${nextLv.theme}`;
-  document.getElementById('st-score').textContent = `Score cumulé : ${_survieScore.toLocaleString('fr-FR')}`;
-  const fill = document.getElementById('st-bar-fill');
-  fill.style.animation = 'none'; void fill.offsetWidth;
-  fill.style.setProperty('--stDur', '1200ms');
-  fill.style.animation = 'stBarFill 1200ms linear forwards';
-  tr.classList.remove('hidden');
-  burst(window.innerWidth/2, window.innerHeight*.35, 28, 'logo');
+  /* Palette overlay du niveau d'arrivée */
+  const [c1,c2,c3] = _stOverlayColors(nextLv);
+  ov.style.setProperty('--st-c1', c1);
+  ov.style.setProperty('--st-c2', c2);
+  ov.style.setProperty('--st-c3', c3);
 
-  setTimeout(()=>{
-    tr.classList.add('hidden');
-    // Appliquer palette du niveau suivant
-    const palettes=[['#d4f4ff','#c8f7ef','#d4fff0'],['#fff3d4','#ffe8c0','#fdffd4'],['#d8ffd4','#e8ffd0','#fdffd4'],['#fff0d4','#ffe8cc','#fff8d4'],['#ffd4f0','#f0d4ff','#fff9d4'],['#d4eeff','#c8f4ff','#d4fff8'],['#fffbd4','#fff5c0','#fdffd4'],['#d8ffd4','#e8ffd0','#fdffd4'],['#ffd4e8','#ffe8d0','#fff9d4'],['#d4ffe8','#d4fff7','#f0ffd4'],['#d4eeff','#e8f4ff','#fff8d4'],['#d4ffd8','#f0ffd4','#fff7d4'],['#ffe8d4','#fff0e0','#fffbd4'],['#ead4ff','#ffd4f0','#fff4ff'],['#d4eeff','#d4f8ff','#f0f8ff'],['#ffd4d4','#ffe0d4','#fff4d4'],['#ead4ff','#ffd4f8','#fff9ff'],['#ffe8d4','#fff0e0','#fffbd4'],['#d4ffe8','#d4fff7','#f0fff8'],['#ffe8d0','#ffd4b0','#fff8e8'],['#d4eeff','#c8f4ff','#e8f8ff']];
-    const p = palettes[nextIdx] || palettes[0];
-    const r = document.documentElement.style;
-    r.setProperty('--bg-top', p[0]); r.setProperty('--bg-mid', p[1]); r.setProperty('--bg-bot', p[2]);
-    majStatusBar(p[0]);
-    // Glissement interne via l'API publique du player
-    if(player1 && player1.survieDoSlide) player1.survieDoSlide(nextIdx);
-    slideFn(nextIdx);
-  }, 1200);
+  /* Timing CSS */
+  ov.style.setProperty('--crashAt', `${T.crash}s`);
+  ov.style.setProperty('--shockAt', `${T.shock}s`);
+  ov.style.setProperty('--dropAt',  `${T.drop}s`);
+  ov.style.setProperty('--badgeAt', `${T.badge}s`);
+  ov.style.setProperty('--nameAt',  `${T.name}s`);
+  ov.style.setProperty('--scoreAt', `${T.score}s`);
+  ov.style.setProperty('--barAt',   `${T.bar}s`);
+  ov.style.setProperty('--readyAt', `${T.ready}s`);
+  ov.style.setProperty('--stDur',   `${T.total - T.bar*1000 - 150}ms`);
+
+  /* Reset animations one-shot */
+  const arena = document.getElementById('st-arena');
+  _stResetShockwaves(arena);
+  const eoEl = _stResetEl('st-emoji-old');
+  const enEl = _stResetEl('st-emoji-new');
+  _stResetEl('st-ready');
+  _stResetEl('st-bar-fill');
+
+  /* Bulles */
+  _stFillBubbles(document.getElementById('st-bubbles'));
+
+  /* Contenu texte */
+  eoEl.textContent = fromLv.emoji;
+  enEl.textContent = nextLv.emoji;
+  document.getElementById('st-ready').textContent       = '';
+  document.getElementById('st-level-badge').textContent = `NIVEAU ${nextLv.id}`;
+  document.getElementById('st-name').textContent        = nextLv.theme;
+  document.getElementById('st-score').textContent       = `Score cumulé : ${_survieScore.toLocaleString('fr-FR')}`;
+
+  /* Fluent 3D — applique l'img sur un élément dont le textContent = emoji */
+  const _stApplyFluent = (el, emoji) => {
+    const img = document.createElement('img');
+    img.src = _fluentUrl(emoji);
+    img.style.cssText = 'width:1em;height:1em;object-fit:contain;pointer-events:none;' ;
+    img.alt = emoji;
+    img.onerror = () => img.replaceWith(document.createTextNode(emoji));
+    el.textContent = ''; el.appendChild(img);
+  };
+
+  /* Précharge une image Fluent, résout dès chargée ou en erreur */
+  const _stPreload = emoji => new Promise(resolve => {
+    const img = new Image();
+    img.onload = img.onerror = () => resolve();
+    img.src = _fluentUrl(emoji);
+  });
+
+  /* Lance l'overlay uniquement quand les 2 emojis sont prêts (max 1.5s) */
+  const _timeout = new Promise(resolve => setTimeout(resolve, 1500));
+  Promise.all([
+    Promise.race([_stPreload(fromLv.emoji), _timeout]),
+    Promise.race([_stPreload(nextLv.emoji), _timeout])
+  ]).then(() => {
+
+    /* Applique les emojis Fluent */
+    _stApplyFluent(eoEl, fromLv.emoji);
+    setTimeout(() => {
+      const enElNow = document.getElementById('st-emoji-new');
+      if(enElNow) _stApplyFluent(enElNow, nextLv.emoji);
+    }, T.drop * 1000 - 40);
+
+    /* Affichage de l'overlay */
+    ov.classList.remove('hidden');
+    requestAnimationFrame(() => requestAnimationFrame(() => ov.classList.add('visible')));
+
+    /* Fermeture après la durée totale de l'animation */
+    setTimeout(() => {
+      ov.classList.remove('visible');
+      setTimeout(() => {
+        ov.classList.add('hidden');
+        /* Appliquer palette de fond du niveau suivant */
+        const palettes=[['#d4f4ff','#c8f7ef','#d4fff0'],['#fff3d4','#ffe8c0','#fdffd4'],['#d8ffd4','#e8ffd0','#fdffd4'],['#fff0d4','#ffe8cc','#fff8d4'],['#ffd4f0','#f0d4ff','#fff9d4'],['#d4eeff','#c8f4ff','#d4fff8'],['#fffbd4','#fff5c0','#fdffd4'],['#d8ffd4','#e8ffd0','#fdffd4'],['#ffd4e8','#ffe8d0','#fff9d4'],['#d4ffe8','#d4fff7','#f0ffd4'],['#d4eeff','#e8f4ff','#fff8d4'],['#d4ffd8','#f0ffd4','#fff7d4'],['#ffe8d4','#fff0e0','#fffbd4'],['#ead4ff','#ffd4f0','#fff4ff'],['#d4eeff','#d4f8ff','#f0f8ff'],['#ffd4d4','#ffe0d4','#fff4d4'],['#ead4ff','#ffd4f8','#fff9ff'],['#ffe8d4','#fff0e0','#fffbd4'],['#d4ffe8','#d4fff7','#f0fff8'],['#ffe8d0','#ffd4b0','#fff8e8'],['#d4eeff','#c8f4ff','#e8f8ff']];
+        const p = palettes[nextIdx] || palettes[0];
+        const rs = document.documentElement.style;
+        rs.setProperty('--bg-top', p[0]); rs.setProperty('--bg-mid', p[1]); rs.setProperty('--bg-bot', p[2]);
+        majStatusBar(p[0]);
+        if(player1 && player1.survieDoSlide) player1.survieDoSlide(nextIdx);
+        slideFn(nextIdx);
+      }, 260);
+    }, T.total);
+
+  }); // fin Promise.all
 }
 
 /**
@@ -11278,10 +11506,23 @@ function hidePuzzlePanel(){
 }
 // ═══ MOBILE SPLASH ═══
 function splashEnter(){
-  const s=document.getElementById('splash-screen');
+  const s = document.getElementById('splash-screen');
+  
+  // 1. Tuer immédiatement les animations internes pour libérer le GPU
+  const splashConfetti = document.getElementById('confetti-splash');
+  if (splashConfetti) splashConfetti.style.display = 'none';
+  
+  // 2. Lancer le fade-out
   s.classList.add('fade-out');
-  if(typeof BURST_CTX!=='undefined'&&BURST_CTX) BURST_CTX.clearRect(0,0,BURST_CANVAS.width,BURST_CANVAS.height);
-  setTimeout(()=>{s.style.display='none';},500);
+  
+  if(typeof BURST_CTX !== 'undefined' && BURST_CTX) {
+    BURST_CTX.clearRect(0,0,BURST_CANVAS.width,BURST_CANVAS.height);
+  }
+  
+  // 3. Retirer du DOM (On passe à 250ms ou 300ms pour correspondre au nouveau CSS)
+  setTimeout(() => { 
+    s.style.display = 'none'; 
+  }, 280); 
 }
 
 // ═══ MOBILE NAV SYNC ═══
