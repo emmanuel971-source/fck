@@ -3150,52 +3150,47 @@ function majStatusBar(hexColor) {
     }
   }
 }
-// ═══ DÉTECTION DEVICE (phone / tablet) ═══
-(function detectDevice() {
-  function _applyDeviceClass(type) {
-    window.DEVICE_TYPE = type;
-    document.body.classList.remove('device-phone', 'device-tablet');
-    document.body.classList.add('device-' + type);
+// ═══ DÉTECTION DEVICE & VERROUILLAGE ORIENTATION ═══
+async function initDeviceAndOrientation() {
+  let deviceType = 'phone'; // Téléphone par défaut
+
+  // 1. Fallback synchrone basé sur la résolution
+  const smallSide = Math.min(screen.width, screen.height);
+  if (smallSide >= 600) {
+    deviceType = 'tablet';
   }
 
-  // Fallback résolution : la petite dimension >= 600px → tablette
-  function _fallback() {
-    const smallSide = Math.min(screen.width, screen.height);
-    _applyDeviceClass(smallSide >= 600 ? 'tablet' : 'phone');
+  // 2. Vérification Capacitor (Asynchrone)
+  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Device) {
+    try {
+      const info = await window.Capacitor.Plugins.Device.getInfo();
+      deviceType = info.deviceType === 'tablet' ? 'tablet' : 'phone';
+    } catch (e) {
+      console.warn("[Device] Erreur de détection Capacitor, utilisation du fallback:", e);
+    }
   }
 
-  // Tentative Capacitor Device plugin
-  try {
-    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Device) {
-      window.Capacitor.Plugins.Device.getInfo().then(function(info) {
-        _applyDeviceClass(info.deviceType === 'tablet' ? 'tablet' : 'phone');
-      }).catch(_fallback);
-    } else {
-      _fallback();
+  // 3. Application des classes CSS et de la variable globale
+  window.DEVICE_TYPE = deviceType;
+  document.body.classList.remove('device-phone', 'device-tablet');
+  document.body.classList.add('device-' + deviceType);
+
+  // 4. Verrouillage de l'orientation via Capacitor
+  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.ScreenOrientation) {
+    try {
+      const targetOrientation = deviceType === 'tablet' ? 'landscape' : 'portrait';
+  // On utilise bien la propriété "orientation" !
+await window.Capacitor.Plugins.ScreenOrientation.lock({ orientation: targetOrientation });
+      console.log(`[Orientation] Verrouillé en mode: ${targetOrientation}`);
+    } catch (e) {
+      console.warn('[ScreenOrientation] Échec du verrouillage:', e);
     }
-  } catch(e) {
-    _fallback();
   }
-})();
-// ═══ VERROUILLAGE ORIENTATION ═══
-(function lockOrientation() {
-  try {
-    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.ScreenOrientation) {
-      const SO = window.Capacitor.Plugins.ScreenOrientation;
-      // On attend que DEVICE_TYPE soit défini (detectDevice s'exécute juste avant)
-      const orientation = window.DEVICE_TYPE === 'tablet' ? 'landscape' : 'portrait';
-      SO.lock({ orientation: orientation }).catch(function(e) {
-        console.warn('[ScreenOrientation] lock failed:', e);
-      });
-    }
-    // Pas de fallback navigateur : l'API Screen Orientation Web est trop restrictive
-    // (nécessite un geste utilisateur). On ignore silencieusement.
-  } catch(e) {
-    console.warn('[ScreenOrientation] erreur:', e);
-  }
-})();
-// ═══════════════════════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════════════════
+}
+
+// Lancement de l'initialisation
+initDeviceAndOrientation();
+
 // ═══ FLUENT EMOJI 3D — Microsoft (MIT License) ═══
 // Approche par codepoint unicode — URL calculée dynamiquement, sans dictionnaire
 
@@ -6626,7 +6621,7 @@ function getLevelTopology(levelWords) {
 function startPuzzleEscape(levelIdx, difficulty = 1) {
   const _idx = levelIdx !== undefined ? levelIdx : 0;
   const wordsForLevel = ACTIVE_LEVELS[_idx].words.map(w=>({...w}));
-
+  document.getElementById('shell').style.display = '';
   // 1. Calcul dynamique de l'ID du blueprint
   const topology = getLevelTopology(wordsForLevel);
   
@@ -6663,6 +6658,7 @@ const targetBlueprintId = `escape_d${difficulty}_${topology}`;
     });
     return;
   }
+document.getElementById('shell').classList.remove('hidden');
 // Activer le layout mobile AVANT startGame
   if(window.DEVICE_TYPE !== 'tablet') {
     document.body.classList.add('mobile-ingame');
@@ -7046,6 +7042,7 @@ function modeTabSwitch(tab){
 // ── Lancer le jeu depuis l'écran mode ──
 function modeStart(mode){
   document.getElementById('mode-overlay').classList.add('hidden');
+  document.getElementById('shell').style.display = '';
   gameMode=mode;
   // Activer le layout mobile AVANT startGame pour que calcRows() en tienne compte
   if(window.DEVICE_TYPE !== 'tablet') {
@@ -8389,6 +8386,7 @@ function showMenu(){
   player1.stopGame();
   if(typeof _mobileNavHide==='function') _mobileNavHide();
   if(typeof resumeConfetti==='function') resumeConfetti();
+  document.getElementById('shell').style.display = 'none';
   document.getElementById('board-overlay').classList.add('hidden');
   document.getElementById('mode-overlay').classList.add('hidden');
   document.getElementById('menu-overlay').classList.remove('hidden');
@@ -10464,6 +10462,7 @@ function updateQuizLists() {
 updateQuizLists();
 
 function showQuiz(){
+  document.getElementById('shell').style.display = 'none'
   document.getElementById('menu-overlay').classList.add('hidden');
   document.getElementById('quiz-overlay').classList.remove('hidden');
   
