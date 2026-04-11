@@ -1944,10 +1944,8 @@ flex: 0 0 42%;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   gap: 0; pointer-events: none; overflow: hidden;
-  background: linear-gradient(160deg,
-    var(--st-c1, rgba(123,47,255,.94)) 0%,
-    var(--st-c2, rgba(255,0,102,.92))  45%,
-    var(--st-c3, rgba(0,170,238,.94))  100%);
+  /* Nouveau fond frais basé sur tes variables globales */
+  background: linear-gradient(160deg, var(--bg-top) 0%, var(--bg-mid) 50%, var(--bg-bot) 100%);
   backdrop-filter: blur(20px) saturate(1.8);
   -webkit-backdrop-filter: blur(20px) saturate(1.8);
   opacity: 0; transform: scale(1.02);
@@ -1994,12 +1992,25 @@ flex: 0 0 42%;
 .st-emoji-old {
   position: absolute;
   font-size: clamp(72px, 20vw, 96px); line-height: 1;
+  filter: drop-shadow(0 6px 0px rgba(0,0,0,.15)) drop-shadow(0 8px 12px rgba(0,0,0,.25));
   animation: stOldExplode .38s ease var(--crashAt, .32s) forwards;
 }
 @keyframes stOldExplode {
-  0%   { transform: scale(1);   opacity: 1; filter: brightness(1); }
-  35%  { transform: scale(1.3); opacity: .7; filter: brightness(1.6); }
-  100% { transform: scale(0);   opacity: 0; filter: brightness(2.2); }
+  0%   { 
+    transform: scale(1);   
+    opacity: 1; 
+    filter: brightness(1) drop-shadow(0 6px 0px rgba(0,0,0,.15)) drop-shadow(0 8px 12px rgba(0,0,0,.25)); 
+  }
+  35%  { 
+    transform: scale(1.3); 
+    opacity: .7; 
+    filter: brightness(1.6) drop-shadow(0 4px 0px rgba(0,0,0,.10)) drop-shadow(0 6px 10px rgba(0,0,0,.15)); 
+  }
+  100% { 
+    transform: scale(0);   
+    opacity: 0; 
+    filter: brightness(2.2) drop-shadow(0 0px 0px rgba(0,0,0,0)) drop-shadow(0 0px 0px rgba(0,0,0,0)); 
+  }
 }
 
 /* Nouvel emoji — tombe du ciel (quizKanaDrop sans translateX) */
@@ -2007,6 +2018,7 @@ flex: 0 0 42%;
   position: absolute;
   font-size: clamp(72px, 20vw, 96px); line-height: 1;
   opacity: 0;
+  filter: drop-shadow(0 6px 0px rgba(0,0,0,.15)) drop-shadow(0 8px 12px rgba(0,0,0,.25));
   animation: stNewDrop .55s cubic-bezier(.36,.07,.19,.97) var(--dropAt, .68s) both;
 }
 @keyframes stNewDrop {
