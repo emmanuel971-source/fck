@@ -155,8 +155,8 @@ body::before {
 .cell.malus{background:linear-gradient(135deg,#fdf3ea,#f7e8d5)!important;color:#1a1040!important;border:1px solid rgba(100,200,220,.12)!important;border-radius:8px;box-shadow:0 3px 0 rgba(139,69,19,.12),inset 0 1px 0 rgba(255,255,255,.7)!important;font-size:clamp(20px,7vw,32px)!important;line-height:1!important;padding-top:2px!important;}
 .cell.malus-incoming{animation:malusWobble .5s ease infinite alternate;}
 .cell.skull{background:#1a1a28!important;border:none!important;border-radius:6px!important;box-shadow:0 3px 0 rgba(0,0,0,.5)!important;font-size:clamp(20px,7vw,32px)!important;line-height:1!important;padding-top:1px!important;}
-.cell.puzzle-trigger{background:#F5C842!important;border:2px solid #BA7517!important;border-radius:6px!important;box-shadow:0 3px 0 rgba(186,117,23,.35),inset 0 1px 0 rgba(255,255,255,.6)!important;animation:triggerPulse 1.2s ease-in-out infinite alternate;}
-@keyframes triggerPulse{from{box-shadow:0 3px 0 rgba(186,117,23,.35),inset 0 1px 0 rgba(255,255,255,.6)}to{box-shadow:0 3px 12px rgba(245,200,66,.7),inset 0 1px 0 rgba(255,255,255,.6)}}
+ /*.cell.puzzle-trigger{background:#F5C842!important;border:2px solid #BA7517!important;border-radius:6px!important;box-shadow:0 3px 0 rgba(186,117,23,.35),inset 0 1px 0 rgba(255,255,255,.6)!important;animation:triggerPulse 1.2s ease-in-out infinite alternate;} */
+ /*@keyframes triggerPulse{from{box-shadow:0 3px 0 rgba(186,117,23,.35),inset 0 1px 0 rgba(255,255,255,.6)}to{box-shadow:0 3px 12px rgba(245,200,66,.7),inset 0 1px 0 rgba(255,255,255,.6)}} */
 .escape-badge{font-size:clamp(16px,4.5vw,22px);line-height:1;filter:drop-shadow(0 1px 4px rgba(0,0,0,.2));animation:floatPulse 2.8s ease-in-out infinite;}
 @keyframes skullShake{0%,100%{transform:translateX(0)}15%{transform:translateX(-5px)}30%{transform:translateX(5px)}45%{transform:translateX(-4px)}60%{transform:translateX(4px)}75%{transform:translateX(-2px)}90%{transform:translateX(2px)}}
 .skull-row-flash{animation:skullShake .5s ease forwards;}
@@ -534,7 +534,7 @@ body::before {
 }
 .word-row{
   display:flex;align-items:center;gap:8px;
-  background:#edfaf3;border:2px solid var(--border);border-radius:16px;padding:2px 10px;
+  background:#ffff;border:2px solid var(--border);border-radius:16px;padding:2px 10px;
   animation:rowSlideIn .45s cubic-bezier(.34,1.56,.64,1) forwards;
   position:relative;overflow:hidden;
   box-shadow:0 3px 10px rgba(0,150,100,.1);
@@ -600,15 +600,15 @@ body::before {
 .word-row.boss.validated { border-color: #52c97a !important; }
 
 .wr-emoji{
-  font-size:clamp(24px,1vw,20px);flex-shrink:0;line-height:1;
+  font-size:clamp(16px,1vw,18px);flex-shrink:0;line-height:1;
   filter:
     drop-shadow(0 3px 0px rgba(0,0,0,.12))
     drop-shadow(0 5px 8px rgba(0,0,0,.20));
 }
 .wr-info{flex:1;min-width:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-.wr-kana{font-size:clamp(24px,7vw,30px);font-weight:900;color:var(--text-dark);line-height:1;font-family:'Noto Sans JP',sans-serif;}
-.wr-romaji{font-size:clamp(24px,5vw,22px);color:var(--sky);font-weight:900;font-family:'Fredoka One',sans-serif;}
-.wr-meaning{font-size:clamp(24px,4.2vw,19px);color:var(--text-mid);font-family:'Nunito',sans-serif;font-weight:700;}
+.wr-kana{font-size:clamp(16px, 4.5vw, 20px);font-weight:900;color:var(--text-dark);line-height:1;font-family:'Noto Sans JP',sans-serif;}
+.wr-romaji{font-size:clamp(16px, 4.5vw, 20px);color:var(--sky);font-weight:900;font-family:'Fredoka One',sans-serif;}
+.wr-meaning{font-size:clamp(16px, 4.5vw, 20px);color:var(--text-mid);font-family:'Nunito',sans-serif;font-weight:700;}
 .wr-mult{font-family:'Fredoka One',cursive;font-size:clamp(24px,6vw,25px);color:var(--mint);text-shadow:0 0 5px rgba(46,216,160,.4);min-width:36px;text-align:right;flex-shrink:0;}
 .word-row.boss .wr-mult{color:var(--coral);}
 .wr-mult.bump{animation:multBump .32s cubic-bezier(.34,1.56,.64,1);}
@@ -1333,11 +1333,11 @@ body::before {
 }
 .victory-kana-char {
   font-family:'Noto Sans JP',sans-serif;font-weight:900;
-  font-size:clamp(21px,5.8vw,28px);color:#1a1040;line-height:1;
+  font-size:clamp(28px, 7vw, 36px);color:#1a1040;line-height:1;
 }
 .victory-kana-roma {
   font-family:'Fredoka One',cursive;
-  font-size:clamp(10px,2.6vw,12px);color:var(--sky);margin-top:2px;
+  font-size:clamp(24px, 4.2vw, 24px);color:var(--sky);margin-top:2px;
 }
 /* Grille vocabulaire — reprend .ov-word */
 #victory-vocab-grid {
@@ -1352,11 +1352,11 @@ body::before {
   animation:victoryCardIn .4s cubic-bezier(.34,1.56,.64,1) both;
 }
 .victory-vocab-card.boss { border-color:var(--neon-gold);box-shadow:0 4px 16px rgba(232,160,0,.25); }
-.vvc-emoji  { font-size:22px;display:block;margin-bottom:3px; }
-.vvc-kana   { font-family:'Noto Sans JP',sans-serif;font-size:17px;font-weight:700;color:var(--sky);display:block; }
+.vvc-emoji  { font-size:40px;display:block;margin-bottom:3px; }
+.vvc-kana   { font-family:'Noto Sans JP',sans-serif;font-size: clamp(18px, 4.5vw, 24px);font-weight:700;color:var(--sky);display:block; }
 .vvc-kana.boss { color:var(--neon-gold); }
-.vvc-romaji { font-size:11px;color:var(--text-dim);display:block;letter-spacing:.3px; }
-.vvc-meaning{ font-size:11px;color:var(--text-mid);display:block;font-weight:800;margin-top:1px; }
+.vvc-romaji { font-size: clamp(13px, 3vw, 15px);color:var(--text-dim);display:block;letter-spacing:.3px; }
+.vvc-meaning{ font-size: clamp(13px, 3vw, 15px);color:var(--text-mid);display:block;font-weight:800;margin-top:1px; }
 /* Boutons */
 #victory-btn-group {
   flex-shrink:0;
@@ -2131,7 +2131,7 @@ backface-visibility: hidden;
 /* ── Cards SN puzzle (style cohérent avec boutons) ── */
 .mode-sn-card{
   display:flex;align-items:center;justify-content:center;gap:10px;
-  border-radius:24px;padding:16px 20px;cursor:pointer;
+  border-radius:24px;padding:6px 8px;cursor:pointer;
   background:white;
   border:2.5px solid transparent;
   box-shadow:0 6px 20px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.04);
@@ -2201,14 +2201,14 @@ backface-visibility: hidden;
 }
 
 /* ═══ PUZZLE TRIGGER PULSE ═══ */
-.cell.puzzle-trigger{
+/*.cell.puzzle-trigger{
   animation: triggerPulse 1.1s ease-in-out infinite !important;
-  z-index:5;
+ z-index:5;
 }
 @keyframes triggerPulse{
   0%,100%{box-shadow:0 0 0 2px #f9d000, 0 0 8px 3px rgba(249,208,0,.5);filter:brightness(1.1);}
   50%{box-shadow:0 0 0 4px #ff8c00, 0 0 16px 6px rgba(255,140,0,.6);filter:brightness(1.3);}
-}
+}*/
 /* ═══ GAME OVERLAY ═══ */
 
 #board-overlay {
@@ -6730,7 +6730,7 @@ function escapeCheckTriggers() {
       console.log('[EscapePuzzle] Trigger déclenché :', key);
       
       // Ton feedback visuel
-      _showEscapeTriggerToast();
+      //_showEscapeTriggerToast();
       
       // Optionnel : Tu pourrais aussi déclencher ici une vérification de victoire 
       // si tous les triggers sont à true.
@@ -10835,7 +10835,7 @@ card.innerHTML = `<img src="${fUrl}" class="femoji" alt="${item.emoji}" style="w
       btn.textContent=k;
       // Adapter la taille selon la longueur du mot
       const kLen=[...k].length;
-      const fs = kLen>=5?'clamp(12px,3.2vw,16px)':kLen>=4?'clamp(13px,3.5vw,18px)':kLen>=3?'clamp(14px,4vw,20px)':'clamp(16px,4.5vw,22px)';
+      const fs = kLen>=5?'clamp(14px,4vw,19px)':kLen>=4?'clamp(15px,4.5vw,21px)':kLen>=3?'clamp(17px,5vw,24px)':'clamp(19px,5.5vw,27px)';
       btn.style.fontSize=fs;
       btn.style.fontFamily="'Noto Sans JP',sans-serif";
       btn.style.fontWeight='900';
