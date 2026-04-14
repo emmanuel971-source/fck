@@ -1244,10 +1244,10 @@ body::before {
   margin:0 16px;flex-shrink:0;
   background:rgba(255,255,255,.96);
   border:2.5px solid #a855f7;
-  border-radius:22px 22px 22px 6px;
+  border-radius: 6px 22px 22px 22px;
   padding:11px 16px 13px;
   font-family:'Nunito',sans-serif;font-weight:800;
-  font-size:clamp(13px,3.4vw,15px);
+  font-size:clamp(16px,4vw,16px);
   color:#1a1040;line-height:1.55;
   box-shadow:0 8px 28px rgba(168,85,247,.18),0 2px 0 rgba(168,85,247,.1);
   position:relative;
@@ -1256,7 +1256,7 @@ body::before {
 }
 #victory-bubble::before {
   content:'';position:absolute;
-  top:-13px;left:22px;
+  top:-13px;left:122px;
   border-left:10px solid transparent;
   border-right:6px solid transparent;
   border-bottom:13px solid #a855f7;
@@ -1264,11 +1264,11 @@ body::before {
 }
 /* Onglet Vocab : queue à droite, bulle miroir */
 #victory-bubble.bubble-vocab {
-  border-radius:22px 22px 6px 22px;
+  border-radius:22px 6px 22px 22px;
 }
 #victory-bubble.bubble-vocab::before {
   left:auto;
-  right:22px;
+  right:122px;
   border-left:6px solid transparent;
   border-right:10px solid transparent;
 }
