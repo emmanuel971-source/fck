@@ -8588,15 +8588,24 @@ document.addEventListener('touchstart', e => {
   const screenW = Math.min(window.innerWidth, 480);
   cellW = Math.floor(screenW / COLS);
 
-  // Long press pour hard drop
-  clearTimeout(lpTimer);
-  lpTimer = setTimeout(() => {
-    if (player1.gameRunning && !player1.resolvingWords && player1.active) {
-      if (navigator.vibrate) navigator.vibrate(25);
-      player1.hardDrop();
-      lpTimer = null;
-    }
-  }, LP_MS);
+  // Long press pour soft drop
+
+let softDropInterval = null; // à déclarer avec les autres variables en haut
+
+lpTimer = setTimeout(() => {
+  if (player1.gameRunning && !player1.resolvingWords && player1.active) {
+    if (navigator.vibrate) navigator.vibrate(18);
+    // Démarre la descente rapide en continu
+    softDropInterval = setInterval(() => {
+      if (player1.gameRunning && !player1.resolvingWords && player1.active) {
+        player1.softDrop();
+      } else {
+        clearInterval(softDropInterval);
+        softDropInterval = null;
+      }
+    }, 80); // ~80ms entre chaque pas, soit ~12 cases/sec — à ajuster selon le feeling
+  }
+}, LP_MS);
 }, {passive: true});
 document.addEventListener('touchmove', e => {
   if (!player1.gameRunning || player1.resolvingWords || !player1.active) return;
@@ -8608,6 +8617,11 @@ document.addEventListener('touchmove', e => {
   if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
     clearTimeout(lpTimer);
     lpTimer = null;
+      // AJOUT
+  if (softDropInterval) {
+    clearInterval(softDropInterval);
+    softDropInterval = null;
+  }
   }
 
   // --- RÉGLAGE DE LA SENSIBILITÉ ---
@@ -8638,6 +8652,11 @@ document.addEventListener('touchmove', e => {
 document.addEventListener('touchend', e => {
   clearTimeout(lpTimer);
   lpTimer = null;
+    // AJOUT : arrêt de la descente rapide
+  if (softDropInterval) {
+    clearInterval(softDropInterval);
+    softDropInterval = null;
+  }
 }, {passive: true});
 // ═══════════════════════════════════════════════════════════════════
 //  MENU PUBLIC — showMenu / showTuto / showPuzzleSelect
