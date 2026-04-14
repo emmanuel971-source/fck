@@ -10694,13 +10694,13 @@ let QUIZ_KANA_LIST = [];
 let QUIZ_VOCAB_LIST = [];
 
 // Cette fonction sera appelée à chaque changement d'onglet Hiragana/Katakana
+// Cette fonction sera appelée à chaque changement d'onglet Hiragana/Katakana
 function updateQuizLists() {
   const seenKana = new Set();
   const kanaList = [];
-  // On ajoute les petits kana Katakana (ャ, ュ, ョ, etc.) à la liste d'exclusion
   const smallKana = new Set(['ゃ','ゅ','ょ','っ','ぁ','ぃ','ぅ','ぇ','ぉ', 'ャ','ュ','ョ','ッ','ァ','ィ','ゥ','ェ','ォ','ー']);
   
-  ACTIVE_LEVELS.forEach(lv => {
+  ACTIVE_LEVELS.forEach((lv, levelIndex) => { // <-- Ajout de levelIndex
     lv.words.forEach(w => {
       const chars = [...w.kana];
       let i = 0;
@@ -10716,7 +10716,8 @@ function updateQuizLists() {
           ACTIVE_LEVELS.forEach(lv2 => {
             lv2.words.forEach(ww => { if(ww.kana.includes(token)) candidates.push(ww); });
           });
-          kanaList.push({ kana: token, exWord: candidates[0]||w, candidates: candidates.length?candidates:[w] });
+          // <-- On injecte le levelIdx ici
+          kanaList.push({ kana: token, exWord: candidates[0]||w, candidates: candidates.length?candidates:[w], levelIdx: levelIndex });
         }
       }
     });
@@ -10725,11 +10726,12 @@ function updateQuizLists() {
 
   const seenVocab = new Set();
   const vocabList = [];
-  ACTIVE_LEVELS.forEach(lv => {
+  ACTIVE_LEVELS.forEach((lv, levelIndex) => { // <-- Ajout de levelIndex
     lv.words.forEach(w => {
       if(!seenVocab.has(w.kana)){
         seenVocab.add(w.kana);
-        vocabList.push(w);
+        // <-- On clone l'objet mot et on y ajoute le levelIdx
+        vocabList.push({...w, levelIdx: levelIndex});
       }
     });
   });
@@ -10764,11 +10766,22 @@ function showQuiz(){
 }
 
 function _quizInitQueue(){
-  if(_quizMode==='hiragana'){
-    _quizQueue = QUIZ_KANA_LIST.map((_,i)=>i);
-  } else {
-    _quizQueue = QUIZ_VOCAB_LIST.map((_,i)=>i);
-  }
+  const list = _quizMode === 'hiragana' ? QUIZ_KANA_LIST : QUIZ_VOCAB_LIST;
+  
+  // On mappe la liste pour garder l'index d'origine et le niveau associé
+  let queue = list.map((item, idx) => ({ index: idx, levelIdx: item.levelIdx }));
+  
+  // On trie pour mettre les items du niveau sélectionné (et suivants) en premier, 
+  // puis on "wrap around" pour mettre les niveaux précédents à la fin.
+  queue.sort((a, b) => {
+    // Si le niveau est avant celui sélectionné, on lui donne un gros poids pour le repousser à la fin
+    const weightA = a.levelIdx >= pendingLevelIdx ? a.levelIdx : a.levelIdx + 1000;
+    const weightB = b.levelIdx >= pendingLevelIdx ? b.levelIdx : b.levelIdx + 1000;
+    return weightA - weightB;
+  });
+  
+  // On ne garde que les index pour la file d'attente finale
+  _quizQueue = queue.map(q => q.index);
 }
 
 function hideQuiz(){
