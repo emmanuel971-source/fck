@@ -753,15 +753,11 @@ body::before {
 }
 #lz-header {
   flex-shrink: 0;
-  padding: clamp(14px,3dvh,22px) 16px 8px;
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: clamp(6px,1.5dvh,12px) 16px 6px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
 }
-.lz-title {
-  font-family: 'Fredoka One', cursive;
-  font-size: clamp(22px,6vw,30px);
-  color: var(--sky);
-  text-shadow: 0 0 16px rgba(0,170,238,.3);
-  text-align: center;
+#lz-header .logo-wrap {
+  margin-bottom: 2px;
 }
 .lz-sub {
   font-family: 'Nunito', sans-serif;
@@ -797,54 +793,53 @@ body::before {
 }
 .lz-btn {
   font-family: 'Fredoka One', cursive;
-  border-radius: 18px;
-  border: 2px solid transparent;
+  border-radius: 22px;
+  border: 2.5px solid var(--lz-color);
+  border-color: color-mix(in srgb, var(--lz-color) 40%, transparent);
   padding: 0 18px;
-  height: clamp(50px, 12vw, 60px);
+  height: clamp(52px, 13vw, 64px);
   cursor: pointer;
-  background: rgba(255,255,255,.72);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow: 0 4px 14px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.9);
-  transition: transform .15s cubic-bezier(.34,1.56,.64,1), box-shadow .15s;
+  background: white;
+  box-shadow: 0 6px 20px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.04);
+  transition: transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .18s;
   display: flex; flex-direction: row; align-items: center;
   gap: 10px;
   width: 100%;
+  position: relative; overflow: hidden;
 }
-.lz-btn:active { transform: scale(.96); box-shadow: 0 2px 6px rgba(0,0,0,.06); }
+.lz-btn::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--lz-color);
+  opacity: .08; border-radius: 20px; pointer-events: none;
+}
+.lz-btn::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,.5) 0%, transparent 60%);
+  pointer-events: none;
+}
+.lz-btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 28px rgba(0,0,0,.13); }
+.lz-btn:active { transform: scale(.97); box-shadow: 0 2px 8px rgba(0,0,0,.06); }
 .lz-btn-kanas {
   font-family: 'Noto Sans JP', sans-serif;
   font-weight: 900;
   font-size: clamp(16px,4.5vw,20px);
-  color: #1a1040;
+  color: var(--lz-color);
+  color: color-mix(in srgb, var(--lz-color) 70%, #1a1040);
   letter-spacing: .05em;
   flex-shrink: 0;
+  position: relative; z-index: 1;
+  text-shadow: 0 1px 3px rgba(0,0,0,.1);
 }
 .lz-btn-label {
   font-family: 'Fredoka One', cursive;
   font-size: clamp(15px,4vw,18px);
-  color: var(--text-mid);
+  color: var(--lz-color);
+  color: color-mix(in srgb, var(--lz-color) 75%, #1a1040);
   flex: 1;
   text-align: right;
+  position: relative; z-index: 1;
+  text-shadow: 0 1px 4px rgba(0,0,0,.12);
 }
-.lz-btn.grp-base {
-  border-color: rgba(77,150,255,.3);
-  background: rgba(220,235,255,.65);
-}
-.lz-btn.grp-base:hover { border-color: #4d96ff; transform: translateY(-2px) scale(1.01); }
-.lz-btn.grp-base .lz-btn-label { color: #3a7ad5; }
-.lz-btn.grp-daku {
-  border-color: rgba(199,125,255,.3);
-  background: rgba(235,220,255,.65);
-}
-.lz-btn.grp-daku:hover { border-color: #c77dff; transform: translateY(-2px) scale(1.01); }
-.lz-btn.grp-daku .lz-btn-label { color: #9b52d6; }
-.lz-btn.grp-han {
-  border-color: rgba(255,107,107,.3);
-  background: rgba(255,225,220,.65);
-}
-.lz-btn.grp-han:hover { border-color: #ff6b6b; transform: translateY(-2px) scale(1.01); }
-.lz-btn.grp-han .lz-btn-label { color: #d94040; }
 #lz-back-btn {
   flex-shrink: 0;
   font-family: 'Fredoka One', cursive;
@@ -3171,7 +3166,28 @@ body:has(#tuto-overlay:not(.hidden)) #bot-ui {
   <div id="confetti-lz" style="position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;"></div>
   <div id="lz-inner">
     <div id="lz-header">
-      <div class="lz-title">📖 Tableau officiel</div>
+      <div class="logo-wrap" style="animation-name:floatPulse;">
+        <div class="logo-card">
+          <div class="logo-droplet ld1"><svg width="16" height="21" viewBox="0 0 16 22"><path d="M8 0C8 0 16 10 16 14A8 8 0 0 1 0 14C0 10 8 0 8 0Z" fill="#ff6b6b" stroke="#fff" stroke-width="3"/></svg></div>
+          <div class="logo-droplet ld2"><svg width="14" height="19" viewBox="0 0 16 22"><path d="M8 0C8 0 16 10 16 14A8 8 0 0 1 0 14C0 10 8 0 8 0Z" fill="#4d96ff" stroke="#fff" stroke-width="3"/></svg></div>
+          <div class="logo-droplet ld3"><svg width="14" height="19" viewBox="0 0 16 22"><path d="M8 0C8 0 16 10 16 14A8 8 0 0 1 0 14C0 10 8 0 8 0Z" fill="#6bcb77" stroke="#fff" stroke-width="3"/></svg></div>
+          <div class="logo-droplet ld4"><svg width="12" height="17" viewBox="0 0 16 22"><path d="M8 0C8 0 16 10 16 14A8 8 0 0 1 0 14C0 10 8 0 8 0Z" fill="#ffbe0b" stroke="#fff" stroke-width="3"/></svg></div>
+          <div class="logo-droplet ld5"><svg width="11" height="16" viewBox="0 0 16 22"><path d="M8 0C8 0 16 10 16 14A8 8 0 0 1 0 14C0 10 8 0 8 0Z" fill="#c77dff" stroke="#fff" stroke-width="3"/></svg></div>
+          <div class="logo-bubble lb1"></div>
+          <div class="logo-bubble lb2"></div>
+          <div class="logo-bubble lb3"></div>
+  <div class="kana-group">
+    <span class="kana-outline-d">かな</span>
+    <span class="kana-outline-w">かな</span>
+    <span class="kana-main">かな</span>
+  </div>
+  <div class="drop-group">
+    <span class="drop-outline-d">DROP!</span>
+    <span class="drop-outline-w">DROP!</span>
+    <span class="drop-main">DROP!</span>
+  </div>
+        </div>
+      </div>
       <div class="lz-sub">Choisis un groupe de kanas à pratiquer</div>
     </div>
     <div id="lz-scroll">
@@ -7670,12 +7686,19 @@ const LEVEL_ZERO_IDX = 9999;  // index virtuel sentinel
 
 // Construit la grille de groupes dans l'overlay
 function buildLevelZeroGrid() {
+  const colorMaps = {
+    base: ['#4d96ff','#00c8e8','#6bcb77','#ffbe0b','#ff8c42','#2ec4b6','#44ccff','#aadc00','#ff6b9d','#7b61ff'],
+    daku: ['#c77dff','#a855f7','#e040fb','#9b52d6'],
+    han:  ['#ff6b6b']
+  };
   ['base','daku','han'].forEach(type => {
     const gridEl = document.getElementById(`lz-grid-${type === 'base' ? 'base' : type === 'daku' ? 'daku' : 'han'}`);
     gridEl.innerHTML = '';
-    LEVEL_ZERO_GROUPS.filter(g => g.type === type).forEach(grp => {
+    const palette = colorMaps[type];
+    LEVEL_ZERO_GROUPS.filter(g => g.type === type).forEach((grp, i) => {
       const btn = document.createElement('button');
-      btn.className = `lz-btn grp-${type}`;
+      btn.className = 'lz-btn';
+      btn.style.setProperty('--lz-color', palette[i % palette.length]);
       btn.innerHTML = `<span class="lz-btn-kanas">${grp.kanas.join('\u2009')}</span><span class="lz-btn-label">${grp.label}</span>`;
       btn.addEventListener('click', () => selectLevelZeroGroup(grp.id));
       gridEl.appendChild(btn);
@@ -11136,31 +11159,81 @@ function showQuiz(){
   _quizRender();
 }
 
-function _quizInitQueue(){
+function _quizInitQueue() {
   const list = _quizMode === 'hiragana' ? QUIZ_KANA_LIST : QUIZ_VOCAB_LIST;
-  
-  // ⚠️ FIX : Récupérer les mots du niveau qu'on a sélectionné (marche pour Lv0 et les autres)
+
+  // =========================================================
+  // 🎯 CAS SPÉCIAL : LEVEL 0 (Logique séquentielle par groupe)
+  // =========================================================
+  if (pendingLevelIdx === LEVEL_ZERO_IDX) {
+    let newQueue = [];
+    
+    // 1. Trouver l'index du groupe de départ (celui cliqué par l'utilisateur)
+    const startIdx = LEVEL_ZERO_GROUPS.findIndex(g => g.id === _levelZeroGroupId);
+    
+    // 2. On récupère ce groupe et tous les suivants dans l'ordre officiel
+    const groupsToPlay = LEVEL_ZERO_GROUPS.slice(startIdx !== -1 ? startIdx : 0);
+
+    if (_quizMode === 'hiragana') {
+      // --- MODE KANA LEVEL 0 ---
+      groupsToPlay.forEach(grp => {
+        // On récupère les index des kanas appartenant à ce groupe précis
+        let groupIndices = list
+          .map((item, idx) => ({ item, idx }))
+          .filter(obj => grp.kanas.includes(obj.item.kana))
+          .map(obj => obj.idx);
+
+        // Mélange aléatoire du sous-groupe de 5 et ajout à la file
+        newQueue.push(...shuffle(groupIndices));
+      });
+    } 
+    else {
+      // --- MODE VOCABULAIRE LEVEL 0 ---
+      groupsToPlay.forEach(grp => {
+        // Génération des 5 mots spécifiques à ce groupe via ta fonction existante
+        const groupWords = _pickLevelZeroWords(grp.id);
+        
+        // Recherche de leurs index respectifs dans la liste globale
+        let groupIndices = groupWords.map(w => {
+          return list.findIndex(item => item.kana === w.kana);
+        }).filter(idx => idx !== -1);
+        
+        // Mélange aléatoire des 5 mots et ajout à la file
+        newQueue.push(...shuffle(groupIndices));
+      });
+    }
+    
+    _quizQueue = newQueue;
+    return; // 🛑 Important : on s'arrête ici pour le Level 0
+  }
+
+  // =========================================================
+  // 🎯 LOGIQUE STANDARD (Pour les niveaux 1 à 21)
+  // =========================================================
   const pendingLv = ACTIVE_LEVELS[pendingLevelIdx];
   const pendingKanas = pendingLv ? new Set(pendingLv.words.flatMap(w => [...w.kana])) : new Set();
   const pendingVocab = pendingLv ? new Set(pendingLv.words.map(w => w.kana)) : new Set();
 
   let queue = list.map((item, idx) => {
-    // Est-ce que cet item appartient au niveau sélectionné ?
     let isPending = false;
     if (_quizMode === 'hiragana') {
-      isPending = pendingKanas.has(item.kana) || pendingKanas.has(item.kana[0]);
+      // Un kana est "pending" s'il appartient au niveau actuel
+      isPending = pendingKanas.has(item.kana) || (item.kana.length > 1 && pendingKanas.has(item.kana[0]));
     } else {
+      // Un mot est "pending" s'il est dans la liste du niveau actuel
       isPending = pendingVocab.has(item.kana);
     }
 
-    // Calcul du poids : 0 si c'est le niveau en cours (passe en premier)
     let weight = 0;
     if (!isPending) {
+      // Si ce n'est pas le niveau actuel, on donne un poids pour le mettre après
+      // Les niveaux futurs viennent juste après (idx + 10), les anciens très loin (idx + 1000)
       weight = item.levelIdx >= pendingLevelIdx ? item.levelIdx + 10 : item.levelIdx + 1000;
     }
     return { index: idx, weight: weight };
   });
-  
+
+  // Tri par poids, puis extraction des index
   queue.sort((a, b) => a.weight - b.weight);
   _quizQueue = queue.map(q => q.index);
 }
