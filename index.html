@@ -727,7 +727,20 @@ body::before {
 .lvl-card-count{font-family:'Nunito',sans-serif;font-size:clamp(12px,3vw,14px);color:var(--text-dim);margin-top:6px;font-weight:700;}
 .menu-scroll-hint{flex-shrink:0;text-align:center;padding:5px 0 8px;font-family:'Nunito',sans-serif;font-size:clamp(13px,3.2vw,16px);color:var(--text-dim);letter-spacing:1px;animation:hintPulse 1.6s ease-in-out infinite;font-weight:700;}
 @keyframes hintPulse{0%,100%{opacity:.4;transform:translateY(0)}50%{opacity:.9;transform:translateY(3px)}}
-
+/* ── Level Zero : overlay sélection groupe ── */
+#lz-overlay{position:fixed;inset:0;z-index:320;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;background:linear-gradient(160deg,#e8f4ff 0%,#f0e8ff 50%,#fff8e8 100%);padding:24px 16px 32px;}
+#lz-overlay.hidden{display:none!important;}
+.lz-title{font-family:'Fredoka One',cursive;font-size:clamp(22px,6vw,30px);color:#4a4a8a;margin-bottom:4px;text-align:center;}
+.lz-sub{font-family:'Nunito',sans-serif;font-size:clamp(13px,3.5vw,15px);color:#888;margin-bottom:18px;text-align:center;}
+.lz-section-label{font-family:'Nunito',sans-serif;font-size:12px;font-weight:900;letter-spacing:.08em;color:#aaa;text-transform:uppercase;margin:12px 0 8px;width:100%;max-width:460px;}
+.lz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:10px;width:100%;max-width:460px;}
+.lz-btn{font-family:'Noto Sans JP',sans-serif;font-size:clamp(18px,5vw,22px);font-weight:700;border-radius:18px;border:2.5px solid transparent;padding:12px 8px 8px;cursor:pointer;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.08);transition:transform .15s,box-shadow .15s;display:flex;flex-direction:column;align-items:center;gap:2px;color:#333;}
+.lz-btn:active{transform:scale(.95);box-shadow:0 2px 6px rgba(0,0,0,.06);}
+.lz-btn-label{font-size:11px;font-family:'Nunito',sans-serif;font-weight:700;color:#aaa;margin-top:2px;}
+.lz-btn.grp-base{border-color:#4d96ff44;} .lz-btn.grp-base:hover{border-color:#4d96ff;}
+.lz-btn.grp-daku{border-color:#c77dff44;} .lz-btn.grp-daku:hover{border-color:#c77dff;}
+.lz-btn.grp-han{border-color:#ff6b6b44;} .lz-btn.grp-han:hover{border-color:#ff6b6b;}
+.lz-back-btn{margin-top:20px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;background:none;border:none;color:#888;cursor:pointer;padding:8px 20px;}
 /* ═══ TUTO ═══ */
 /* tuto-overlay supprimé — sera remplacé à l'étape 6 */
 .tuto-title{font-family:'Fredoka One',cursive;font-size:clamp(26px,8vw,34px);color:var(--sky);text-align:center;margin-bottom:5px;}
@@ -3035,7 +3048,22 @@ body:has(#tuto-overlay:not(.hidden)) #bot-ui {
 
   <button id="btn-retour-niveaux" class="mode-back-btn" style="margin-top:14px" onclick="modeBack()">← Retour aux niveaux</button>
 </div>
+<!-- ═══ LEVEL ZERO — Sélection du groupe de kanas ═══ -->
+<div id="lz-overlay" class="hidden">
+  <div class="lz-title">📖 Tableau officiel</div>
+  <div class="lz-sub">Choisis un groupe de kanas à pratiquer</div>
 
+  <div class="lz-section-label">Kanas de base</div>
+  <div class="lz-grid" id="lz-grid-base"></div>
+
+  <div class="lz-section-label">Kanas voix (dakuten)</div>
+  <div class="lz-grid" id="lz-grid-daku"></div>
+
+  <div class="lz-section-label">Kanas semi-voix (handakuten)</div>
+  <div class="lz-grid" id="lz-grid-han"></div>
+
+  <button class="lz-back-btn" onclick="hideLevelZeroOverlay()">← Retour</button>
+</div>
 <!-- ═══ QUIZ OVERLAY ═══ -->
 <div id="quiz-overlay" class="hidden">
   <div id="confetti-quiz" style="position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;"></div>
@@ -3475,6 +3503,51 @@ function applyFluent() {
 // ═══════════════════════════════════════════════════════════════════
 //  DONNÉES — niveaux, constantes partagées
 // ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+//  LEVEL ZERO — Pool de mots + groupes officiels
+// ═══════════════════════════════════════════════════════════════════
+
+// Mots supplémentaires couvrant les kanas non présents dans les levels thématiques
+const LEVEL_ZERO_EXTRA_WORDS = [
+  {kana:'せみ',  romaji:'semi',  meaning:'cigale',           emoji:'🦗', boss:false},
+  {kana:'てら',  romaji:'tera',  meaning:'temple',           emoji:'⛩️', boss:false},
+  {kana:'れんが',romaji:'renga', meaning:'brique',           emoji:'🧱', boss:false},
+  {kana:'がか',  romaji:'gaka',  meaning:'peintre',          emoji:'🎨', boss:false},
+  {kana:'ぐんて',romaji:'gunte', meaning:'gant de travail',  emoji:'🧤', boss:false},
+  {kana:'げた',  romaji:'geta',  meaning:'sandale japonaise',emoji:'🥿', boss:false},
+  {kana:'ざる',  romaji:'zaru',  meaning:'passoire',         emoji:'🧺', boss:false},
+  {kana:'だんご',romaji:'dango', meaning:'dango',            emoji:'🍡', boss:false},
+  {kana:'でんき',romaji:'denki', meaning:'électricité',      emoji:'💡', boss:false},
+  {kana:'ぶた',  romaji:'buta',  meaning:'cochon',           emoji:'🐷', boss:false},
+  {kana:'べんと',romaji:'bento', meaning:'bento',            emoji:'🍱', boss:false},
+  {kana:'ぼうし',romaji:'boshi', meaning:'chapeau',          emoji:'👒', boss:false},
+  {kana:'ぱん',  romaji:'pan',   meaning:'pain',             emoji:'🍞', boss:false},
+  {kana:'ぴか',  romaji:'pika',  meaning:'éclair',           emoji:'⚡', boss:false},
+  {kana:'ぷりん',romaji:'purin', meaning:'pudding',          emoji:'🍮', boss:false},
+  {kana:'ぽち',  romaji:'pochi', meaning:'nom de chien',     emoji:'🐕', boss:false},
+];
+
+// Groupes officiels du tableau des kanas
+const LEVEL_ZERO_GROUPS = [
+  // Base
+  {id:'a',   label:'あ行', kanas:['あ','い','う','え','お'], type:'base', color:'#4d96ff'},
+  {id:'ka',  label:'か行', kanas:['か','き','く','け','こ'], type:'base', color:'#4d96ff'},
+  {id:'sa',  label:'さ行', kanas:['さ','し','す','せ','そ'], type:'base', color:'#4d96ff'},
+  {id:'ta',  label:'た行', kanas:['た','ち','つ','て','と'], type:'base', color:'#4d96ff'},
+  {id:'na',  label:'な行', kanas:['な','に','ぬ','ね','の'], type:'base', color:'#4d96ff'},
+  {id:'ha',  label:'は行', kanas:['は','ひ','ふ','へ','ほ'], type:'base', color:'#4d96ff'},
+  {id:'ma',  label:'ま行', kanas:['ま','み','む','め','も'], type:'base', color:'#4d96ff'},
+  {id:'ya',  label:'や行', kanas:['や','ゆ','よ'],           type:'base', color:'#4d96ff'},
+  {id:'ra',  label:'ら行', kanas:['ら','り','る','れ','ろ'], type:'base', color:'#4d96ff'},
+  {id:'wa',  label:'わ行', kanas:['わ','を','ん'],           type:'base', color:'#4d96ff'},
+  // Dakuten
+  {id:'ga',  label:'が行', kanas:['が','ぎ','ぐ','げ','ご'], type:'daku', color:'#c77dff'},
+  {id:'za',  label:'ざ行', kanas:['ざ','じ','ず','ぜ','ぞ'], type:'daku', color:'#c77dff'},
+  {id:'da',  label:'だ行', kanas:['だ','ぢ','づ','で','ど'], type:'daku', color:'#c77dff'},
+  {id:'ba',  label:'ば行', kanas:['ば','び','ぶ','べ','ぼ'], type:'daku', color:'#c77dff'},
+  // Handakuten
+  {id:'pa',  label:'ぱ行', kanas:['ぱ','ぴ','ぷ','ぺ','ぽ'], type:'han',  color:'#ff6b6b'},
+];
 const ALL_LEVELS=[
   {id:1,theme:'Nos Compagnons',clan:'',emoji:'🐱',color:'#ffaa7a',words:[
     {kana:'ねこ',romaji:'neko',meaning:'chat',emoji:'🐱',boss:false},
@@ -3907,6 +3980,8 @@ const KANA_COLORS = {
 };
 const DEFAULT_KANA_BG='#F0F0F0';
 function kanaBg(char){
+  // ⚠️ FIX : Sécurité si char est undefined, null ou vide
+  if(!char) return DEFAULT_KANA_BG;
   // 1. Si le caractère existe dans la palette, on le prend
   if(KANA_COLORS[char]) return KANA_COLORS[char];
   
@@ -4056,6 +4131,7 @@ function _romajiFor(kana){
   }
   // 3. Puis dans tous les niveaux
   for(const lv of ALL_LEVELS){
+    if (!lv || !lv.words) continue;
     const w = lv.words.find(w=>w.kana===kana);
     if(w) return w.romaji;
   }
@@ -7018,7 +7094,26 @@ let ACTIVE_LEVELS = ALL_LEVELS; // Pointe par défaut sur les hiragana
 function renderMenuLevels() {
   const scroll = document.getElementById('lvl-scroll');
   scroll.innerHTML = ''; // On vide la liste avant de la recréer
-
+// ── Card Level Zero (tout en haut) — hiragana uniquement ──
+if (currentAlphabet === 'hiragana') {
+  const lzCard = document.createElement('div');
+  lzCard.className = 'lvl-card';
+  lzCard.style.cssText = '--lc:#6c63ff;border-color:#6c63ff55;';
+  lzCard.innerHTML = `
+    <div class="lvl-card-left">
+      <div class="lvl-card-emoji">📖</div>
+      <div class="lvl-card-num" style="color:#6c63ff">Lv.0</div>
+    </div>
+    <div class="lvl-card-right">
+      <div class="lvl-card-name">Tableau officiel</div>
+      <div class="lvl-card-words" style="flex-wrap:wrap;gap:4px">
+        ${LEVEL_ZERO_GROUPS.map(g=>`<span class="lvl-card-word-chip">${g.label}</span>`).join('')}
+      </div>
+      <div class="lvl-card-count" style="margin-top:6px">15 groupes · tirage aléatoire ✨</div>
+    </div>`;
+  lzCard.addEventListener('click', showLevelZeroOverlay);
+  scroll.appendChild(lzCard);
+}
   ACTIVE_LEVELS.forEach((lvl, i) => {
     // Astuce : on différencie les scores du Lv1 Hiragana et Lv1 Katakana
     const scoreId = currentAlphabet === 'katakana' ? `${lvl.id}_kata` : lvl.id;
@@ -7434,14 +7529,156 @@ function _survieVictory(){
 function modeBack(){
   document.getElementById('mode-overlay').classList.add('hidden');
   if(typeof _mobileNavHide==='function') _mobileNavHide();
+  // Si on vient du Level Zero, revenir à l'overlay groupe plutôt qu'au menu
+  if(pendingLevelIdx === LEVEL_ZERO_IDX){
+    buildLevelZeroGrid();
+    document.getElementById('lz-overlay').classList.remove('hidden');
+  } else {
+    document.getElementById('menu-overlay').classList.remove('hidden');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  LEVEL ZERO — Logique overlay + pioche des mots
+// ═══════════════════════════════════════════════════════════════════
+
+let _levelZeroGroupId = null; // groupe sélectionné
+const LEVEL_ZERO_IDX = 9999;  // index virtuel sentinel
+
+// Construit la grille de groupes dans l'overlay
+function buildLevelZeroGrid() {
+  ['base','daku','han'].forEach(type => {
+    const gridEl = document.getElementById(`lz-grid-${type === 'base' ? 'base' : type === 'daku' ? 'daku' : 'han'}`);
+    gridEl.innerHTML = '';
+    LEVEL_ZERO_GROUPS.filter(g => g.type === type).forEach(grp => {
+      const btn = document.createElement('button');
+      btn.className = `lz-btn grp-${type}`;
+      btn.innerHTML = `${grp.kanas.join('')}<span class="lz-btn-label">${grp.label}</span>`;
+      btn.addEventListener('click', () => selectLevelZeroGroup(grp.id));
+      gridEl.appendChild(btn);
+    });
+  });
+  if (typeof fluent === 'function') setTimeout(() => fluent(document.getElementById('lz-overlay')), 40);
+}
+
+function showLevelZeroOverlay() {
+  buildLevelZeroGrid();
+  document.getElementById('menu-overlay').classList.add('hidden');
+  document.getElementById('lz-overlay').classList.remove('hidden');
+}
+
+function hideLevelZeroOverlay() {
+  document.getElementById('lz-overlay').classList.add('hidden');
   document.getElementById('menu-overlay').classList.remove('hidden');
 }
 
-// showTuto est maintenant la cinématique tuto — voir fonction showTuto() plus bas
+// Pioche 5 mots depuis ALL_LEVELS + LEVEL_ZERO_EXTRA_WORDS contenant au moins un kana du groupe
+function _pickLevelZeroWords(groupId) {
+  const grp = LEVEL_ZERO_GROUPS.find(g => g.id === groupId);
+  if (!grp) return [];
+  const kanas = grp.kanas;
+  const kanaSet = new Set(kanas);
 
-// Listeners existants qui référençaient tuto/puzzle-back-btn — nettoyés
-// (les éléments n'existent plus)
+  // Pool complet dédupliqué : tous les mots contenant au moins un kana du groupe
+  const seen = new Set();
+  const pool2k = []; // mots de exactement 2 kanas
+  const pool3k = []; // mots de exactement 3 kanas
+  [...ALL_LEVELS, {words: LEVEL_ZERO_EXTRA_WORDS}].forEach(lv => {
+    if (!lv || !lv.words) return;
+    lv.words.forEach(w => {
+      if (seen.has(w.kana)) return;
+      const len = [...w.kana].length;
+      if (len !== 2 && len !== 3) return; // on garde uniquement 2k et 3k
+      if (![...w.kana].some(c => kanaSet.has(c))) return;
+      seen.add(w.kana);
+      w._covers = [...w.kana].filter(c => kanaSet.has(c));
+      (len === 2 ? pool2k : pool3k).push(w);
+    });
+  });
 
+  // Mélange des deux pools
+  const shuffle = arr => { for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];} };
+  shuffle(pool2k);
+  shuffle(pool3k);
+
+  // ── Couverture garantie : algorithme greedy ──
+  // On sélectionne 4 mots de 2k + 1 mot de 3k (topologie 4x2k_1x3k)
+  // en s'assurant que tous les kanas du groupe sont couverts.
+
+  function greedyPick(pool, slots) {
+    const picked = [];
+    const covered = new Set();
+    const used = new Set();
+
+    // Passe 1 : couvrir les kanas manquants en priorité
+    while (covered.size < kanas.length && picked.length < slots) {
+      let best = null, bestScore = -1;
+      for (const w of pool) {
+        if (used.has(w.kana)) continue;
+        const newCover = w._covers.filter(c => !covered.has(c)).length;
+        if (newCover > bestScore) { bestScore = newCover; best = w; }
+      }
+      if (!best || bestScore === 0) break;
+      picked.push(best);
+      used.add(best.kana);
+      best._covers.forEach(c => covered.add(c));
+    }
+
+    // Passe 2 : compléter jusqu'au nombre de slots
+    for (const w of pool) {
+      if (picked.length >= slots) break;
+      if (!used.has(w.kana)) picked.push(w);
+    }
+
+    return picked;
+  }
+
+  // Couvrir d'abord avec les 3k (1 slot), puis compléter avec les 2k (4 slots)
+  // car les mots 3k couvrent plus de kanas → meilleure chance de tout couvrir
+  const picked3k = greedyPick(pool3k, 1);
+  const alreadyCovered = new Set(picked3k.flatMap(w => w._covers));
+
+  // Retirer les kanas déjà couverts par le mot 3k du problème de couverture 2k
+  // en ajustant les _covers fictifs pour la passe greedy 2k
+  const pool2kAdjusted = pool2k.map(w => ({...w, _covers: w._covers.filter(c => !alreadyCovered.has(c))}));
+  const picked2k = greedyPick(pool2kAdjusted, 4);
+
+  // Résultat final : 4 mots 2k en premier (wordIdx 0-3), 1 mot 3k en dernier (wordIdx 4)
+  // → correspond exactement à la convention des blueprints 4x2k_1x3k
+  const result = [...picked2k, ...picked3k];
+
+  // Nettoyage
+  pool2k.forEach(w => delete w._covers);
+  pool3k.forEach(w => delete w._covers);
+
+  return result;
+}
+function selectLevelZeroGroup(groupId) {
+  _levelZeroGroupId = groupId;
+  const grp = LEVEL_ZERO_GROUPS.find(g => g.id === groupId);
+  const words = _pickLevelZeroWords(groupId);
+
+  if (words.length === 0) {
+    alert('Aucun mot trouvé pour ce groupe !');
+    return;
+  }
+
+  // Injecter le niveau virtuel dans ACTIVE_LEVELS à l'index LEVEL_ZERO_IDX
+  // On utilise une entrée fantôme à la fin — propre et sans effet de bord
+  ACTIVE_LEVELS[LEVEL_ZERO_IDX] = {
+    id: 0,
+    theme: `📖 ${grp.label}`,
+    clan: '',
+    emoji: '📖',
+    color: grp.color,
+    words: words.map(w => ({...w})),
+  };
+  pendingLevelIdx = LEVEL_ZERO_IDX;
+
+  // Fermer l'overlay groupe, ouvrir le mode-overlay habituel
+  document.getElementById('lz-overlay').classList.add('hidden');
+  showModeSelect(LEVEL_ZERO_IDX);
+}
 
 
 // ═══════════════════════════════════════════════════════════════════
@@ -7585,12 +7822,19 @@ function calcRows(){
     kanaPool=unique.flatMap(ch=>activeChars.has(ch)?[ch,ch]:[ch]);
   }
 
-  function rndKana(){
-    if(!kanaPool.length)return'あ';
-    const pool=kanaPool.length>1?kanaPool.filter(k=>k!==lastKana):kanaPool;
-    const k=pool[Math.floor(Math.random()*pool.length)];
-    lastKana=k;return k;
-  }
+function rndKana(){
+  if(!kanaPool.length) return 'あ';
+  
+  // On filtre le dernier kana joué pour éviter les répétitions
+  let pool = kanaPool.length > 1 ? kanaPool.filter(k => k !== lastKana) : kanaPool;
+  
+  // ⚠️ FIX : Si le filtre a complètement vidé le tableau (ex: mot "もも"), on annule le filtre
+  if(!pool.length) pool = kanaPool;
+  
+  const k = pool[Math.floor(Math.random() * pool.length)];
+  lastKana = k; 
+  return k;
+}
 
   function initBoard(){
     board=Array.from({length:ROWS},()=>Array.from({length:COLS},()=>({filled:false,char:''})));
@@ -10700,7 +10944,11 @@ function updateQuizLists() {
   const kanaList = [];
   const smallKana = new Set(['ゃ','ゅ','ょ','っ','ぁ','ぃ','ぅ','ぇ','ぉ', 'ャ','ュ','ョ','ッ','ァ','ィ','ゥ','ェ','ォ','ー']);
   
-  ACTIVE_LEVELS.forEach((lv, levelIndex) => { // <-- Ajout de levelIndex
+  // ⚠️ FIX : On englobe tout, y compris le Level 0
+  const levelsToMap = [...ACTIVE_LEVELS, { words: LEVEL_ZERO_EXTRA_WORDS }];
+
+  levelsToMap.forEach((lv, levelIndex) => { 
+    if (!lv || !lv.words) return;
     lv.words.forEach(w => {
       const chars = [...w.kana];
       let i = 0;
@@ -10713,10 +10961,10 @@ function updateQuizLists() {
         if(!smallKana.has(token) && !seenKana.has(token) && KANA_TO_ROMAJI[token]){
           seenKana.add(token);
           const candidates = [];
-          ACTIVE_LEVELS.forEach(lv2 => {
+          levelsToMap.forEach(lv2 => {
+            if (!lv2 || !lv2.words) return;
             lv2.words.forEach(ww => { if(ww.kana.includes(token)) candidates.push(ww); });
           });
-          // <-- On injecte le levelIdx ici
           kanaList.push({ kana: token, exWord: candidates[0]||w, candidates: candidates.length?candidates:[w], levelIdx: levelIndex });
         }
       }
@@ -10726,11 +10974,11 @@ function updateQuizLists() {
 
   const seenVocab = new Set();
   const vocabList = [];
-  ACTIVE_LEVELS.forEach((lv, levelIndex) => { // <-- Ajout de levelIndex
+  levelsToMap.forEach((lv, levelIndex) => { 
+    if (!lv || !lv.words) return;
     lv.words.forEach(w => {
       if(!seenVocab.has(w.kana)){
         seenVocab.add(w.kana);
-        // <-- On clone l'objet mot et on y ajoute le levelIdx
         vocabList.push({...w, levelIdx: levelIndex});
       }
     });
@@ -10768,19 +11016,29 @@ function showQuiz(){
 function _quizInitQueue(){
   const list = _quizMode === 'hiragana' ? QUIZ_KANA_LIST : QUIZ_VOCAB_LIST;
   
-  // On mappe la liste pour garder l'index d'origine et le niveau associé
-  let queue = list.map((item, idx) => ({ index: idx, levelIdx: item.levelIdx }));
-  
-  // On trie pour mettre les items du niveau sélectionné (et suivants) en premier, 
-  // puis on "wrap around" pour mettre les niveaux précédents à la fin.
-  queue.sort((a, b) => {
-    // Si le niveau est avant celui sélectionné, on lui donne un gros poids pour le repousser à la fin
-    const weightA = a.levelIdx >= pendingLevelIdx ? a.levelIdx : a.levelIdx + 1000;
-    const weightB = b.levelIdx >= pendingLevelIdx ? b.levelIdx : b.levelIdx + 1000;
-    return weightA - weightB;
+  // ⚠️ FIX : Récupérer les mots du niveau qu'on a sélectionné (marche pour Lv0 et les autres)
+  const pendingLv = ACTIVE_LEVELS[pendingLevelIdx];
+  const pendingKanas = pendingLv ? new Set(pendingLv.words.flatMap(w => [...w.kana])) : new Set();
+  const pendingVocab = pendingLv ? new Set(pendingLv.words.map(w => w.kana)) : new Set();
+
+  let queue = list.map((item, idx) => {
+    // Est-ce que cet item appartient au niveau sélectionné ?
+    let isPending = false;
+    if (_quizMode === 'hiragana') {
+      isPending = pendingKanas.has(item.kana) || pendingKanas.has(item.kana[0]);
+    } else {
+      isPending = pendingVocab.has(item.kana);
+    }
+
+    // Calcul du poids : 0 si c'est le niveau en cours (passe en premier)
+    let weight = 0;
+    if (!isPending) {
+      weight = item.levelIdx >= pendingLevelIdx ? item.levelIdx + 10 : item.levelIdx + 1000;
+    }
+    return { index: idx, weight: weight };
   });
   
-  // On ne garde que les index pour la file d'attente finale
+  queue.sort((a, b) => a.weight - b.weight);
   _quizQueue = queue.map(q => q.index);
 }
 
@@ -11201,7 +11459,9 @@ const STATS_GOJUUON_KATA = [
 
 // Set global pour savoir quels Kana sont vraiment testables dans tous tes niveaux combinés
 const ALL_TESTABLE_KANA = new Set();
-[...ALL_LEVELS, ...ALL_LEVELS_KATA].forEach(lv => {
+// ⚠️ FIX : On ajoute {words: LEVEL_ZERO_EXTRA_WORDS} dans le tableau
+[...ALL_LEVELS, ...ALL_LEVELS_KATA, {words: LEVEL_ZERO_EXTRA_WORDS}].forEach(lv => {
+  if (!lv || !lv.words) return; 
   lv.words.forEach(w => {
      const chars = [...w.kana];
      const smallKana = new Set(['ゃ','ゅ','ょ','っ','ぁ','ぃ','ぅ','ぇ','ぉ', 'ャ','ュ','ョ','ッ','ァ','ィ','ゥ','ェ','ォ','ー']);
@@ -11307,9 +11567,10 @@ function _statsRender(){
 function _statsRenderVocab(){
   const stats=KS.getVocabStats();
   
-  // Grouper les mots par emoji pour combiner Hira et Kata
   const vocabMap = new Map();
-  [...ALL_LEVELS, ...ALL_LEVELS_KATA].forEach(lv => {
+  // ⚠️ FIX : On ajoute {words: LEVEL_ZERO_EXTRA_WORDS} ici aussi
+  [...ALL_LEVELS, ...ALL_LEVELS_KATA, {words: LEVEL_ZERO_EXTRA_WORDS}].forEach(lv => {
+    if (!lv || !lv.words) return; 
     lv.words.forEach(w => {
       if(!vocabMap.has(w.emoji)) {
         vocabMap.set(w.emoji, { emoji: w.emoji, meanings: new Set(), hira: null, kata: null });
