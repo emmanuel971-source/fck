@@ -3695,6 +3695,90 @@ const LEVEL_ZERO_GROUPS = [
   // Handakuten
   {id:'pa',  label:'ぱ', romaji:'pa',  kanas:['ぱ','ぴ','ぷ','ぺ','ぽ'], type:'han',  color:'#ff6b6b'},
 ];
+// ── Groupes Level Zero KATAKANA ──────────────────────────────────
+const LEVEL_ZERO_GROUPS_KATA = [
+  // Base
+  {id:'a',  label:'ア', romaji:'a',  kanas:['ア','イ','ウ','エ','オ'], type:'base', color:'#4d96ff'},
+  {id:'ka', label:'カ', romaji:'ka', kanas:['カ','キ','ク','ケ','コ'], type:'base', color:'#4d96ff'},
+  {id:'sa', label:'サ', romaji:'sa', kanas:['サ','シ','ス','セ','ソ'], type:'base', color:'#4d96ff'},
+  {id:'ta', label:'タ', romaji:'ta', kanas:['タ','チ','ツ','テ','ト'], type:'base', color:'#4d96ff'},
+  {id:'na', label:'ナ', romaji:'na', kanas:['ナ','ニ','ヌ','ネ','ノ'], type:'base', color:'#4d96ff'},
+  {id:'ha', label:'ハ', romaji:'ha', kanas:['ハ','ヒ','フ','ヘ','ホ'], type:'base', color:'#4d96ff'},
+  {id:'ma', label:'マ', romaji:'ma', kanas:['マ','ミ','ム','メ','モ'], type:'base', color:'#4d96ff'},
+  {id:'ya', label:'ヤ', romaji:'ya', kanas:['ヤ','ユ','ヨ'],           type:'base', color:'#4d96ff'},
+  {id:'ra', label:'ラ', romaji:'ra', kanas:['ラ','リ','ル','レ','ロ'], type:'base', color:'#4d96ff'},
+  {id:'wa', label:'ワ', romaji:'wa', kanas:['ワ','ヲ','ン'],           type:'base', color:'#4d96ff'},
+  // Dakuten
+  {id:'ga', label:'ガ', romaji:'ga', kanas:['ガ','ギ','グ','ゲ','ゴ'], type:'daku', color:'#c77dff'},
+  {id:'za', label:'ザ', romaji:'za', kanas:['ザ','ジ','ズ','ゼ','ゾ'], type:'daku', color:'#c77dff'},
+  {id:'da', label:'ダ', romaji:'da', kanas:['ダ','ヂ','ヅ','デ','ド'], type:'daku', color:'#c77dff'},
+  {id:'ba', label:'バ', romaji:'ba', kanas:['バ','ビ','ブ','ベ','ボ'], type:'daku', color:'#c77dff'},
+  // Handakuten
+  {id:'pa', label:'パ', romaji:'pa', kanas:['パ','ピ','プ','ペ','ポ'], type:'han',  color:'#ff6b6b'},
+];
+
+// ── Mots extra Level Zero KATAKANA ───────────────────────────────
+const LEVEL_ZERO_EXTRA_WORDS_KATA = [
+  // ── ア行 ──
+  {kana:'アイス', romaji:'aisu',   meaning:'glace',        emoji:'🍦', boss:false},
+  {kana:'オーブン',romaji:'ōbun',  meaning:'four',         emoji:'🔥', boss:false},
+  {kana:'エコ',   romaji:'eko',    meaning:'écolo',        emoji:'♻️', boss:false},
+  // ── カ行 ──
+  {kana:'ケーキ', romaji:'kēki',   meaning:'gâteau',       emoji:'🎂', boss:false},
+  {kana:'コーヒー',romaji:'kōhī',  meaning:'café',         emoji:'☕', boss:false},
+  {kana:'クッキー',romaji:'kukkī', meaning:'cookie',       emoji:'🍪', boss:false},
+  // ── サ行 ──
+  {kana:'スキー', romaji:'sukī',   meaning:'ski',          emoji:'⛷️', boss:false},
+  {kana:'ソース', romaji:'sōsu',   meaning:'sauce',        emoji:'🫙', boss:false},
+  {kana:'サッカー',romaji:'sakkā', meaning:'football',     emoji:'⚽', boss:false},
+  // ── タ行 ──
+  {kana:'ツナ',   romaji:'tsuna',  meaning:'thon',         emoji:'🐟', boss:false},
+  {kana:'トースト',romaji:'tōsuto',meaning:'toast',        emoji:'🍞', boss:false},
+  {kana:'タクシー',romaji:'takushī',meaning:'taxi',        emoji:'🚕', boss:false},
+  // ── ナ行 ──
+  {kana:'ナイフ', romaji:'naifu',  meaning:'couteau',      emoji:'🔪', boss:false},
+  {kana:'ノート', romaji:'nōto',   meaning:'cahier',       emoji:'📓', boss:false},
+  {kana:'ネット', romaji:'netto',  meaning:'internet',     emoji:'🌐', boss:false},
+  // ── ハ行 ──
+  {kana:'ホテル', romaji:'hoteru', meaning:'hôtel',        emoji:'🏨', boss:false},
+  {kana:'ヒーロー',romaji:'hīrō',  meaning:'héros',        emoji:'🦸', boss:false},
+  {kana:'フォーク',romaji:'fōku',  meaning:'fourchette',   emoji:'🍴', boss:false},
+  // ── マ行 ──
+  {kana:'メロン', romaji:'meron',  meaning:'melon',        emoji:'🍈', boss:false},
+  {kana:'マスク', romaji:'masuku', meaning:'masque',       emoji:'😷', boss:false},
+  {kana:'モデル', romaji:'moderu', meaning:'modèle',       emoji:'🧍', boss:false},
+  // ── ヤ行 ──
+  {kana:'ヤシ',   romaji:'yashi',  meaning:'palmier',      emoji:'🌴', boss:false},
+  {kana:'ヨット', romaji:'yotto',  meaning:'voilier',      emoji:'⛵', boss:false},
+  {kana:'ユニフォーム',romaji:'yunifōmu',meaning:'uniforme',emoji:'👕', boss:false},
+  // ── ラ行 (avec ロ manquant) ──
+  {kana:'ロボット',romaji:'robotto',meaning:'robot',       emoji:'🤖', boss:false},
+  {kana:'レモン', romaji:'remon',  meaning:'citron',       emoji:'🍋', boss:false},
+  {kana:'ロケット',romaji:'roketto',meaning:'fusée',       emoji:'🚀', boss:false},
+  // ── ワ行 (avec ヲ rare) ──
+  {kana:'ワイン', romaji:'wain',   meaning:'vin',          emoji:'🍷', boss:false},
+  {kana:'ワッフル',romaji:'waffuru',meaning:'gaufre',      emoji:'🧇', boss:false},
+  // ── ガ行 ──
+  {kana:'ゲーム', romaji:'gēmu',   meaning:'jeu vidéo',    emoji:'🎮', boss:false},
+  {kana:'グラス', romaji:'gurasu', meaning:'verre',        emoji:'🥛', boss:false},
+  {kana:'ガイド', romaji:'gaido',  meaning:'guide',        emoji:'🗺️', boss:false},
+  // ── ザ行 (avec ゼ manquant) ──
+  {kana:'ゼリー', romaji:'zerī',   meaning:'gelée',        emoji:'🍮', boss:false},
+  {kana:'ゾンビ', romaji:'zonbi',  meaning:'zombie',       emoji:'🧟', boss:false},
+  {kana:'ジュース',romaji:'jūsu',  meaning:'jus',          emoji:'🧃', boss:false},
+  // ── ダ行 (avec ヂ ヅ rares) ──
+  {kana:'ドア',   romaji:'doa',    meaning:'porte',        emoji:'🚪', boss:false},
+  {kana:'デスク', romaji:'desuku', meaning:'bureau',       emoji:'🖥️', boss:false},
+  {kana:'ダンス', romaji:'dansu',  meaning:'danse',        emoji:'💃', boss:false},
+  // ── バ行 ──
+  {kana:'ボール', romaji:'bōru',   meaning:'balle',        emoji:'⚽', boss:false},
+  {kana:'バス',   romaji:'basu',   meaning:'bus',          emoji:'🚌', boss:false},
+  {kana:'ビール', romaji:'bīru',   meaning:'bière',        emoji:'🍺', boss:false},
+  // ── パ行 ──
+  {kana:'ピザ',   romaji:'piza',   meaning:'pizza',        emoji:'🍕', boss:false},
+  {kana:'ポスト', romaji:'posuto', meaning:'boîte aux lettres',emoji:'📮', boss:false},
+  {kana:'パスタ', romaji:'pasuta', meaning:'pâtes',        emoji:'🍝', boss:false},
+];
 const ALL_LEVELS=[
   {id:1,theme:'Nos Compagnons',clan:'',emoji:'🐱',color:'#ffaa7a',words:[
     {kana:'ねこ',romaji:'neko',meaning:'chat',emoji:'🐱',boss:false},
@@ -7241,26 +7325,28 @@ let ACTIVE_LEVELS = ALL_LEVELS; // Pointe par défaut sur les hiragana
 function renderMenuLevels() {
   const scroll = document.getElementById('lvl-scroll');
   scroll.innerHTML = ''; // On vide la liste avant de la recréer
-// ── Card Level Zero (tout en haut) — hiragana uniquement ──
-if (currentAlphabet === 'hiragana') {
-  const lzCard = document.createElement('div');
-  lzCard.className = 'lvl-card';
-  lzCard.style.cssText = '--lc:#6c63ff;border-color:#6c63ff55;';
-  lzCard.innerHTML = `
-    <div class="lvl-card-left">
-      <div class="lvl-card-emoji">📖</div>
-      <div class="lvl-card-num" style="color:#6c63ff">Lv.0</div>
+// ── Card Level Zero (tout en haut) — Dynamique Hira/Kata ──
+const isHira = currentAlphabet === 'hiragana';
+const currentGroups = isHira ? LEVEL_ZERO_GROUPS : LEVEL_ZERO_GROUPS_KATA;
+const alphabetName = isHira ? 'Hiragana' : 'Katakana';
+
+const lzCard = document.createElement('div');
+lzCard.className = 'lvl-card';
+lzCard.style.cssText = '--lc:#6c63ff;border-color:#6c63ff55;';
+lzCard.innerHTML = `
+  <div class="lvl-card-left">
+    <div class="lvl-card-emoji">📖</div>
+    <div class="lvl-card-num" style="color:#6c63ff">Lv.0</div>
+  </div>
+  <div class="lvl-card-right">
+    <div class="lvl-card-name">Tableau ${alphabetName}</div>
+    <div class="lvl-card-words" style="flex-wrap:wrap;gap:4px">
+      ${currentGroups.map(g=>`<span class="lvl-card-word-chip">${g.label}</span>`).join('')}
     </div>
-    <div class="lvl-card-right">
-      <div class="lvl-card-name">Tableau officiel</div>
-      <div class="lvl-card-words" style="flex-wrap:wrap;gap:4px">
-        ${LEVEL_ZERO_GROUPS.map(g=>`<span class="lvl-card-word-chip">${g.label}</span>`).join('')}
-      </div>
-      <div class="lvl-card-count" style="margin-top:6px">15 groupes · tirage aléatoire ✨</div>
-    </div>`;
-  lzCard.addEventListener('click', showLevelZeroOverlay);
-  scroll.appendChild(lzCard);
-}
+    <div class="lvl-card-count" style="margin-top:6px">${currentGroups.length} groupes · tirage aléatoire ✨</div>
+  </div>`;
+lzCard.addEventListener('click', showLevelZeroOverlay);
+scroll.appendChild(lzCard);
   ACTIVE_LEVELS.forEach((lvl, i) => {
     // Astuce : on différencie les scores du Lv1 Hiragana et Lv1 Katakana
     const scoreId = currentAlphabet === 'katakana' ? `${lvl.id}_kata` : lvl.id;
@@ -7694,6 +7780,7 @@ const LEVEL_ZERO_IDX = 9999;  // index virtuel sentinel
 
 // Construit la grille de groupes dans l'overlay
 function buildLevelZeroGrid() {
+  const groups = currentAlphabet === 'hiragana' ? LEVEL_ZERO_GROUPS : LEVEL_ZERO_GROUPS_KATA;
   const colorMaps = {
     base: ['#4d96ff','#00c8e8','#6bcb77','#ffbe0b','#ff8c42','#2ec4b6','#44ccff','#aadc00','#ff6b9d','#7b61ff'],
     daku: ['#c77dff','#a855f7','#e040fb','#9b52d6'],
@@ -7703,7 +7790,7 @@ function buildLevelZeroGrid() {
     const gridEl = document.getElementById(`lz-grid-${type === 'base' ? 'base' : type === 'daku' ? 'daku' : 'han'}`);
     gridEl.innerHTML = '';
     const palette = colorMaps[type];
-    LEVEL_ZERO_GROUPS.filter(g => g.type === type).forEach((grp, i) => {
+    groups.filter(g => g.type === type).forEach((grp, i) => {
       const btn = document.createElement('button');
       btn.className = 'lz-btn';
       btn.style.setProperty('--lz-color', palette[i % palette.length]);
@@ -7729,8 +7816,12 @@ function hideLevelZeroOverlay() {
 
 // Pioche 5 mots depuis ALL_LEVELS + LEVEL_ZERO_EXTRA_WORDS contenant au moins un kana du groupe
 function _pickLevelZeroWords(groupId) {
-  const grp = LEVEL_ZERO_GROUPS.find(g => g.id === groupId);
-  if (!grp) return [];
+const groups = currentAlphabet === 'hiragana' ? LEVEL_ZERO_GROUPS : LEVEL_ZERO_GROUPS_KATA;
+const levels = currentAlphabet === 'hiragana' ? ALL_LEVELS : ALL_LEVELS_KATA;
+const extras = currentAlphabet === 'hiragana' ? LEVEL_ZERO_EXTRA_WORDS : LEVEL_ZERO_EXTRA_WORDS_KATA;
+
+const grp = groups.find(g => g.id === groupId);
+if (!grp) return [];
   const kanas = grp.kanas;
   const kanaSet = new Set(kanas);
 
@@ -7738,7 +7829,7 @@ function _pickLevelZeroWords(groupId) {
   const seen = new Set();
   const pool2k = []; // mots de exactement 2 kanas
   const pool3k = []; // mots de exactement 3 kanas
-  [...ALL_LEVELS, {words: LEVEL_ZERO_EXTRA_WORDS}].forEach(lv => {
+  [...levels, {words: extras}].forEach(lv => {
     if (!lv || !lv.words) return;
     lv.words.forEach(w => {
       if (seen.has(w.kana)) return;
@@ -7810,7 +7901,8 @@ function _pickLevelZeroWords(groupId) {
 }
 function selectLevelZeroGroup(groupId) {
   _levelZeroGroupId = groupId;
-  const grp = LEVEL_ZERO_GROUPS.find(g => g.id === groupId);
+  const groups = currentAlphabet === 'hiragana' ? LEVEL_ZERO_GROUPS : LEVEL_ZERO_GROUPS_KATA;
+const grp = groups.find(g => g.id === groupId);
   const words = _pickLevelZeroWords(groupId);
 
   if (words.length === 0) {
@@ -11098,9 +11190,10 @@ function updateQuizLists() {
   const seenKana = new Set();
   const kanaList = [];
   const smallKana = new Set(['ゃ','ゅ','ょ','っ','ぁ','ぃ','ぅ','ぇ','ぉ', 'ャ','ュ','ョ','ッ','ァ','ィ','ゥ','ェ','ォ','ー']);
+  const yoonKana = new Set(['ゃ','ゅ','ょ','ぁ','ぃ','ぅ','ぇ','ぉ', 'ャ','ュ','ョ','ァ','ィ','ゥ','ェ','ォ']); // Ajout ici
   
-  // ⚠️ FIX : On englobe tout, y compris le Level 0
-  const levelsToMap = [...ACTIVE_LEVELS, { words: LEVEL_ZERO_EXTRA_WORDS }];
+  const extras = currentAlphabet === 'hiragana' ? LEVEL_ZERO_EXTRA_WORDS : LEVEL_ZERO_EXTRA_WORDS_KATA;
+  const levelsToMap = [...ACTIVE_LEVELS, { words: extras }];
 
   levelsToMap.forEach((lv, levelIndex) => { 
     if (!lv || !lv.words) return;
@@ -11109,7 +11202,8 @@ function updateQuizLists() {
       let i = 0;
       while(i < chars.length){
         let token = chars[i];
-        if(i+1 < chars.length && smallKana.has(chars[i+1])){
+        // On utilise yoonKana ici au lieu de smallKana
+        if(i+1 < chars.length && yoonKana.has(chars[i+1])){
           token = chars[i] + chars[i+1];
           i += 2;
         } else { i++; }
@@ -11174,14 +11268,17 @@ function _quizInitQueue() {
   // =========================================================
   // 🎯 CAS SPÉCIAL : LEVEL 0 (Logique séquentielle par groupe)
   // =========================================================
-  if (pendingLevelIdx === LEVEL_ZERO_IDX) {
+if (pendingLevelIdx === LEVEL_ZERO_IDX) {
     let newQueue = [];
     
+    // SÉLECTION DU BON ALPHABET POUR LE LEVEL 0
+    const activeLevelZeroGroups = currentAlphabet === 'hiragana' ? LEVEL_ZERO_GROUPS : LEVEL_ZERO_GROUPS_KATA;
+    
     // 1. Trouver l'index du groupe de départ (celui cliqué par l'utilisateur)
-    const startIdx = LEVEL_ZERO_GROUPS.findIndex(g => g.id === _levelZeroGroupId);
+    const startIdx = activeLevelZeroGroups.findIndex(g => g.id === _levelZeroGroupId);
     
     // 2. On récupère ce groupe et tous les suivants dans l'ordre officiel
-    const groupsToPlay = LEVEL_ZERO_GROUPS.slice(startIdx !== -1 ? startIdx : 0);
+    const groupsToPlay = activeLevelZeroGroups.slice(startIdx !== -1 ? startIdx : 0);
 
     if (_quizMode === 'hiragana') {
       // --- MODE KANA LEVEL 0 ---
@@ -11665,15 +11762,17 @@ const STATS_GOJUUON_KATA = [
 // Set global pour savoir quels Kana sont vraiment testables dans tous tes niveaux combinés
 const ALL_TESTABLE_KANA = new Set();
 // ⚠️ FIX : On ajoute {words: LEVEL_ZERO_EXTRA_WORDS} dans le tableau
-[...ALL_LEVELS, ...ALL_LEVELS_KATA, {words: LEVEL_ZERO_EXTRA_WORDS}].forEach(lv => {
+[...ALL_LEVELS, ...ALL_LEVELS_KATA, {words: LEVEL_ZERO_EXTRA_WORDS}, {words: LEVEL_ZERO_EXTRA_WORDS_KATA}].forEach(lv => {
   if (!lv || !lv.words) return; 
   lv.words.forEach(w => {
      const chars = [...w.kana];
      const smallKana = new Set(['ゃ','ゅ','ょ','っ','ぁ','ぃ','ぅ','ぇ','ぉ', 'ャ','ュ','ョ','ッ','ァ','ィ','ゥ','ェ','ォ','ー']);
+     const yoonKana = new Set(['ゃ','ゅ','ょ','ぁ','ぃ','ぅ','ぇ','ぉ', 'ャ','ュ','ョ','ァ','ィ','ゥ','ェ','ォ']); // Uniquement les digraphes
      let i = 0;
      while(i < chars.length){
         let token = chars[i];
-        if(i+1 < chars.length && smallKana.has(chars[i+1])){ token += chars[i+1]; i+=2; } else { i++; }
+        // On ne fusionne que les digraphes (Yoon), on ne fusionne plus ー et ッ avec leur lettre parente !
+        if(i+1 < chars.length && yoonKana.has(chars[i+1])){ token += chars[i+1]; i+=2; } else { i++; }
         if(!smallKana.has(token)) ALL_TESTABLE_KANA.add(token);
      }
   });
@@ -11774,7 +11873,7 @@ function _statsRenderVocab(){
   
   const vocabMap = new Map();
   // ⚠️ FIX : On ajoute {words: LEVEL_ZERO_EXTRA_WORDS} ici aussi
-  [...ALL_LEVELS, ...ALL_LEVELS_KATA, {words: LEVEL_ZERO_EXTRA_WORDS}].forEach(lv => {
+  [...ALL_LEVELS, ...ALL_LEVELS_KATA, {words: LEVEL_ZERO_EXTRA_WORDS}, {words: LEVEL_ZERO_EXTRA_WORDS_KATA}].forEach(lv => {
     if (!lv || !lv.words) return; 
     lv.words.forEach(w => {
       if(!vocabMap.has(w.emoji)) {
