@@ -753,7 +753,7 @@ body::before {
 }
 #lz-header {
   flex-shrink: 0;
-  padding: clamp(6px,1.5dvh,12px) 16px 6px;
+  padding: clamp(18px,5dvh,32px) 16px clamp(4px,1.5dvh,10px);
   display: flex; flex-direction: column; align-items: center; gap: 2px;
 }
 #lz-header .logo-wrap {
@@ -827,6 +827,7 @@ body::before {
   color: color-mix(in srgb, var(--lz-color) 70%, #1a1040);
   letter-spacing: .05em;
   flex-shrink: 0;
+  white-space: nowrap;
   position: relative; z-index: 1;
   text-shadow: 0 1px 3px rgba(0,0,0,.1);
 }
@@ -839,6 +840,13 @@ body::before {
   text-align: right;
   position: relative; z-index: 1;
   text-shadow: 0 1px 4px rgba(0,0,0,.12);
+}
+.lz-btn-romaji {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.00em;
+  font-weight: 700;
+  opacity: 0.65;
+  white-space: nowrap;
 }
 #lz-back-btn {
   flex-shrink: 0;
@@ -3669,23 +3677,23 @@ const LEVEL_ZERO_EXTRA_WORDS = [
 // Groupes officiels du tableau des kanas
 const LEVEL_ZERO_GROUPS = [
   // Base
-  {id:'a',   label:'あ行', kanas:['あ','い','う','え','お'], type:'base', color:'#4d96ff'},
-  {id:'ka',  label:'か行', kanas:['か','き','く','け','こ'], type:'base', color:'#4d96ff'},
-  {id:'sa',  label:'さ行', kanas:['さ','し','す','せ','そ'], type:'base', color:'#4d96ff'},
-  {id:'ta',  label:'た行', kanas:['た','ち','つ','て','と'], type:'base', color:'#4d96ff'},
-  {id:'na',  label:'な行', kanas:['な','に','ぬ','ね','の'], type:'base', color:'#4d96ff'},
-  {id:'ha',  label:'は行', kanas:['は','ひ','ふ','へ','ほ'], type:'base', color:'#4d96ff'},
-  {id:'ma',  label:'ま行', kanas:['ま','み','む','め','も'], type:'base', color:'#4d96ff'},
-  {id:'ya',  label:'や行', kanas:['や','ゆ','よ'],           type:'base', color:'#4d96ff'},
-  {id:'ra',  label:'ら行', kanas:['ら','り','る','れ','ろ'], type:'base', color:'#4d96ff'},
-  {id:'wa',  label:'わ行', kanas:['わ','を','ん'],           type:'base', color:'#4d96ff'},
+  {id:'a',   label:'あ', romaji:'a',   kanas:['あ','い','う','え','お'], type:'base', color:'#4d96ff'},
+  {id:'ka',  label:'か', romaji:'ka',  kanas:['か','き','く','け','こ'], type:'base', color:'#4d96ff'},
+  {id:'sa',  label:'さ', romaji:'sa',  kanas:['さ','し','す','せ','そ'], type:'base', color:'#4d96ff'},
+  {id:'ta',  label:'た', romaji:'ta',  kanas:['た','ち','つ','て','と'], type:'base', color:'#4d96ff'},
+  {id:'na',  label:'な', romaji:'na',  kanas:['な','に','ぬ','ね','の'], type:'base', color:'#4d96ff'},
+  {id:'ha',  label:'は', romaji:'ha',  kanas:['は','ひ','ふ','へ','ほ'], type:'base', color:'#4d96ff'},
+  {id:'ma',  label:'ま', romaji:'ma',  kanas:['ま','み','む','め','も'], type:'base', color:'#4d96ff'},
+  {id:'ya',  label:'や', romaji:'ya',  kanas:['や','ゆ','よ'],           type:'base', color:'#4d96ff'},
+  {id:'ra',  label:'ら', romaji:'ra',  kanas:['ら','り','る','れ','ろ'], type:'base', color:'#4d96ff'},
+  {id:'wa',  label:'わ', romaji:'wa',  kanas:['わ','を','ん'],           type:'base', color:'#4d96ff'},
   // Dakuten
-  {id:'ga',  label:'が行', kanas:['が','ぎ','ぐ','げ','ご'], type:'daku', color:'#c77dff'},
-  {id:'za',  label:'ざ行', kanas:['ざ','じ','ず','ぜ','ぞ'], type:'daku', color:'#c77dff'},
-  {id:'da',  label:'だ行', kanas:['だ','ぢ','づ','で','ど'], type:'daku', color:'#c77dff'},
-  {id:'ba',  label:'ば行', kanas:['ば','び','ぶ','べ','ぼ'], type:'daku', color:'#c77dff'},
+  {id:'ga',  label:'が', romaji:'ga',  kanas:['が','ぎ','ぐ','げ','ご'], type:'daku', color:'#c77dff'},
+  {id:'za',  label:'ざ', romaji:'za',  kanas:['ざ','じ','ず','ぜ','ぞ'], type:'daku', color:'#c77dff'},
+  {id:'da',  label:'だ', romaji:'da',  kanas:['だ','ぢ','づ','で','ど'], type:'daku', color:'#c77dff'},
+  {id:'ba',  label:'ば', romaji:'ba',  kanas:['ば','び','ぶ','べ','ぼ'], type:'daku', color:'#c77dff'},
   // Handakuten
-  {id:'pa',  label:'ぱ行', kanas:['ぱ','ぴ','ぷ','ぺ','ぽ'], type:'han',  color:'#ff6b6b'},
+  {id:'pa',  label:'ぱ', romaji:'pa',  kanas:['ぱ','ぴ','ぷ','ぺ','ぽ'], type:'han',  color:'#ff6b6b'},
 ];
 const ALL_LEVELS=[
   {id:1,theme:'Nos Compagnons',clan:'',emoji:'🐱',color:'#ffaa7a',words:[
@@ -7699,7 +7707,8 @@ function buildLevelZeroGrid() {
       const btn = document.createElement('button');
       btn.className = 'lz-btn';
       btn.style.setProperty('--lz-color', palette[i % palette.length]);
-      btn.innerHTML = `<span class="lz-btn-kanas">${grp.kanas.join('\u2009')}</span><span class="lz-btn-label">${grp.label}</span>`;
+      const romajis = grp.kanas.map(k => {const m={あ:'a',い:'i',う:'u',え:'e',お:'o',か:'ka',き:'ki',く:'ku',け:'ke',こ:'ko',さ:'sa',し:'shi',す:'su',せ:'se',そ:'so',た:'ta',ち:'chi',つ:'tsu',て:'te',と:'to',な:'na',に:'ni',ぬ:'nu',ね:'ne',の:'no',は:'ha',ひ:'hi',ふ:'fu',へ:'he',ほ:'ho',ま:'ma',み:'mi',む:'mu',め:'me',も:'mo',や:'ya',ゆ:'yu',よ:'yo',ら:'ra',り:'ri',る:'ru',れ:'re',ろ:'ro',わ:'wa',を:'wo',ん:'n',が:'ga',ぎ:'gi',ぐ:'gu',げ:'ge',ご:'go',ざ:'za',じ:'ji',ず:'zu',ぜ:'ze',ぞ:'zo',だ:'da',ぢ:'di',づ:'du',で:'de',ど:'do',ば:'ba',び:'bi',ぶ:'bu',べ:'be',ぼ:'bo',ぱ:'pa',ぴ:'pi',ぷ:'pu',ぺ:'pe',ぽ:'po'};return m[k]||k;});
+btn.innerHTML = `<span class="lz-btn-kanas">${grp.kanas.join('\u2009')}<span class="lz-btn-romaji"> (${romajis.join(' ')})</span></span>`;
       btn.addEventListener('click', () => selectLevelZeroGroup(grp.id));
       gridEl.appendChild(btn);
     });
