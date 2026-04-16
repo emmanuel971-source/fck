@@ -10794,7 +10794,7 @@ function _wofFmtDate(iso){
 }
 function _wofPodSlot(e,cls,num,medal){
   if(!e)return'<div class="wof-pod '+cls+'"><div class="wof-pod-info"><div class="wof-pod-name" style="opacity:.3">—</div></div><div class="wof-pod-block"><div class="wof-pod-medal">'+medal+'</div><div class="wof-pod-rank">'+num+'</div></div></div>';
-  const lv=ALL_LEVELS.find(l=>l.id===e.levelId),em=e.levelEmoji||(lv?lv.emoji:'🎮');
+  const lv=ALL_LEVELS.find(l=> l && l.id===e.levelId),em=e.levelEmoji||(lv?lv.emoji:'🎮');
   return'<div class="wof-pod '+cls+'"><div class="wof-pod-info"><div class="wof-pod-name">'+(e.name||'Anonyme')+'</div><div class="wof-pod-score">'+((e.score||0).toLocaleString('fr-FR'))+'</div><div class="wof-pod-lvl">'+em+' Lv.'+(e.levelId||'?')+'</div></div><div class="wof-pod-block"><div class="wof-pod-medal">'+medal+'</div><div class="wof-pod-rank">'+num+'</div></div></div>';
 }
 // ── Scores génériques pré-remplis au premier lancement ──
@@ -10882,7 +10882,7 @@ function _wofRender(hiIdx){
   }
   hs.slice(3).forEach((e,i)=>{
     const rank=i+4,mine=hiIdx!==undefined&&rank-1===hiIdx;
-    const lv=ALL_LEVELS.find(l=>l.id===e.levelId),em=e.levelEmoji||(lv?lv.emoji:'🎮');
+    const lv=ALL_LEVELS.find(l=> l && l.id===e.levelId),em=e.levelEmoji||(lv?lv.emoji:'🎮');
     const row=document.createElement('div');
     row.className='wof-row'+(mine?' wof-mine wof-new-entry':'');
     row.style.setProperty('--ws',(i*.15).toFixed(2)+'s');
@@ -10991,7 +10991,7 @@ const _origSSB=KS.saveSoloBest.bind(KS);
 KS.saveSoloBest=function(levelId,score,name){
   const r=_origSSB(levelId,score,name);
   if(KS.isHighscore(score)){
-    const lv=ALL_LEVELS.find(l=>l.id===levelId)||ALL_LEVELS_KATA.find(l=>l.id===levelId);
+    const lv=ALL_LEVELS.find(l=> l && l.id===levelId)||ALL_LEVELS_KATA.find(l=> l && l.id===levelId);
     setTimeout(()=>{
       // Marquer qu'on vient du débrief (victory-overlay toujours visible)
       _wofFromVictory = !document.getElementById('victory-overlay').classList.contains('hidden');
