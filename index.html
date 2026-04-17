@@ -2995,6 +2995,12 @@ body:has(#tuto-overlay:not(.hidden)) #bot-ui {
   /* Une lueur un peu plus vive pour indiquer qu'il est actif */
   box-shadow: 0 4px 24px rgba(168,85,247,.7), 0 0 0 3px rgba(168,85,247,.4) !important;
 }
+.femoji {
+  width: 1.2em;
+  height: 1.2em;
+  vertical-align: middle;
+  object-fit: contain;
+}
 </style>
 </head>
 <body>
@@ -3532,7 +3538,21 @@ function _emojiToCP(emoji) {
 }
 
 const FLUENT_BASE = 'https://uwx.github.io/fluentui-twemoji-3d/export/3D_png/72x72/';
-function _fluentUrl(emoji) { return FLUENT_BASE + _emojiToCP(emoji) + '.png'; }
+
+// ── Custom emoji overrides ──────────────────────────────────────────
+const CUSTOM_EMOJI_BASE = 'img/emoji-custom/';
+const _customEmojiMap = {
+  'tsuna': 'tsuna',   // thon      🐟
+  // ajoute tes autres remplacements ici au fur et à mesure
+};
+// ───────────────────────────────────────────────────────────────────
+
+function _fluentUrl(emoji, romaji) {
+  if (romaji && _customEmojiMap[romaji]) {
+    return CUSTOM_EMOJI_BASE + _customEmojiMap[romaji] + '.png';
+  }
+  return FLUENT_BASE + _emojiToCP(emoji) + '.png';
+}
 
 // Cache des emojis dont l'image est absente → repli sur l'emoji natif
 // Pré-rempli avec les emojis Unicode 15.0+ absents du repo fluentui-twemoji-3d
@@ -3544,7 +3564,7 @@ function _isEmoji(g) {
   if (g.length === 1 && g.codePointAt(0) < 127) return false;
   return _emojiRe.test(g);
 }
-
+// ─
 // Remplace les emojis dans un élément DOM par des images Fluent 3D.
 // Ne touche QUE les textNodes directs des éléments non encore traités (data-fd).
 // L'attribut data-fd sur le PARENT évite de retraiter le même noeud.
@@ -7146,7 +7166,7 @@ document.getElementById('shell').classList.remove('hidden');
       const row=document.createElement('div');
       row.className='word-row'+(w.boss?' boss':'');
       row.id='wr-'+w.kana;
-      row.innerHTML=`<div class="wr-emoji">${w.emoji}</div><div class="wr-info"><span class="wr-kana">${w.kana}</span><span class="wr-romaji">${w.romaji}</span><span class="wr-meaning">${w.meaning}</span></div><div class="wr-mult" id="wm-${w.kana}">${badge}</div>`;
+      row.innerHTML=`<div class="wr-emoji"><img src="${_fluentUrl(w.emoji, w.romaji)}" class="femoji" alt="${w.emoji}" onerror="this.replaceWith(document.createTextNode('${w.emoji}'))"></div><div class="wr-info"><span class="wr-kana">${w.kana}</span><span class="wr-romaji">${w.romaji}</span><span class="wr-meaning">${w.meaning}</span></div><div class="wr-mult" id="wm-${w.kana}">${badge}</div>`;
       wp.appendChild(row);
     });
     if(typeof fluent==='function') setTimeout(()=>fluent(wp),60);
@@ -7466,7 +7486,7 @@ function showModeSelect(levelIdx){
   if(btnVsBot) btnVsBot.style.display = hasBattleRoom ? '' : 'none';
   pendingLevelIdx=levelIdx;
   const lvl = ACTIVE_LEVELS[levelIdx];
-  const fUrl = _fluentUrl(lvl.emoji);
+  const fUrl = _fluentUrl(lvl.emoji, lvl.romaji);
   document.getElementById('mode-level-name').innerHTML =
     `<img src="${fUrl}" class="femoji" alt="${lvl.emoji}" style="width:clamp(32px,9vw,44px);height:clamp(32px,9vw,44px);vertical-align:middle;filter:drop-shadow(0 3px 8px rgba(0,0,0,.18))" onerror="this.replaceWith(document.createTextNode('${lvl.emoji}'))"> ${lvl.theme}`;
   
@@ -8225,7 +8245,7 @@ function renderPanel(){
       const row=document.createElement('div');
       row.className='word-row'+(w.boss?' boss':'');
       row.id='wr-'+w.kana;
-      row.innerHTML=`<div class="wr-emoji">${w.emoji}</div><div class="wr-info"><span class="wr-kana">${w.kana}</span><span class="wr-romaji">${w.romaji}</span><span class="wr-meaning">${w.meaning}</span></div><div class="wr-mult" id="wm-${w.kana}">×${w.mult||1}</div>`;
+      row.innerHTML = `<div class="wr-emoji"><img src="${_fluentUrl(w.emoji, w.romaji)}" class="femoji" alt="${w.emoji}"></div><div class="wr-info"><span class="wr-kana">${w.kana}</span><span class="wr-romaji">${w.romaji}</span><span class="wr-meaning">${w.meaning}</span></div><div class="wr-mult" id="wm-${w.kana}">×${w.mult||1}</div>`;
       dom.wordPanelEl.appendChild(row);
     });
     // Fluent 3D sur les emojis du word-panel
@@ -11408,7 +11428,7 @@ function _quizRender(){
     // MODE VOCAB : afficher le grand emoji
     card.className='emoji-mode';
     // Au lieu de : card.textContent = item.emoji;
-const fUrl = _fluentUrl(item.emoji);
+const fUrl = _fluentUrl(item.emoji, item.romaji);
 card.innerHTML = `<img src="${fUrl}" class="femoji" alt="${item.emoji}" style="width:1em;height:1em" onerror="this.replaceWith(document.createTextNode('${item.emoji}'))">`;
     card.style.fontSize='';
     card.style.background='transparent';
@@ -11616,7 +11636,7 @@ function _quizReveal(choiceIdx){
 
     setTimeout(()=>{
       card.className='emoji-mode';
-     const fUrl = _fluentUrl(exWord.emoji);
+     const fUrl = _fluentUrl(exWord.emoji, exWord.romaji);
 card.innerHTML = `<img src="${fUrl}" class="femoji" alt="${exWord.emoji}" style="width:1em;height:1em" onerror="this.replaceWith(document.createTextNode('${exWord.emoji}'))">`;
       card.style.fontSize='';
       card.style.background='transparent';
@@ -11871,20 +11891,20 @@ function _statsRender(){
 function _statsRenderVocab(){
   const stats=KS.getVocabStats();
   
-  const vocabMap = new Map();
-  // ⚠️ FIX : On ajoute {words: LEVEL_ZERO_EXTRA_WORDS} ici aussi
-  [...ALL_LEVELS, ...ALL_LEVELS_KATA, {words: LEVEL_ZERO_EXTRA_WORDS}, {words: LEVEL_ZERO_EXTRA_WORDS_KATA}].forEach(lv => {
-    if (!lv || !lv.words) return; 
-    lv.words.forEach(w => {
-      if(!vocabMap.has(w.emoji)) {
-        vocabMap.set(w.emoji, { emoji: w.emoji, meanings: new Set(), hira: null, kata: null });
-      }
-      const entry = vocabMap.get(w.emoji);
-      entry.meanings.add(w.meaning);
-      if (w.kana.match(/[ア-ン]/)) entry.kata = w.kana;
-      else entry.hira = w.kana;
-    });
+// Après — clé w.meaning (unique par mot), romaji stocké
+const vocabMap = new Map();
+[...ALL_LEVELS, ...ALL_LEVELS_KATA, {words: LEVEL_ZERO_EXTRA_WORDS}, {words: LEVEL_ZERO_EXTRA_WORDS_KATA}].forEach(lv => {
+  if (!lv || !lv.words) return;
+  lv.words.forEach(w => {
+    if(!vocabMap.has(w.meaning)) {
+      vocabMap.set(w.meaning, { emoji: w.emoji, romaji: w.romaji, meanings: new Set(), hira: null, kata: null });
+    }
+    const entry = vocabMap.get(w.meaning);
+    entry.meanings.add(w.meaning);
+    if (w.kana.match(/[ア-ン]/)) entry.kata = w.kana;
+    else entry.hira = w.kana;
   });
+});
 
   const uniqueVocab = Array.from(vocabMap.values());
   let totalTests=0,totalCorrect=0,mastered=0,bestStreak=0;
@@ -11933,7 +11953,7 @@ const cell=document.createElement('div');
     if(t>0){ const r=c/t; sc=r>=0.8?'mastered':r>=0.4?'learning':'struggling'; pt=Math.round(r*100)+'%'; }
     cell.classList.add(sc);
     
-    const fUrl=typeof _fluentUrl==='function'?_fluentUrl(v.emoji):'';
+    const fUrl=typeof _fluentUrl==='function'?_fluentUrl(v.emoji, v.romaji):'';
     
     // <-- Hauteur ET largeur fixées, image centrée -->
     const eImg=fUrl?`<img src="${fUrl}" alt="${v.emoji}" style="width:clamp(44px,11vw,56px);height:clamp(44px,11vw,56px);object-fit:contain;display:block;margin:0 auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`:'';
@@ -11962,7 +11982,7 @@ function _statsShowTooltip(e, kana, s, vocabEntry){
   
   if(vocabEntry) {
     // Mode Vocabulaire : afficher l'émoji + les deux écritures si elles existent
-    const fUrl = typeof _fluentUrl==='function' ? _fluentUrl(vocabEntry.emoji) : '';
+    const fUrl = typeof _fluentUrl==='function' ? _fluentUrl(vocabEntry.emoji, vocabEntry.romaji) : '';
     const imgHtml = fUrl ? `<img src="${fUrl}" class="femoji" alt="${vocabEntry.emoji}" style="width:1em;height:1em;vertical-align:middle" onerror="this.replaceWith(document.createTextNode('${vocabEntry.emoji}'))">` : vocabEntry.emoji;
     
     let wordsHtml = '';
@@ -12020,7 +12040,7 @@ function _statsShowTooltip(e, kana, s, vocabEntry){
   // 1. Construction de l'en-tête (Mode Vocabulaire ou Mode Kana)
   let headerHtml = '';
   if(vocabEntry) {
-    const fUrl = typeof _fluentUrl==='function' ? _fluentUrl(vocabEntry.emoji) : '';
+    const fUrl = typeof _fluentUrl==='function' ? _fluentUrl(vocabEntry.emoji, vocabEntry.romaji) : '';
     const imgHtml = fUrl ? `<img src="${fUrl}" class="femoji" alt="${vocabEntry.emoji}" style="width:1.2em;height:1.2em;vertical-align:middle" onerror="this.replaceWith(document.createTextNode('${vocabEntry.emoji}'))">` : vocabEntry.emoji;
     
     let wordsHtml = '';
@@ -12357,7 +12377,7 @@ function showVictoryDebrief({ congrats, score, words, btn1Text, btn1Action, isPu
     card.className = 'victory-vocab-card' + (w.boss ? ' boss' : '');
     card.style.animationDelay = `${i * 0.04}s`;
     card.innerHTML = `
-      <span class="vvc-emoji">${w.emoji}</span>
+      <span class="vvc-emoji"><img src="${_fluentUrl(w.emoji, w.romaji)}" class="femoji" alt="${w.emoji}" style="width:1em;height:1em;vertical-align:middle"></span>
       <span class="vvc-kana${w.boss ? ' boss' : ''}">${w.kana}${w.boss ? ' ⭐' : ''}</span>
       <span class="vvc-romaji">${w.romaji}</span>
       <span class="vvc-meaning">${w.meaning}</span>`;
